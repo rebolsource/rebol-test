@@ -2,6 +2,7 @@ datatypes/action.r
 [action? :abs]
 [not action? 1]
 [action! = type? :abs]
+; bug#1659
 ; actions are active
 [1 == do reduce [:abs -1]]
 datatypes/binary.r
@@ -1053,6 +1054,7 @@ datatypes/function.r
 	]
 	f 1
 ]
+; bug#1659
 ; inline function test
 [
 	f: does reduce [does [true]]
@@ -1464,6 +1466,7 @@ datatypes/native.r
 [native? :type?]
 [not native? 1]
 [native! = type? :type?]
+; bug#1659
 ; natives are active
 [same? none! do reduce [:type? make none! none]]
 datatypes/none.r
