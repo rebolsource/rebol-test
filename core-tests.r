@@ -9534,8 +9534,16 @@ Functions/math/sameq.r
 #r3only
 ["foo" = decompress/gzip #{1F8B0800EF46BE4C00034BCBCF07002165738C03000000}]
 functions/context/bind.r
-#bug#1655
+; bug#1655
 [not head? bind next [1] 'rebol]
 functions/file/make-dir.r
 ; bug#1674
-[e: try [make-dir %/folder-to-save-test-files] e/type = 'access]
+[
+	e: try [make-dir %/folder-to-save-test-files]
+	e/type = 'access
+]
+; bug#1666
+[
+	f: does [#]
+	none == f
+]
