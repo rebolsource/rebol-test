@@ -9521,3 +9521,12 @@ Functions/math/sameq.r
 ; bug#1678
 #r3only
 [(checksum/method to-binary "" 'CRC32) = 0
+; bug#1679: "Native GZIP compress/decompress suport"
+#r3only
+["foo" = decompress/gzip compress/gzip "foo"]
+; bug#1679
+#r3only
+[#{1F8B0800EF46BE4C00034BCBCF07002165738C03000000} = compress/gzip "foo"]
+; bug#1679
+#r3only
+["foo" = decompress/gzip #{1F8B0800EF46BE4C00034BCBCF07002165738C03000000}]
