@@ -9515,3 +9515,9 @@ Functions/math/sameq.r
 ; bug#1422: "Rebol crashes when opening the 128th port"
 #r3crash
 [repeat n 200 [try [close open open join tcp://localhost: n]] true]
+; bug#1678: "Can we add CRC-32 as a checksum method?"
+#r3only
+[(checksum/method to-binary "foo" 'CRC32) = -1938594527
+; bug#1678
+#r3only
+[(checksum/method to-binary "" 'CRC32) = 0
