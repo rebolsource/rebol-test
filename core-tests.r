@@ -1567,6 +1567,7 @@ datatypes/paren.r
 	insert/only tail last fact fact
 	24 = do fact
 ]
+; bug#1665
 ; infinite recursion
 [
 	fact: to paren! []
@@ -6490,6 +6491,7 @@ Functions/series/copy.r
 #64bit
 [error? try [copy/part [] 9223372036854775807]]
 [error? try [copy none]]
+; bug#877
 [
 	a: copy []
 	insert/only a a
@@ -7077,6 +7079,7 @@ Functions/convert/mold.r
 	error? try [string? mold a]
 	true
 ]
+; bug#1711
 ; load/next
 [try/except [block? load/next "1"] [true]]
 datatypes/library.r
@@ -9530,3 +9533,6 @@ Functions/math/sameq.r
 ; bug#1679
 #r3only
 ["foo" = decompress/gzip #{1F8B0800EF46BE4C00034BCBCF07002165738C03000000}]
+functions/context/bind.r
+#bug#1655
+[not head? bind next [1] 'rebol]
