@@ -9536,3 +9536,6 @@ Functions/math/sameq.r
 functions/context/bind.r
 #bug#1655
 [not head? bind next [1] 'rebol]
+functions/file/make-dir.r
+; bug#1674
+[e: try [make-dir %/folder-to-save-test-files] e/type = 'access]
