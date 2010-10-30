@@ -1053,11 +1053,10 @@ datatypes/function.r
 	]
 	f 1
 ]
-; nameless function test
+; inline function test
 [
-	f: does reduce [does []]
+	f: does reduce [does [true]]
 	f
-	true
 ]
 ; no-rebind test
 [
@@ -6149,6 +6148,7 @@ Functions/control/try.r
 [error? try [exit]]
 ; testing TRY/EXCEPT
 [try/except [1 / 0] [true]]
+[error? try/except [make error! ""] [0]]
 Functions/control/unless.r
 [
 	success: false
