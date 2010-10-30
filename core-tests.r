@@ -6899,6 +6899,12 @@ Functions/series/ordinals.r
 [8 = eighth [1 2 3 4 5 6 7 8 9 10 11]]
 [9 = ninth [1 2 3 4 5 6 7 8 9 10 11]]
 [10 = tenth [1 2 3 4 5 6 7 8 9 10 11]]
+functions/series/parse.r
+; bug#1672
+[
+	a: [a]
+	error? try [parse [] a]
+]
 Functions/series/pick.r
 #64bit
 [error? try [pick at [1 2 3 4 5] 3 -9223372036854775808]]
@@ -9520,10 +9526,10 @@ Functions/math/sameq.r
 [repeat n 200 [try [close open open join tcp://localhost: n]] true]
 ; bug#1678: "Can we add CRC-32 as a checksum method?"
 #r3only
-[(checksum/method to-binary "foo" 'CRC32) = -1938594527
+[(checksum/method to-binary "foo" 'CRC32) = -1938594527]
 ; bug#1678
 #r3only
-[(checksum/method to-binary "" 'CRC32) = 0
+[(checksum/method to-binary "" 'CRC32) = 0]
 ; bug#1679: "Native GZIP compress/decompress suport"
 #r3only
 ["foo" = decompress/gzip compress/gzip "foo"]
@@ -9545,5 +9551,5 @@ functions/file/make-dir.r
 ; bug#1666
 [
 	f: does [#]
-	none == f
+	# == f
 ]
