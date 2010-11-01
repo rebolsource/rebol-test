@@ -9546,6 +9546,9 @@ Functions/math/sameq.r
 functions/context/bind.r
 ; bug#1655
 [not head? bind next [1] 'rebol]
+functions/file/exists.r
+; bug#1613
+[exists? http://www.rebol.com/index.html]
 functions/file/make-dir.r
 ; bug#1674
 [
