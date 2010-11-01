@@ -2,9 +2,11 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 27-Oct-2010/5:13:12+2:00
+	Date: 1-Nov-2010/13:35:13+1:00
 	Purpose: "Test framework"
 ]
+
+#include-check %line-numberq.r
 
 make object! compose [
 	(unless value? 'transcode [[transcode: :load]])
@@ -17,7 +19,8 @@ make object! compose [
 
 	; counters
 	skipped: none
-	failed: none
+	test-failures: none
+	dialect-failures: none
 	succeeded: none
 
 	failures: none
@@ -101,19 +104,21 @@ make object! compose [
 		test-file [file! url!]
 		emit-test [any-function!]
 		/local flags path position flag source current-dir failure
+		test-file-name
 	] [
 		current-dir: what-dir
 		print ["file:" test-file]
 		log ["^/file: " test-file "^/^/"]
+		test-file-name: test-file
 		if error? try [
 			if file? test-file [
-				test-file: clean-path test-file
+				test-file-name: test-file: clean-path test-file
 				change-dir first split-path test-file
 			]
 			test-file: read test-file
 		] [
-			failed: failed + 1
-			log ["failed, cannot access the file"]
+			dialect-failures: dialect-failures + 1
+			log [{^/"failed, dialect: cannot access the file"^/}]
 		]
 
 		flags: copy []
@@ -139,6 +144,8 @@ make object! compose [
 							case [
 								any [file? path url? path] [
 									parse-test-file path :process-vector
+									print ["file:" test-file-name]
+									log ["^/file: " test-file-name "^/^/"]	
 								]
 								path? path []
 								true [failure: [end skip]]
@@ -149,8 +156,12 @@ make object! compose [
 				any whitespace
 			]
 		] [
-			failed: failed + 1
-			log ["failed, file parsing unsuccessful"]
+			dialect-failures: dialect-failures + 1
+			log [
+				"^/file: " test-file-name
+				" line: " line-number? position
+				{ "failed, dialect: file parsing unsuccessful"^/}
+			]
 		]
 		change-dir current-dir
 	]
@@ -167,7 +178,7 @@ make object! compose [
 		]
 		unless failures [log [source]]
 		if error? try [test-block: load source] [
-			failed: failed + 1
+			test-failures: test-failures + 1
 			log either failures [
 				[source "^/"]
 			] [
@@ -180,7 +191,7 @@ make object! compose [
 			succeeded: succeeded + 1
 			unless failures [log [{ "} test-block {"^/}]]
 		] [
-			failed: failed + 1
+			test-failures: test-failures + 1
 			log either failures [
 				[source "^/"]
 			] [
@@ -207,23 +218,29 @@ make object! compose [
 		log-file: clean-path log-file
 
 		if exists? log-file [delete log-file]
-		succeeded: failed: skipped: 0
+		succeeded: test-failures: dialect-failures: skipped: 0
 
 		parse-test-file file :process-vector
 
 		print ["Done, see the log file:" log-file]
 		print [
+			now
 			rebol/version
-			"Total:" succeeded + failed + skipped
+			"Total:" succeeded + test-failures + dialect-failures + skipped
 			"Succeeded:" succeeded
-			"Failed:" failed
+			"Test failures:" test-failures
+			"Dialect failures:" dialect-failures
 			"Skipped:" skipped
 		]
 		log [
-			"^(line)" rebol/version " "
-			"Total: " succeeded + failed + skipped
+			"^(line)"
+			now
+			" "
+			rebol/version
+			" Total: " succeeded + test-failures + dialect-failures + skipped
 			" Succeeded: " succeeded
-			" Failed: " failed
+			" Test failures: " test-failures
+			" Dialect failures: " dialect-failures
 			" Skipped: " skipped
 		]
 		#[unset!]

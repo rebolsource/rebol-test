@@ -2,11 +2,11 @@ Rebol [
 	Title: "Core tests run"
 	File: %core-tests-run.r
 	Author: "Ladislav Mecir"
-	Date: 29-Oct-2010/16:10:02+2:00
+	Date: 1-Nov-2010/14:21:20+1:00
 	Purpose: "Core tests"
 ]
 
-do %test-framework.r
+include %test-framework.r
 
 ; example doing REBOL/Core tests
 ; using appropriate flags depending on the interpreter version
