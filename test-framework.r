@@ -195,7 +195,7 @@ make object! compose [
 			log either failures [
 				[source "^/"]
 			] [
-				[{ "} test-block {"^/}]
+				compose [{ "} (test-block) {"^/}]
 			]
 		]
 	]
