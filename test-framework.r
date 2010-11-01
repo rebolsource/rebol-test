@@ -2,7 +2,7 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 1-Nov-2010/13:35:13+1:00
+	Date: 1-Nov-2010/18:04:55+1:00
 	Purpose: "Test framework"
 ]
 
@@ -119,6 +119,7 @@ make object! compose [
 		] [
 			dialect-failures: dialect-failures + 1
 			log [{^/"failed, dialect: cannot access the file"^/}]
+			exit
 		]
 
 		flags: copy []
