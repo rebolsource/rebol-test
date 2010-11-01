@@ -2,7 +2,7 @@ Rebol [
 	Title: "Core tests run"
 	File: %core-tests-run.r
 	Author: "Ladislav Mecir"
-	Date: 1-Nov-2010/14:21:20+1:00
+	Date: 1-Nov-2010/23:32:25+1:00
 	Purpose: "Core tests"
 ]
 
@@ -18,7 +18,7 @@ do-core-tests: does [
 		print "Testing..."
 		do-tests/only-failures %core-tests.r flags %cpl
 	] [
-		flags: [#32bit #r3crash #r2only]
+		flags: [#32bit #r3crash #r2only #test3crash]
 		print "Testing..."
 		do-tests/only-failures %core-tests.r flags %cpl
 	]

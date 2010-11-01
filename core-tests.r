@@ -5126,6 +5126,16 @@ Functions/control/catch.r
 		2
 	]
 ]
+#r3only
+; CATCH/QUIT
+[
+	catch/quit [quit]
+	true
+]
+#r3only
+#test3crash
+; bug#851
+[error? try [catch/quit [] do make error! ""]]
 Functions/control/compose.r
 [
 	num: 1
