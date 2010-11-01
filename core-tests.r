@@ -3525,6 +3525,7 @@ Functions/math/round.r
 [$101 == round/half-ceiling $100.5000000001]
 [-$100 == round/half-ceiling -$100]
 [-$100 == round/half-ceiling -$100.5]
+; bug#1471
 [-$101 == round/half-ceiling -$100.5000000001]
 ; round/half-ceiling/to
 [0.0 == round/half-ceiling/to 0.1 -1.0]
