@@ -6814,6 +6814,8 @@ Functions/series/emptyq.r
 	clear head blk
 	empty? blk
 ]
+#r3
+[none? empty? none]
 Functions/series/exclude.r
 [empty? exclude [1 2] [2 1]]
 Functions/series/find.r
@@ -7148,6 +7150,11 @@ Functions/series/insert.r
 	insert/dup a 0 -2147483648
 	empty? a
 ]
+Functions/series/lengthq.r
+; bug#1626: "Allow LENGTH? to take none as an argument, return none"
+; bug#1688: "LENGTH? NONE returns TRUE" (should return NONE)
+#r3
+[none? length? none]
 Functions/series/next.r
 [
 	blk: [1]
