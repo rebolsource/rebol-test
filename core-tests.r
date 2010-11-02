@@ -6166,6 +6166,8 @@ Functions/control/loop.r
 ]
 ; bug#1509
 [loop 1 [error? break/return true false]]
+; bug#1515
+[loop 1 [type? a: break/return true false]]
 ; break return value
 [unset? loop 10 [break]]
 ; break/return return value
