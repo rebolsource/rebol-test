@@ -6164,6 +6164,8 @@ Functions/control/loop.r
 	loop 10 [num: num + 1 break]
 	num = 1
 ]
+; bug#1509
+[loop 1 [error? break/return true false]]
 ; break return value
 [unset? loop 10 [break]]
 ; break/return return value
