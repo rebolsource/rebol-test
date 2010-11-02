@@ -2,11 +2,12 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 2-Nov-2010/3:18:52+1:00
+	Date: 2-Nov-2010/6:27:26+1:00
 	Purpose: "Test framework"
 ]
 
 do %line-numberq.r
+do %catch-any.r
 
 make object! compose [
 	(unless value? 'transcode [[transcode: :load]])
@@ -25,57 +26,29 @@ make object! compose [
 
 	failures: none
 
-	do-block: func [
-		{Evaluate a block, helper function for DO-TEST.}
-		block "block to evaluate"
-		result [word!] "will contain the result"
-		test-out [word!]
-	] [
-		error? set/any result do block
-		set test-out "test done"
-	]
-
-	; if catch/quit is available, use it as a guard
-	inner-block: [
-		error? catch [
-			error? loop 1 [
-				error? error: try [
-					do-block block 'result 'test-out
-					unless test-out [
-						test-out: "return/exit out of the test code"
-					]
-				]
-				unless test-out [test-out: "error was caused in the test code"]
-			]
-			unless test-out [
-				test-out: "break or continue out of the test code"
-			]
-		]
-		unless test-out [test-out: "throw out of the test code"]
-	]
-	unless error? try [catch/quit []] [
-		inner-block: compose/deep [
-			catch/quit [(inner-block)]
-			unless test-out [test-out: "quit out of the test code"]
-		]
+	exceptions: make object! [
+		return: "return/exit out of the test code"
+		error: "error was caused in the test code"
+		break: "break or continue out of the test code"
+		throw: "throw out of the test code"
+		quit: "quit out of the test code"
 	]
 
 	do-test: func [
 		{
 			Evaluate BLOCK. Guard against "Throw out", "Break out",
-			"Exit out", "Quit out" and "ordinary" errors.
+			"Exit out", "Quit out" and "triggered" errors.
 		}
 		[throw]
 		block [block!] {Block to evaluate}
-		/local result test-out error
-	] append inner-block [
+		/local result exception
+	] [
+		error? set/any 'result catch-any block 'exception
 		case [
-			test-out <> "test done" [reduce ["failed, " test-out]]
-			not value? 'result [["failed, returned #[unset!]"]]
-			error? :result [["failed, returned error"]]
-			not logic? :result [["failed, not a logic value"]]
-			:result [["succeeded"]]
-			true [["failed"]]
+			exception [rejoin ["failed, " exceptions/:exception]]
+			not logic? get/any 'result ["failed, not a logic value"]
+			:result ["succeeded"]
+			true ["failed"]
 		]
 	]
 
@@ -188,7 +161,7 @@ make object! compose [
 			exit
 		]
 		test-block: do-test test-block
-		either test-block = ["succeeded"] [
+		either test-block = "succeeded" [
 			succeeded: succeeded + 1
 			unless failures [log [{ "} test-block {"^/}]]
 		] [
@@ -196,7 +169,7 @@ make object! compose [
 			log either failures [
 				[source "^/"]
 			] [
-				compose [{ "} (test-block) {"^/}]
+				reduce [{ "} test-block {"^/}]
 			]
 		]
 	]
