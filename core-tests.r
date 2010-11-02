@@ -6534,11 +6534,14 @@ Functions/control/while.r
 	while [true] [num: 1 break num: 2]
 	num = 1
 ]
-; Test that return stops the loop
+; Test that RETURN stops the loop
 [
 	f1: does [while [true] [return 1]]
 	1 = f1
 ]
+; bug#1519
+; Test that RETURN stops the loop
+[do does [while [return true] [return false]]]
 #r3only
 ; Test that errors do not stop the loop and errors can be returned
 [
