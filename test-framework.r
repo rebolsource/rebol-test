@@ -2,11 +2,11 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 1-Nov-2010/18:04:55+1:00
+	Date: 2-Nov-2010/3:18:52+1:00
 	Purpose: "Test framework"
 ]
 
-#include-check %line-numberq.r
+do %line-numberq.r
 
 make object! compose [
 	(unless value? 'transcode [[transcode: :load]])
