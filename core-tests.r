@@ -2926,6 +2926,7 @@ Functions/math/complement.r
 	(make bitset! #{0000000000000000000000000000000000000000000000000000000000000000})
 		= complement make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
 ]
+; bug#1706
 ; image
 [(make image! [1x1 #{000000}]) = complement make image! [1x1 #{ffffff} #{ff}]]
 [(make image! [1x1 #{ffffff} #{ff}]) = complement make image! [1x1 #{000000}]]
