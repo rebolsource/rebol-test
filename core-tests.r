@@ -9917,6 +9917,7 @@ functions/file/make-dir.r
 	e/type = 'access
 ]
 ; bug#1666
+; bug#1650
 [
 	f: does [#]
 	# == f
