@@ -2,7 +2,7 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 2-Nov-2010/6:27:26+1:00
+	Date: 2-Nov-2010/11:43:12+1:00
 	Purpose: "Test framework"
 ]
 
@@ -32,24 +32,6 @@ make object! compose [
 		break: "break or continue out of the test code"
 		throw: "throw out of the test code"
 		quit: "quit out of the test code"
-	]
-
-	do-test: func [
-		{
-			Evaluate BLOCK. Guard against "Throw out", "Break out",
-			"Exit out", "Quit out" and "triggered" errors.
-		}
-		[throw]
-		block [block!] {Block to evaluate}
-		/local result exception
-	] [
-		error? set/any 'result catch-any block 'exception
-		case [
-			exception [rejoin ["failed, " exceptions/:exception]]
-			not logic? get/any 'result ["failed, not a logic value"]
-			:result ["succeeded"]
-			true ["failed"]
-		]
 	]
 
 	whitespace: charset [#"^A" - #" " "^(7F)^(A0)"]
@@ -144,12 +126,13 @@ make object! compose [
 	process-vector: func [
 		flags [block!]
 		source [string!]
-		/local test-block
+		/local test-block exception
 	] [
 		unless empty? exclude flags allowed-flags [
 			skipped: skipped + 1
 			exit
 		]
+
 		unless failures [log [source]]
 		if error? try [test-block: load source] [
 			test-failures: test-failures + 1
@@ -160,7 +143,15 @@ make object! compose [
 			]
 			exit
 		]
-		test-block: do-test test-block
+
+		error? set/any 'test-block catch-any test-block 'exception
+		test-block: case [
+			exception [rejoin ["failed, " exceptions/:exception]]
+			not logic? get/any 'test-block ["failed, not a logic value"]
+			:test-block ["succeeded"]
+			true ["failed"]
+		]
+
 		either test-block = "succeeded" [
 			succeeded: succeeded + 1
 			unless failures [log [{ "} test-block {"^/}]]
