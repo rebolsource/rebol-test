@@ -6618,6 +6618,7 @@ Functions/define/use.r
 		2
 	]
 ]
+; bug#539
 ; RETURN out of USE
 [
 	f: func [] [
@@ -6625,6 +6626,15 @@ Functions/define/use.r
 		2
 	]
 	1 = f
+]
+; bug#539
+; EXIT out of USE
+[
+	f: func [] [
+		use [] [exit]
+		42
+	]
+	unset? f
 ]
 Functions/define/valueq.r
 [false == value? 'nonsense]
