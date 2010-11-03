@@ -803,18 +803,19 @@ datatypes/error.r
 #r3only
 ; error that does not exist
 [try/except [make error! [type: 'script id: 'set-self]] [true]]
+; throw errors cannot be made
 #r3only
-[error? make error! [type: 'throw id: 'break]]
+[try/except [make error! [type: 'throw id: 'break]] [true]]
 #r3only
-[error? make error! [type: 'throw id: 'return]]
+[try/except [make error! [type: 'throw id: 'return]] [true]]
 #r3only
-[error? make error! [type: 'throw id: 'throw]]
+[try/except [make error! [type: 'throw id: 'throw]] [true]]
 #r3only
-[error? make error! [type: 'throw id: 'continue]]
+[try/except [make error! [type: 'throw id: 'continue]] [true]]
 #r3only
-[error? make error! [type: 'throw id: 'halt]]
+[try/except [make error! [type: 'throw id: 'halt]] [true]]
 #r3only
-[error? make error! [type: 'throw id: 'quit]]
+[try/except [make error! [type: 'throw id: 'quit]] [true]]
 #r3only
 [error? make error! [type: 'note id: 'no-load]]
 #r3only
@@ -2918,13 +2919,25 @@ Functions/math/complement.r
 #r2only
 ["^(01)" = complement "^(fe)"]
 ; bitset
+#r2only
 [
 	(make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF})
 		= complement make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
 ]
+#r2only
 [
 	(make bitset! #{0000000000000000000000000000000000000000000000000000000000000000})
 		= complement make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+]
+[not find complement charset "b" #"b"]
+[find complement charset "a" #"b"]
+[
+	a: make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
+	a == complement complement a
+]
+[
+	a: make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+	a == complement complement a
 ]
 ; bug#1706
 ; image
@@ -3291,13 +3304,23 @@ Functions/math/negate.r
 [-1:01 = negate 1:01]
 [1:01 = negate -1:01]
 ; bitset
+#r2only
 [
 	(make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF})
 		= negate make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
 ]
+#r2only
 [
 	(make bitset! #{0000000000000000000000000000000000000000000000000000000000000000})
 		= negate make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+]
+[
+	a: make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+	a == negate negate a
+]
+[
+	a: make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
+	a == negate negate a
 ]
 Functions/math/negativeq.r
 [not negative? 0]
@@ -5068,6 +5091,7 @@ Functions/control/catch.r
 [unset? catch [throw ()]]
 [error? catch [throw try [1 / 0]]]
 [1 = catch [throw 1]]
+; bug#1509
 [1 = catch [type? throw 1]]
 ; catch/name results
 [unset? catch/name [] 'catch]
@@ -5195,6 +5219,25 @@ Functions/control/continue.r
 [
 	success: true
 	loop 1 [continue success: false]
+	success
+]
+#r3only
+[
+	success: true
+	repeat i 1 [continue success: false]
+	success
+]
+#r3only
+[
+	success: true
+	cycle?: true
+	while [cycle?] [cycle?: false continue success: false]
+	success
+]
+#r3only
+[
+	success: true
+	foreach i [1] [continue success: false]
 	success
 ]
 Functions/control/disarm.r
@@ -5425,6 +5468,11 @@ Functions/control/do.r
 [
 	f1: does [do [return 1 2] 2]
 	1 = f1
+]
+; bug#539
+[
+	f1: does [do "return 1 2" 2]
+	1 = f1	
 ]
 ; THROW stops evaluation
 [
@@ -5689,6 +5737,7 @@ Functions/control/for.r
 	]
 ]
 #64bit
+; bug#1136
 [
 	num: 0
 	for i 9223372036854775807 9223372036854775807 1 [
@@ -5704,6 +5753,7 @@ Functions/control/for.r
 	]
 ]
 #64bit
+; bug#1136
 [
 	num: 0
 	for i -9223372036854775808 -9223372036854775808 -1 [
@@ -6822,7 +6872,7 @@ Functions/series/emptyq.r
 	empty? blk
 ]
 #r3
-[none? empty? none]
+[empty? none]
 Functions/series/exclude.r
 [empty? exclude [1 2] [2 1]]
 Functions/series/find.r
@@ -7003,6 +7053,7 @@ Functions/series/insert.r
 	insert a #"0"
 	a == <0>
 ]
+; bug#854
 [
 	a: <0>
 	b: make tag! 0
@@ -7601,8 +7652,10 @@ datatypes/percent.r
 [-1% = load mold -1.0%]
 #r3only
 ; 64-bit IEEE 754 maximum
+; bug#1475
 [same? 1.7976931348623157e310% load mold/all 1.7976931348623157e310%]
 #r3only
+; bug#1475
 ; 64-bit IEEE 754 minimum
 [same? -1.7976931348623157E310% load mold/all -1.7976931348623157e310%]
 #r3only
@@ -8197,6 +8250,7 @@ Functions/math/equalq.r
 #r3only
 ; object! complex structural equivalence
 ; Slight differences.
+; bug#1133
 [
 	a-value: construct/only [c: $1]
 	b-value: construct/only [c: 100%]
@@ -8790,6 +8844,7 @@ Functions/math/equivq.r
 [not equiv? 9223372036854775807 9223372036854775806]
 ; "decimal tolerance"
 #r3
+; bug#1134
 [not equiv? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}]
 ; symmetry
 #r3
@@ -9105,10 +9160,17 @@ Functions/math/strict-equalq.r
 	insert/only b-value b-value
 	strict-equal? a-value b-value
 ]
+#r2only
 [
 	a-value: first ['a/b]
 	parse :a-value [b-value:]
 	not strict-equal? :a-value :b-value
+]
+#r3only
+[
+	a-value: first ['a/b]
+	parse :a-value [b-value:]
+	strict-equal? :a-value :b-value
 ]
 ; symmetry
 [
@@ -9119,10 +9181,17 @@ Functions/math/strict-equalq.r
 [not strict-equal? [] none]
 ; symmetry
 [equal? strict-equal? [] none strict-equal? none []]
+#r2only
 [
 	a-value: first [()]
 	parse a-value [b-value:]
 	not strict-equal? a-value b-value
+]
+#r3only
+[
+	a-value: first [()]
+	parse a-value [b-value:]
+	strict-equal? a-value b-value
 ]
 ; symmetry
 [
@@ -9130,10 +9199,17 @@ Functions/math/strict-equalq.r
 	parse a-value [b-value:]
 	equal? strict-equal? a-value b-value strict-equal? b-value a-value
 ]
+#r2only
 [
 	a-value: 'a/b
 	parse a-value [b-value:]
 	not strict-equal? :a-value :b-value
+]
+#r3only
+[
+	a-value: 'a/b
+	parse a-value [b-value:]
+	strict-equal? :a-value :b-value
 ]
 ; symmetry
 [
@@ -9141,10 +9217,17 @@ Functions/math/strict-equalq.r
 	parse a-value [b-value:]
 	equal? strict-equal? :a-value :b-value strict-equal? :b-value :a-value
 ]
+#r2only
 [
 	a-value: first [a/b:]
 	parse :a-value [b-value:]
 	not strict-equal? :a-value :b-value
+]
+#r3only
+[
+	a-value: first [a/b:]
+	parse :a-value [b-value:]
+	strict-equal? :a-value :b-value
 ]
 ; symmetry
 [
@@ -9543,10 +9626,17 @@ Functions/math/sameq.r
 	insert/only b-value b-value
 	not same? a-value b-value
 ]
+#r2only
 [
 	a-value: first ['a/b]
 	parse :a-value [b-value:]
 	not same? :a-value :b-value
+]
+#r3only
+[
+	a-value: first ['a/b]
+	parse :a-value [b-value:]
+	same? :a-value :b-value
 ]
 ; symmetry
 [
@@ -9557,10 +9647,17 @@ Functions/math/sameq.r
 [not same? [] none]
 ; symmetry
 [equal? same? [] none same? none []]
+#r2only
 [
 	a-value: first [()]
 	parse a-value [b-value:]
 	not same? a-value b-value
+]
+#r3only
+[
+	a-value: first [()]
+	parse a-value [b-value:]
+	same? a-value b-value
 ]
 ; symmetry
 [
@@ -9568,10 +9665,17 @@ Functions/math/sameq.r
 	parse a-value [b-value:]
 	equal? same? a-value b-value same? b-value a-value
 ]
+#r2only
 [
 	a-value: 'a/b
 	parse a-value [b-value:]
 	not same? :a-value :b-value
+]
+#r3only
+[
+	a-value: 'a/b
+	parse a-value [b-value:]
+	same? :a-value :b-value
 ]
 ; symmetry
 [
@@ -9579,10 +9683,17 @@ Functions/math/sameq.r
 	parse a-value [b-value:]
 	equal? same? :a-value :b-value same? :b-value :a-value
 ]
+#r2only
 [
 	a-value: first [a/b:]
 	parse :a-value [b-value:]
 	not same? :a-value :b-value
+]
+#r3only
+[
+	a-value: first [a/b:]
+	parse :a-value [b-value:]
+	same? :a-value :b-value
 ]
 ; symmetry
 [

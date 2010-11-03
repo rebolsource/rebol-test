@@ -2,7 +2,7 @@ Rebol [
 	Title: "Catch-any"
 	File: %catch-any.r
 	Author: "Ladislav Mecir"
-	Date: 2-Nov-2010/6:39:25+1:00
+	Date: 3-Nov-2010/4:58:46+1:00
 	Purpose: "Catch any REBOL exception"
 ]
 
@@ -16,52 +16,50 @@ set 'catch-any func [
 		set/any 'result catch [
 			set/any 'result loop 1 [
 				result: try [
-					; this applies, if RETURN (or EXIT)
-					; is evaluated in the BLOCK
+					; RETURN or EXIT
 					set exception 'return
 					set/any 'result do block
 					
-					; we get here if no exception was encountered
+					; no exception
 					set exception none
 					return get/any 'result
 				]
-				; we get here if an error was triggered
+				; an error was triggered
 				set exception 'error
 				return result
 			]
-			; we get here if BREAK or CONTINUE was called
+			; BREAK or CONTINUE
 			set exception 'break
 			return get/any 'result
 		]
-		; we get here if THROW was called
+		; THROW
 		set exception 'throw
 		return get/any 'result
 	]
-	; we get here if QUIT was called
+	; QUIT
 	set exception 'quit
 	#[unset!]
 ]] [[
 	error? set/any 'result catch [
 		error? set/any 'result loop 1 [
 			error? result: try [
-				; this applies, if RETURN (or EXIT)
-				; is evaluated in the BLOCK
+				; RETURN or EXIT
 				set exception 'return
 				set/any 'result do block
 				
-				; we get here if no exception was encountered
+				; no exception
 				set exception none
 				return get/any 'result
 			]
-			; we get here if an error was triggered
+			; an error was triggered
 			set exception 'error
 			return result
 		]
-		; we get here if BREAK or CONTINUE was called
+		; BREAK
 		set exception 'break
 		return get/any 'result
 	]
-	; we get here if THROW was called
+	; THROW
 	set exception 'throw
 	return get/any 'result
 ]]
