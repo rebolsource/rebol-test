@@ -2517,7 +2517,11 @@ datatypes/word.r
 	a-value: 'a
 	:a-value == a-value
 ]
-Functions/math/absolute.r
+functions/datatype/as-pair.r
+#r3only
+; bug#1624
+[native? :as-pair]
+functions/math/absolute.r
 [:abs = :absolute]
 [0 = abs 0]
 [1 = abs 1]
