@@ -6392,6 +6392,7 @@ Functions/control/repeat.r
 		either test [i == 2] [
 			test: true
 			i: false
+			true
 		]
 	]
 ]
@@ -7459,8 +7460,11 @@ Functions/convert/mold.r
 	error? try [string? mold a]
 	true
 ]
-; bug#1711
 ; load/next
+#r2only
+[block? load/next "1"]
+; bug#1711
+#r3only
 [try/except [block? load/next "1"] [true]]
 datatypes/library.r
 [
@@ -8117,6 +8121,10 @@ Functions/math/equalq.r
 ; percent! approximate equality symmetry
 [equal? equal? 10% + 10% + 10% 30% equal? 30% 10% + 10% + 10%]
 [equal? 2-Jul-2009 2-Jul-2009]
+#r2only
+; date! ignores time portion
+[equal? 2-Jul-2009 2-Jul-2009/22:20]
+#r3only
 ; date! doesn't ignore time portion
 [not equal? 2-Jul-2009 2-Jul-2009/22:20]
 [equal? equal? 2-Jul-2009 2-Jul-2009/22:20 equal? 2-Jul-2009/22:20 2-Jul-2009]
@@ -8256,6 +8264,7 @@ Functions/math/equalq.r
 	b-value: construct/only [c: 100%]
 	equal? a-value b-value
 ]
+#r3only
 [
 	a-value: construct/only [
 		a: 1 b: 1.0 c: $1 d: 1%
@@ -9395,10 +9404,16 @@ Functions/math/strict-equalq.r
 ; symmetry
 [equal? strict-equal? 10% + 10% + 10% 30% strict-equal? 30% 10% + 10% + 10%]
 ; date!; approximate equality
+#r2only
+[strict-equal? 2-Jul-2009 2-Jul-2009/22:20]
+#r3only
 [not strict-equal? 2-Jul-2009 2-Jul-2009/22:20]
 ; symmetry
 [equal? strict-equal? 2-Jul-2009 2-Jul-2009/22:20 strict-equal? 2-Jul-2009/22:20 2-Jul-2009]
 ; missing time = 00:00:00+00:00, by time compatibility standards
+#r2only
+[strict-equal? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
+#r3only
 [not strict-equal? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
 ; symmetry
 [equal? strict-equal? 2-Jul-2009 2-Jul-2009/00:00 strict-equal? 2-Jul-2009/00:00 2-Jul-2009]
@@ -9895,10 +9910,16 @@ Functions/math/sameq.r
 ; symmetry
 [equal? same? 'a use [a] ['a] same? use [a] ['a] 'a]
 ; different word types
+#r2only
+[same? 'a first [:a]]
+#r3only
 [not same? 'a first [:a]]
 ; symmetry
 [equal? same? 'a first [:a] same? first [:a] 'a]
 ; different word types
+#r2only
+[same? 'a first ['a]]
+#r3only
 [not same? 'a first ['a]]
 ; symmetry
 [equal? same? 'a first ['a] same? first ['a] 'a]
@@ -9907,12 +9928,18 @@ Functions/math/sameq.r
 ; symmetry
 [equal? same? 'a /a same? /a 'a]
 ; different word types
+#r2only
+[same? 'a first [a:]]
+#r3only
 [not same? 'a first [a:]]
 ; symmetry
 [equal? same? 'a first [a:] same? first [a:] 'a]
 ; reflexivity
 [same? first [:a] first [:a]]
 ; different word types
+#r2only
+[same? first [:a] first ['a]]
+#r3only
 [not same? first [:a] first ['a]]
 ; symmetry
 [equal? same? first [:a] first ['a] same? first ['a] first [:a]]
@@ -9921,6 +9948,9 @@ Functions/math/sameq.r
 ; symmetry
 [equal? same? first [:a] /a same? /a first [:a]]
 ; different word types
+#r2only
+[same? first [:a] first [a:]]
+#r3only
 [not same? first [:a] first [a:]]
 ; symmetry
 [equal? same? first [:a] first [a:] same? first [a:] first [:a]]
@@ -9931,6 +9961,9 @@ Functions/math/sameq.r
 ; symmetry
 [equal? same? first ['a] /a same? /a first ['a]]
 ; different word types
+#r2only
+[same? first ['a] first [a:]]
+#r3only
 [not same? first ['a] first [a:]]
 ; symmetry
 [equal? same? first ['a] first [a:] same? first [a:] first ['a]]
@@ -9957,7 +9990,7 @@ Functions/math/sameq.r
 ]
 ; bug#1422: "Rebol crashes when opening the 128th port"
 #r3crash
-[repeat n 200 [try [close open open join tcp://localhost: n]] true]
+[error? try [repeat n 200 [try [close open open join tcp://localhost: n]]] true]
 ; bug#1651: "FILE-TYPE? should return NONE for unknown types"
 #r3
 [none? file-type? %foo.0123456789bar0123456789]
@@ -10023,9 +10056,19 @@ functions/file/exists.r
 [exists? http://www.rebol.com/index.html]
 functions/file/make-dir.r
 ; bug#1674
+#r2only
 [
-	e: try [make-dir %/folder-to-save-test-files]
-	e/type = 'access
+	all [
+		e: disarm try [make-dir %/folder-to-save-test-files]
+		e/type = 'access
+	]
+]
+#r3only
+[
+	all [
+		e: try [make-dir %/folder-to-save-test-files]
+		e/type = 'access
+	]
 ]
 ; bug#1666
 ; bug#1650
