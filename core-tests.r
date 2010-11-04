@@ -4287,7 +4287,7 @@ Functions/math/zeroq.r
 [not zero? 0.255.0]
 [not zero? 0.0.1]
 [not zero? 0.0.255]
-Functions/control/all.r
+functions/control/all.r
 ; zero values
 [true == all []]
 ; one value
@@ -4637,7 +4637,7 @@ Functions/control/all.r
 	blk: [all blk]
 	error? try blk
 ]
-Functions/control/any.r
+functions/control/any.r
 ; zero values
 [none? any []]
 ; one value
@@ -4996,7 +4996,7 @@ Functions/control/any.r
 	blk: [any blk]
 	error? try blk
 ]
-Functions/control/attempt.r
+functions/control/attempt.r
 [none? attempt [1 / 0]]
 [1 = attempt [1]]
 [unset? attempt []]
@@ -5017,7 +5017,7 @@ Functions/control/attempt.r
 	blk: [attempt blk]
 	none? attempt blk
 ]
-Functions/control/break.r
+functions/control/break.r
 [unset? while [true] [break]]
 ; break/return
 [none? while [true] [break/return none]]
@@ -5078,7 +5078,7 @@ Functions/control/case.r
 	blk: [case blk]
 	error? try blk
 ]
-Functions/control/catch.r
+functions/control/catch.r
 [
 	catch [
 		throw success: true
@@ -5165,7 +5165,7 @@ Functions/control/catch.r
 #test3crash
 ; bug#851
 [error? try [catch/quit [] do make error! ""]]
-Functions/control/compose.r
+functions/control/compose.r
 [
 	num: 1
 	[1 num] = compose [(num) num]
@@ -5218,7 +5218,7 @@ Functions/control/compose.r
 	blk: [(compose blk)]
 	error? try blk
 ]
-Functions/control/continue.r
+functions/control/continue.r
 #r3only
 [
 	success: true
@@ -5244,10 +5244,10 @@ Functions/control/continue.r
 	foreach i [1] [continue success: false]
 	success
 ]
-Functions/control/disarm.r
+functions/control/disarm.r
 #r2only
 [object? disarm try [1 / 0]]
-Functions/control/do.r
+functions/control/do.r
 [
 	success: false
 	do [success: true]
@@ -5577,7 +5577,7 @@ Functions/control/do.r
 	val2: try [do/next [1 / 0] 'b]
 	val1/near = val2/near
 ]
-Functions/control/either.r
+functions/control/either.r
 [
 	either true [success: true] [success: false]
 	success
@@ -5647,12 +5647,12 @@ Functions/control/either.r
 	blk: [either false [] blk]
 	error? try blk
 ]
-Functions/control/else.r
+functions/control/else.r
 #r2only
 [error? err: try [else] c: disarm err c/id = 'else-gone]
 #r3only
 [error? err: try [else] c: err c/id = 'no-value]
-Functions/control/exit.r
+functions/control/exit.r
 [
 	success: true
 	f1: does [exit success: false]
@@ -5666,7 +5666,7 @@ Functions/control/exit.r
 #r3only
 ; test "exit not in function"
 [error? try [exit]]
-Functions/control/for.r
+functions/control/for.r
 [
 	success: true
 	num: 0
@@ -5840,7 +5840,7 @@ Functions/control/for.r
 		]
 	]
 ]
-Functions/control/forall.r
+functions/control/forall.r
 [
 	str: "abcdef"
 	out: copy ""
@@ -5923,7 +5923,7 @@ Functions/control/forall.r
 	e: disarm try [f]
 	e/near = [f]
 ]
-Functions/control/foreach.r
+functions/control/foreach.r
 [
 	out: copy ""
 	str: "abcdef"
@@ -5995,7 +5995,7 @@ Functions/control/foreach.r
 	]
 	num = 10
 ]
-Functions/control/forever.r
+functions/control/forever.r
 [
 	num: 0
 	forever [
@@ -6039,7 +6039,7 @@ Functions/control/forever.r
 	]
 	10 = num3
 ]
-Functions/control/forskip.r
+functions/control/forskip.r
 #r2only
 [
 	blk: copy out: copy []
@@ -6121,7 +6121,12 @@ Functions/control/forskip.r
 	e: disarm try [f]
 	e/near = [f]
 ]
-Functions/control/if.r
+functions/control/halt.r
+; bug#1742
+#test2crash
+#test3crash
+[halt]
+functions/control/if.r
 [
 	success: false
 	if true [success: true]
