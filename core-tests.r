@@ -9191,6 +9191,7 @@ Functions/math/strict-equalq.r
 ]
 #r2crash
 #r3crash
+; bug#1066
 ; comparison of cyclic blocks
 [
 	a-value: copy []
