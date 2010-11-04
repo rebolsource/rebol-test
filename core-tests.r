@@ -5840,6 +5840,9 @@ functions/control/for.r
 		]
 	]
 ]
+; FOR does not bind 'self
+; bug#1529
+[same? 'self for i 1 1 1 ['self]]
 functions/control/forall.r
 [
 	str: "abcdef"
