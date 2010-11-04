@@ -10055,6 +10055,9 @@ functions/context/bind.r
 ]
 ; bug#1655
 [not head? bind next [1] 'rebol]
+functions/context/set.r
+; bug#1745
+[equal? error? try [set /a 1] error? try [set [/a] 1]]
 functions/file/exists.r
 ; bug#1613
 [exists? http://www.rebol.com/index.html]
