@@ -3630,6 +3630,10 @@ Functions/math/round.r
 [-0.123 == round/even/to -0.1234 1E-3]
 [0.1234 = round/even/to 0.12345 1E-4]
 [-0.1234 = round/even/to -0.12345 1E-4]
+; bug#1470
+[2.6 == round/even/to $2.55 0.1]
+; bug#1470
+[$2.6 == round/even/to 2.55 $0.1]
 ; round-up breakpoint
 [0.12346 = round/even/to 0.123456 1E-5]
 [-0.12346 = round/even/to -0.123456 1E-5]
