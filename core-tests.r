@@ -7298,6 +7298,11 @@ Functions/series/ordinals.r
 [9 = ninth [1 2 3 4 5 6 7 8 9 10 11]]
 [10 = tenth [1 2 3 4 5 6 7 8 9 10 11]]
 functions/series/parse.r
+; bug#1280
+[
+	parse "" [(i: 0) 3 [["a" |] (i: i + 1)]]
+	i == 3
+]
 ; bug#1672
 [
 	a: [a]
