@@ -1076,6 +1076,8 @@ datatypes/file.r
 [%"" == make file! 0]
 [%"" == to file! ""]
 ["%%2520" = mold to file! "%20"]
+; bug#1241
+[file? %"/c/Program Files (x86)"]
 datatypes/function.r
 [function? does ["OK"]]
 [not function? 1]
