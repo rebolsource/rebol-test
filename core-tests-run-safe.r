@@ -8,19 +8,31 @@ Rebol [
 
 do %test-framework.r
 
-; example doing REBOL/Core tests
-; using appropriate flags depending on the interpreter version
+; Example runner for the REBOL/Core tests which chooses
+; appropriate flags depending on the interpreter version.
 
-do-core-tests: does [
-	; check if we run R3 or R2
-	either in system 'catalog [
-		flags: [#64bit #r3only #r2crash #r3]
-		print "Testing..."
-		do-tests %core-tests.r flags %cps
-	] [
-		flags: [#32bit #r3crash #r2only #test3crash]
-		print "Testing..."
-		do-tests %core-tests.r flags %cps
+do-core-tests: has [
+	flags result log-file succeeded test-failures dialect-failures skipped
+] [
+	; Check if we run R3 or R2.
+	flags: pick [
+		[#64bit #r3only #r2crash #r3]
+		[#32bit #r3crash #r2only #test3crash]
+	] found? in system 'catalog
+
+	print "Testing ..."
+	result: do-tests %core-tests.r flags %cps
+	set [log-file succeeded test-failures dialect-failures skipped] result
+
+	print ["Done, see the log file:" log-file]
+	print [
+		now
+		rebol/version
+		"Total:" succeeded + test-failures + dialect-failures + skipped
+		"Succeeded:" succeeded
+		"Test failures:" test-failures
+		"Dialect failures:" dialect-failures
+		"Skipped:" skipped
 	]
 ]
 

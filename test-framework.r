@@ -187,16 +187,6 @@ make object! compose [
 
 		parse-test-file file :process-vector
 
-		print ["Done, see the log file:" log-file]
-		print [
-			now
-			rebol/version
-			"Total:" succeeded + test-failures + dialect-failures + skipped
-			"Succeeded:" succeeded
-			"Test failures:" test-failures
-			"Dialect failures:" dialect-failures
-			"Skipped:" skipped
-		]
 		log [
 			"^(line)"
 			now
@@ -208,6 +198,6 @@ make object! compose [
 			" Dialect failures: " dialect-failures
 			" Skipped: " skipped
 		]
-		#[unset!]
+		reduce [log-file succeeded test-failures dialect-failures skipped]
 	]
 ]
