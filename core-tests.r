@@ -1483,6 +1483,13 @@ datatypes/lit-word.r
 	a-value: first ['a]
 	strict-equal? to word! :a-value do reduce [:a-value]
 ]
+; bug#1342
+[word? '/]
+[word? '<]
+[word? '>]
+[word? '<=]
+[word? '>=]
+[word? '<>]
 datatypes/logic.r
 [logic? true]
 [logic? false]
