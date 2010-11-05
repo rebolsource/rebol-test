@@ -10085,6 +10085,8 @@ functions/context/bind.r
 functions/context/set.r
 ; bug#1745
 [equal? error? try [set /a 1] error? try [set [/a] 1]]
+; bug#1745
+[equal? error? try [set #a 1] error? try [set [#a] 1]]
 functions/file/exists.r
 ; bug#1613
 [exists? http://www.rebol.com/index.html]
