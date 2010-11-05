@@ -6874,6 +6874,7 @@ Functions/series/copy.r
 ]
 [[1] = copy/part tail [1] -1]
 [[1] = copy/part tail [1] -2147483647]
+; bug#1118
 [[1] = copy/part tail [1] -2147483648]
 #64bit
 [error? try [copy/part tail [1] -9223372036854775808]]
