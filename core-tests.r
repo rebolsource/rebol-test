@@ -6305,6 +6305,7 @@ Functions/control/reduce.r
 ["1 + 1" = reduce "1 + 1"]
 #r3only
 [error? first reduce [try [1 / 0]]]
+; bug#1760
 ; RETURN stops the evaluation
 [
 	f1: does [reduce [return 1 2] 2]
