@@ -7473,6 +7473,13 @@ Functions/convert/load.r
 ; bug#1711
 #r3only
 [try/except [block? load/next "1"] [true]]
+; bug#1122
+[
+	any [
+		error? try [load "9999999999999999999"]
+		greater? load "9999999999999999999" load "9223372036854775807"
+	]
+]
 Functions/convert/mold.r
 ; cyclic block
 [
