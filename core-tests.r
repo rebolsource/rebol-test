@@ -7350,6 +7350,13 @@ functions/series/parse.r
 [false == parse "" [not 0 "a"]]
 #r3only
 [false == parse "" [not [0 "a"]]]
+; bug#1240
+#r3only
+[parse "" [not "a"]]
+#r3only
+[parse "" [not skip]]
+#r3only
+[parse "" [not fail]]
 Functions/series/pick.r
 #64bit
 [error? try [pick at [1 2 3 4 5] 3 -9223372036854775808]]
