@@ -3694,6 +3694,7 @@ Functions/math/round.r
 [0.0 == (-562'949'953'421'313.0 - round/even/to -562'949'953'421'313.0 1.0)]
 [562'949'953'421'314.0 == round/even/to 562'949'953'421'314.0 1.0]
 [-562'949'953'421'314.0 == round/even/to -562'949'953'421'314.0 1.0]
+; bug#1116
 [$1.15 == round/even/to 1.15 $0.01]
 ; this fails, by design
 [0:0:1.15 == round/even/to 0:0:1.15 0:0:0.01]
@@ -7312,6 +7313,19 @@ functions/series/parse.r
 	a: [a]
 	error? try [parse [] a]
 ]
+; bug#1268
+#r3only
+[
+	i: 0
+	parse "a" [any [(i: i + 1)]]
+	i == 1
+]
+#r2only
+[
+	i: 0
+	parse "a" [any [(i: i + 1 j: if i = 2 ['break]) j]]
+	i == 2
+]
 Functions/series/pick.r
 #64bit
 [error? try [pick at [1 2 3 4 5] 3 -9223372036854775808]]
@@ -10101,6 +10115,8 @@ functions/context/bind.r
 ]
 ; bug#1655
 [not head? bind next [1] 'rebol]
+; bug#892
+[y: 'x do has [x] [x: true get bind y 'x]]
 functions/context/set.r
 ; bug#1745
 [equal? error? try [set /a 1] error? try [set [/a] 1]]
