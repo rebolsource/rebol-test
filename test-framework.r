@@ -2,7 +2,7 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 2-Nov-2010/11:43:12+1:00
+	Date: 18-Nov-2010/11:23:15+1:00
 	Purpose: "Test framework"
 ]
 
@@ -14,13 +14,14 @@ make object! compose [
 
 	log-file: none
 	
-	log: func [report [block!]] [
+	log: func [report [block!]][
 		write/append log-file to binary! rejoin report
 	]
 
 	; counters
 	skipped: none
 	test-failures: none
+	crashes: none
 	dialect-failures: none
 	succeeded: none
 
@@ -60,7 +61,7 @@ make object! compose [
 		emit-test [any-function!]
 		/local flags path position flag source current-dir failure
 		test-file-name
-	] [
+	][
 		current-dir: what-dir
 		print ["file:" test-file]
 		log ["^/file: " test-file "^/^/"]
@@ -71,7 +72,7 @@ make object! compose [
 				change-dir first split-path test-file
 			]
 			test-file: read test-file
-		] [
+		][
 			dialect-failures: dialect-failures + 1
 			log [{^/"failed, dialect: cannot access the file"^/}]
 			exit
@@ -111,7 +112,7 @@ make object! compose [
 				]
 				any whitespace
 			]
-		] [
+		][
 			dialect-failures: dialect-failures + 1
 			log [
 				"^/file: " test-file-name
@@ -123,24 +124,28 @@ make object! compose [
 	]
 
 	allowed-flags: none
+	crash-markers: none
 	process-vector: func [
 		flags [block!]
 		source [string!]
 		/local test-block exception
-	] [
+	][
+		unless empty? intersect crash-markers flags [
+			crashes: crashes + 1
+			exit
+		]
+
 		unless empty? exclude flags allowed-flags [
 			skipped: skipped + 1
 			exit
 		]
 
 		unless failures [log [source]]
-		if error? try [test-block: load source] [
+		if error? try [test-block: load source][
 			test-failures: test-failures + 1
 			log either failures [
 				[source "^/"]
-			] [
-				[{ "failed, cannot load test source"^/}]
-			]
+			][[{ "failed, cannot load test source"^/}]]
 			exit
 		]
 
@@ -155,13 +160,11 @@ make object! compose [
 		either test-block = "succeeded" [
 			succeeded: succeeded + 1
 			unless failures [log [{ "} test-block {"^/}]]
-		] [
+		][
 			test-failures: test-failures + 1
 			log either failures [
 				[source "^/"]
-			] [
-				reduce [{ "} test-block {"^/}]
-			]
+			][reduce [{ "} test-block {"^/}]]
 		]
 	]
 
@@ -169,11 +172,15 @@ make object! compose [
 		{Executes tests in the FILE}
 		file [file! url!] {test file}
 		flags [block!] {which flags to accept}
+		crash-flags [block!] {crash-marking flags}
 		log-file-prefix [file!]
 		/only-failures
-	] [
+	][
 		allowed-flags: flags
+		crash-markers: crash-flags
+		
 		failures: only-failures
+		
 		log-file: log-file-prefix
 		repeat i length? version: system/version [
 			append log-file "_"
@@ -183,7 +190,8 @@ make object! compose [
 		log-file: clean-path log-file
 
 		if exists? log-file [delete log-file]
-		succeeded: test-failures: dialect-failures: skipped: 0
+		
+		succeeded: test-failures: crashes: dialect-failures: skipped: 0
 
 		parse-test-file file :process-vector
 
@@ -192,12 +200,16 @@ make object! compose [
 			now
 			" "
 			rebol/version
-			" Total: " succeeded + test-failures + dialect-failures + skipped
+			" Total: " succeeded + test-failures + crashes + dialect-failures
+				+ skipped
 			" Succeeded: " succeeded
 			" Test failures: " test-failures
+			" Crashes: " crashes
 			" Dialect failures: " dialect-failures
 			" Skipped: " skipped
 		]
-		reduce [log-file succeeded test-failures dialect-failures skipped]
+		reduce [
+			log-file succeeded test-failures crashes dialect-failures skipped
+		]
 	]
 ]
