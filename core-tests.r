@@ -7466,6 +7466,12 @@ Functions/convert/load.r
 	a = load mold a
 ]
 [error? try [load "1xyz#"]]
+; load/next
+#r2only
+[block? load/next "1"]
+; bug#1711
+#r3only
+[try/except [block? load/next "1"] [true]]
 Functions/convert/mold.r
 ; cyclic block
 [
@@ -7491,12 +7497,16 @@ Functions/convert/mold.r
 	error? try [string? mold a]
 	true
 ]
-; load/next
-#r2only
-[block? load/next "1"]
-; bug#1711
-#r3only
-[try/except [block? load/next "1"] [true]]
+; mold/all decimal
+; bug#1633
+[equal? mold/all 0.1 "0.10000000000000001"]
+; bug#897
+[equal? mold/all 0.3 "0.29999999999999999"]
+; bug#729
+[
+	x: 0.30000000000000004
+	same? x load mold/all x
+]
 datatypes/library.r
 [
 	success: library? a-library: load/library case [
