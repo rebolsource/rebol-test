@@ -7323,9 +7323,33 @@ functions/series/parse.r
 #r2only
 [
 	i: 0
-	parse "a" [any [(i: i + 1 j: if i = 2 ['break]) j]]
+	parse "a" [any [(i: i + 1 j: if i = 2 [[end skip]]) j]]
 	i == 2
 ]
+#r3only
+[
+	i: 0
+	parse "a" [while [(i: i + 1 j: if i = 2 [[fail]]) j]]
+	i == 2
+]
+#r3only
+; bug#1267
+[
+	b: "abc"
+	c: ["a" | "b"]
+	a2: [any [b e: (d: [:e]) then fail | [c | (d: [fail]) fail]] d]
+	a4: [any [b then e: (d: [:e]) fail | [c | (d: [fail]) fail]] d]
+	equal? parse "aaaaabc" a2 parse "aaaaabc" a4
+]
+#r3only
+; bug#1246
+[parse "1" [not not "1" "1"]]
+#r3only
+[parse "1" [not [not "1"] "1"]]
+#r3only
+[false == parse "" [not 0 "a"]]
+#r3only
+[false == parse "" [not [0 "a"]]]
 Functions/series/pick.r
 #64bit
 [error? try [pick at [1 2 3 4 5] 3 -9223372036854775808]]
