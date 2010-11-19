@@ -1,0 +1,2 @@
+2.7.7.3.1 19-Nov-2010/15:08:27+1:00 Total: 4314 Succeeded: 3334 Test-failures: 97 Crashes: 8 Dialect-failures: 0 Skipped: 875
+2.100.110.3.1 19-Nov-2010/15:08:55+1:00 Total: 4314 Succeeded: 3925 Test-failures: 52 Crashes: 7 Dialect-failures: 0 Skipped: 330
