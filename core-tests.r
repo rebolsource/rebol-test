@@ -7560,6 +7560,8 @@ Functions/convert/mold.r
 	x: 0.30000000000000004
 	same? x load mold/all x
 ]
+; bug#1753
+[c: last mold/all 1e16 (#"0" <= c) and (#"9" >= c)]
 datatypes/library.r
 [
 	success: library? a-library: load/library case [
