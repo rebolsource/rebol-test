@@ -12,7 +12,8 @@ do %test-framework.r
 ; appropriate flags depending on the interpreter version.
 
 do-core-tests: has [
-	flags result log-file succeeded test-failures dialect-failures skipped
+	flags crash-flags result log-file
+	succeeded test-failures crashes dialect-failures skipped
 ] [
 	; Check if we run R3 or R2.
 	set [flags crash-flags] pick [
