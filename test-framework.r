@@ -207,6 +207,7 @@ make object! compose [
 			" Crashes: " crashes
 			" Dialect-failures: " dialect-failures
 			" Skipped: " skipped
+			"^(line)"
 		]
 		reduce [
 			log-file succeeded test-failures crashes dialect-failures skipped
