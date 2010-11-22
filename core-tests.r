@@ -1424,6 +1424,7 @@ datatypes/integer.r
 [error? try [to integer! -2147483649.0]]
 #32bit
 [error? try [to integer! 2147483648.0]]
+; bug#921
 #64bit
 [error? try [to integer! 9.2233720368547765e18]]
 #64bit
@@ -7123,6 +7124,7 @@ Functions/series/insert.r
 	insert a #"^(00)"
 	a == #{00}
 ]
+; bug#855
 [
 	a: #{00}
 	b: make binary! 0
@@ -7544,11 +7546,11 @@ Functions/convert/mold.r
 	string? mold a
 ]
 ; deep nested block
+; bug#876
 [
 	a: copy []
 	repeat i 10000 [a: append/only copy [] a]
-	error? try [string? mold a]
-	true
+	string? mold a
 ]
 ; mold/all decimal
 ; bug#1633
@@ -8542,7 +8544,23 @@ Functions/math/equalq.r
 ; Error in R2 (could be fixed).
 #r3only
 [not equal? make port! http:// make port! http://]
-Functions/math/equivq.r
+; bug#1049
+#r3crash
+#r2crash
+[
+	a: copy []
+	insert/only a a
+	b: copy []
+	insert/only b b
+	equal? a b ; crash!
+]
+; bug#859
+[
+	a: copy quote ()
+	insert/only a a
+	error? try [do a]
+]
+functions/math/equivq.r
 ; reflexivity test for native!
 #r3
 [equiv? :abs :abs]
@@ -9142,7 +9160,17 @@ Functions/math/equivq.r
 		equiv? p p
 	]
 ]
-Functions/math/strict-equalq.r
+functions/math/random.r
+; bug#1084
+#r3only
+[
+	random/seed 0
+	not any [
+		negative? random 1.0
+		negative? random 1.0
+	]
+]
+functions/math/strict-equalq.r
 [strict-equal? :abs :abs]
 ; reflexivity test for native!
 [strict-equal? :all :all]
@@ -9597,7 +9625,7 @@ Functions/math/strict-equalq.r
 		strict-equal? p p
 	]
 ]
-Functions/math/sameq.r
+functions/math/sameq.r
 [same? :abs :abs]
 ; reflexivity test for native!
 [same? :all :all]
