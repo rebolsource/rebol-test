@@ -3949,6 +3949,7 @@ Functions/math/sine.r
 [0 = sine/radians negate pi]
 [(sine 1e-12) / 1e-12 = (pi / 180)]
 [(sine/radians 1e-9) / 1e-9 = 1.0]
+; #bug#852
 ; Flint Hills test
 [
 	n: 25000
@@ -6530,9 +6531,9 @@ Functions/control/try.r
 [error? try [exit]]
 #r3only
 ; testing TRY/EXCEPT
-[try/except [1 / 0] [true]]
-#r3only
-[error? try/except [make error! ""] [0]]
+; bug#822
+[error? try/except [make error! ""][0]]
+[try/except [do make error! ""][true]]
 Functions/control/unless.r
 [
 	success: false
