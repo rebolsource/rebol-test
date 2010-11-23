@@ -3062,6 +3062,7 @@ Functions/math/evenq.r
 [even? 2.0]
 [not even? -1.0]
 [even? -2.0]
+; bug#1775
 [even? 1.7976931348623157e308]
 [even? -1.7976931348623157e308]
 ; char
