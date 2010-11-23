@@ -610,6 +610,7 @@ datatypes/decimal.r
 ; decimal! to binary! and binary! to decimal!
 [equal? #{3ff0000000000000} to binary! 1.0]
 [same? to decimal! #{3ff0000000000000} 1.0]
+; bug#747
 [equal? #{3FF0000000000009} to binary! to decimal! #{3FF0000000000009}]
 datatypes/email.r
 [email? me@here.com]
@@ -1768,6 +1769,8 @@ datatypes/none.r
 [none! = type? none]
 ; literal form
 [none = #[none]]
+; bug#845
+[none = #[none!]]
 [none = make none! none]
 [none = to none! none]
 [none = to none! 1]
@@ -1788,6 +1791,7 @@ datatypes/object.r
 	x = 1
 ]
 ; BREAK out of make object!
+; bug#846
 [
 	1 = loop 1 [
 		make object! [break/return 1]
@@ -1795,6 +1799,7 @@ datatypes/object.r
 	]
 ]
 ; THROW out of make object!
+; bug#847
 [
 	1 = catch [
 		make object! [throw 1]
@@ -1809,6 +1814,7 @@ datatypes/object.r
 	]
 ]
 ; RETURN out of make object!
+; bug#848
 [
 	f: func [] [
 		make object! [return 1]
@@ -2314,6 +2320,7 @@ datatypes/unset.r
 [unset? ()]
 [unset! == type? ()]
 [not unset? 1]
+; bug#836
 [unset? #[unset!]]
 #r3only
 [unset? make unset! none]
@@ -2558,7 +2565,13 @@ functions/math/absolute.r
 [2147483647x2147483647 = abs 2147483647x-2147483647]
 [2147483647x2147483647 = abs -2147483647x2147483647]
 [2147483647x2147483647 = abs -2147483647x-2147483647]
-Functions/math/add.r
+#64bit
+; bug#833
+[
+	a: try [abs to integer! #{8000000000000000}]
+	any [error? a not negative? a]
+]
+functions/math/add.r
 [3 = add 1 2]
 #64bit
 ; integer -9223372036854775808 + x tests
@@ -2807,7 +2820,7 @@ Functions/math/add.r
 [0.0.255 = add 0.0.255 0.0.0]
 [0.0.255 = add 0.0.255 0.0.1]
 [0.0.255 = add 0.0.255 0.0.255]
-Functions/math/and.r
+functions/math/and.r
 [true and true = true]
 [true and false = false]
 [false and true = false]
@@ -2837,7 +2850,7 @@ Functions/math/and.r
 #r2only
 ; string
 ["^(03)^(00)" and "^(02)^(00)" = "^(02)^(00)"]
-Functions/math/arccosine.r
+functions/math/arccosine.r
 [0 = arccosine 1]
 [0 = arccosine/radians 1]
 [30 = arccosine (square-root 3) / 2]
@@ -2858,7 +2871,7 @@ Functions/math/arccosine.r
 [pi * 2 / 3 = arccosine/radians -0.5]
 [error? try [arccosine 1.1]]
 [error? try [arccosine -1.1]]
-Functions/math/arcsine.r
+functions/math/arcsine.r
 [0 = arcsine 0]
 [0 = arcsine/radians 0]
 [30 = arcsine 0.5]
@@ -2881,7 +2894,7 @@ Functions/math/arcsine.r
 [1e-9 / (arcsine/radians 1e-9) = 1.0]
 [error? try [arcsine 1.1]]
 [error? try [arcsine -1.1]]
-Functions/math/arctangent.r
+functions/math/arctangent.r
 [-90 = arctangent -1e16]
 [pi / -2 = arctangent/radians -1e16]
 [-60 = arctangent negate square-root 3]
@@ -2900,7 +2913,8 @@ Functions/math/arctangent.r
 [pi / 3 = arctangent/radians square-root 3]
 [90 = arctangent 1e16]
 [pi / 2 = arctangent/radians 1e16]
-Functions/math/complement.r
+functions/math/complement.r
+; bug#849
 [false = complement true]
 [true = complement false]
 ; integer
@@ -2957,7 +2971,11 @@ Functions/math/complement.r
 ; image
 [(make image! [1x1 #{000000}]) = complement make image! [1x1 #{ffffff} #{ff}]]
 [(make image! [1x1 #{ffffff} #{ff}]) = complement make image! [1x1 #{000000}]]
-Functions/math/cosine.r
+; typeset
+; bug#799
+#r3only
+[typeset? complement make typeset! [unset!]]
+functions/math/cosine.r
 [1 = cosine 0]
 [1 = cosine/radians 0]
 [(square-root 3) / 2 = cosine 30]
@@ -2976,7 +2994,7 @@ Functions/math/cosine.r
 [(square-root 2) / -2 = cosine/radians pi * 3 / 4]
 [-0.5 = cosine 120]
 [-0.5 = cosine/radians pi * 2 / 3]
-Functions/math/difference.r
+functions/math/difference.r
 [24:00 = difference 1/Jan/2007 31/Dec/2006]
 [0:00 = difference 1/Jan/2007 1/Jan/2007]
 ; block
@@ -2984,7 +3002,7 @@ Functions/math/difference.r
 [[] = difference [1 2] [1 2]]
 ; bitset
 [(charset "a") = difference charset "a" charset ""]
-Functions/math/divide.r
+functions/math/divide.r
 [1 == divide -2147483648 -2147483648]
 [2 == divide -2147483648 -1073741824]
 [1073741824 == divide -2147483648 -2]
@@ -3046,7 +3064,7 @@ Functions/math/divide.r
 [2147483647 == divide 2147483647 1]
 [1073741823.5 == divide 2147483647 2]
 [1 == divide 2147483647 2147483647]
-Functions/math/evenq.r
+functions/math/evenq.r
 [even? 0]
 [not even? 1]
 [not even? -1]
@@ -3086,13 +3104,13 @@ Functions/math/evenq.r
 [even? 0:0:02]
 [not even? -0:0:01]
 [even? -0:0:02]
-Functions/math/exp.r
+functions/math/exp.r
 [1 = exp 0]
 [2.718281828459045 = exp 1]
 [2.718281828459045 * 2.718281828459045 = exp 2]
 [(square-root 2.718281828459045) = exp 0.5]
 [1 / 2.718281828459045 = exp -1]
-Functions/math/log-10.r
+functions/math/log-10.r
 [0 = log-10 1]
 [0.5 = log-10 square-root 10]
 [1 = log-10 10]
@@ -3103,7 +3121,7 @@ Functions/math/log-10.r
 [-3 = log-10 0.001]
 [error? try [log-10 0]]
 [error? try [log-10 -1]]
-Functions/math/log-2.r
+functions/math/log-2.r
 [0 = log-2 1]
 [1 = log-2 2]
 [-1 = log-2 0.5]
@@ -3113,7 +3131,7 @@ Functions/math/log-2.r
 [-3 = log-2 0.125]
 [error? try [log-2 0]]
 [error? try [log-2 -1]]
-Functions/math/log-e.r
+functions/math/log-e.r
 [0 = log-e 1]
 [0.5 = log-e square-root 2.718281828459045]
 [1 = log-e 2.718281828459045]
@@ -3121,7 +3139,7 @@ Functions/math/log-e.r
 [2 = log-e 2.718281828459045 * 2.718281828459045]
 [error? try [log-e 0]]
 [error? try [log-e -1]]
-Functions/math/mod.r
+functions/math/mod.r
 [0.0 == mod 1E15 1]
 [0.0 == mod -1E15 1]
 [0.0 == mod 1E14 1]
@@ -3166,14 +3184,14 @@ Functions/math/mod.r
 [not negative? 1e-16 - abs mod 0.1 + 0.1 + 0.1 0.3]
 [not negative? 1e-16 - abs mod 0.3 0.1 + 0.1 + 0.1]
 [not negative? 1e-16 - abs mod to money! 0.1 + 0.1 + 0.1 0.3]
-Functions/math/modulo.r
+functions/math/modulo.r
 [0.0 == modulo 0.1 + 0.1 + 0.1 0.3]
 [0.0 == modulo 0.3 0.1 + 0.1 + 0.1]
 [$0.0 == modulo $0.1 + $0.1 + $0.1 $0.3]
 [$0.0 == modulo $0.3 $0.1 + $0.1 + $0.1]
 [0.0 == modulo 1 0.1]
 [0.0 == modulo 0.15 - 0.05 - 0.1 0.1]
-Functions/math/multiply.r
+functions/math/multiply.r
 #32bit
 [error? try [multiply -2147483648 -2147483648]]
 #32bit
@@ -3289,7 +3307,7 @@ Functions/math/multiply.r
 #64bit
 [error? try [multiply -9223372036854775808 -1]]
 [0:0:1 == multiply 0:0:2 0.5]
-Functions/math/negate.r
+functions/math/negate.r
 [0 = negate 0]
 [-1 = negate 1]
 [1 = negate -1]
@@ -3337,7 +3355,7 @@ Functions/math/negate.r
 	a: make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
 	a == negate negate a
 ]
-Functions/math/negativeq.r
+functions/math/negativeq.r
 [not negative? 0]
 [not negative? 1]
 [negative? -1]
@@ -3370,7 +3388,7 @@ Functions/math/negativeq.r
 [not negative? 0:00]
 [not negative? 0:00:0.000000001]
 [negative? -0:00:0.000000001]
-Functions/math/not.r
+functions/math/not.r
 [false = not :abs]
 [false = not #{}]
 [false = not charset ""]
@@ -3415,7 +3433,7 @@ Functions/math/not.r
 #r3only
 [false = not http://]
 [false = not 'a]
-Functions/math/oddq.r
+functions/math/oddq.r
 [not odd? 0]
 [odd? 1]
 [odd? -1]
@@ -3454,7 +3472,7 @@ Functions/math/oddq.r
 [not odd? 0:0:02]
 [odd? -0:0:01]
 [not odd? -0:0:02]
-Functions/math/positiveq.r
+functions/math/positiveq.r
 [not positive? 0]
 [positive? 1]
 [not positive? -1]
@@ -3487,13 +3505,13 @@ Functions/math/positiveq.r
 [not positive? 0:00]
 [positive? 0:00:0.000000001]
 [not positive? -0:00:0.000000001]
-Functions/math/power.r
+functions/math/power.r
 [1 = power 1 1000]
 [1 = power 1000 0]
 [4 = power 2 2]
 [0.5 = power 2 -1]
 [0.1 = power 10 -1]
-Functions/math/remainder.r
+functions/math/remainder.r
 #64bit
 ; integer! tests
 [0 = remainder -9223372036854775808 -1]
@@ -3503,7 +3521,7 @@ Functions/math/remainder.r
 ; time! tests
 [-1:00 == remainder -1:00 -3:00]
 [1:00 == remainder 1:00 -3:00]
-Functions/math/round.r
+functions/math/round.r
 [0 == round 0]
 [1 == round 1]
 [-1 == round -1]
@@ -3903,7 +3921,7 @@ Functions/math/round.r
 [-0.6 == round/half-down/to -0.55001 0.1]
 [-0.5 == round/half-down/to -0.75 0.5]
 [-1.0 == round/half-down/to -0.75001 0.5]
-Functions/math/signq.r
+functions/math/signq.r
 [0 = sign? 0]
 [1 = sign? 1]
 [-1 = sign? -1]
@@ -3924,7 +3942,7 @@ Functions/math/signq.r
 [0 = sign? 0:00]
 [1 = sign? 0:00:0.000000001]
 [-1 = sign? -0:00:0.000000001]
-Functions/math/sine.r
+functions/math/sine.r
 [0 = sine 0]
 [0 = sine/radians 0]
 [0.5 = sine 30]
@@ -3961,7 +3979,7 @@ Functions/math/sine.r
 	]
 	30.314520404 = round/to s4 1e-9
 ]
-Functions/math/square-root.r
+functions/math/square-root.r
 [0 = square-root 0]
 [error? try [square-root -1]]
 [1 = square-root 1]
@@ -3969,7 +3987,7 @@ Functions/math/square-root.r
 [2 = square-root 4]
 [3 = square-root 9]
 [1.1 = square-root 1.21]
-Functions/math/subtract.r
+functions/math/subtract.r
 [1 == subtract 3 2]
 #64bit
 ; integer -9223372036854775808 - x tests
@@ -4228,7 +4246,7 @@ Functions/math/subtract.r
 [0.0.255 = subtract 0.0.255 0.0.0]
 [0.0.254 = subtract 0.0.255 0.0.1]
 [0.0.0 = subtract 0.0.255 0.0.255]
-Functions/math/tangent.r
+functions/math/tangent.r
 [error? try [tangent -90]]
 [error? try [tangent/radians pi / -2]]
 [(negate square-root 3) = tangent -60]
@@ -4258,7 +4276,7 @@ Functions/math/tangent.r
 	]
 	30.314520404 = round/to s4t 1e-9
 ]
-Functions/math/zeroq.r
+functions/math/zeroq.r
 [zero? 0]
 [not zero? 1]
 [not zero? -1]
@@ -5042,7 +5060,7 @@ functions/control/break.r
 [true = while [true] [break/return true]]
 [unset? while [true] [break/return ()]]
 [error? while [true] [break/return try [1 / 0]]]
-Functions/control/case.r
+functions/control/case.r
 [
 	success: false
 	case [true [success: true]]
@@ -6229,7 +6247,7 @@ functions/control/if.r
 	blk: [if true blk]
 	error? try blk
 ]
-Functions/control/loop.r
+functions/control/loop.r
 [
 	num: 0
 	loop 10 [num: num + 1] 
@@ -6297,7 +6315,7 @@ Functions/control/loop.r
 	]
 	f 1
 ]
-Functions/control/reduce.r
+functions/control/reduce.r
 [[1 2] = reduce [1 1 + 1]]
 [
 	success: false
@@ -6322,7 +6340,7 @@ Functions/control/reduce.r
 	blk: [reduce blk]
 	error? try blk
 ]
-Functions/control/remove-each.r
+functions/control/remove-each.r
 [
 	remove-each i s: [1 2] [true]
 	empty? s
@@ -6331,7 +6349,7 @@ Functions/control/remove-each.r
 	remove-each i s: [1 2] [false]
 	[1 2] = s
 ]
-Functions/control/repeat.r
+functions/control/repeat.r
 [
 	success: true
 	num: 0
@@ -6439,7 +6457,7 @@ Functions/control/repeat.r
 		]
 	]
 ]
-Functions/control/return.r
+functions/control/return.r
 [
 	f1: does [return 1 2]
 	1 = f1
@@ -6462,7 +6480,7 @@ Functions/control/return.r
 #r3only
 ; test "return not in function"; as well as the TRY capability to catch it
 [error? try [return 1]]
-Functions/control/switch.r
+functions/control/switch.r
 [
 	11 = switch 1 [
 		1 [11]
@@ -6481,7 +6499,7 @@ Functions/control/switch.r
 	cases: reduce [1 head insert copy [] try [1 / 0]]
 	error? switch 1 cases
 ]
-Functions/control/throw.r
+functions/control/throw.r
 [
 	catch [
 		throw success: true
@@ -6489,7 +6507,7 @@ Functions/control/throw.r
 	]
 	success
 ]
-Functions/control/try.r
+functions/control/try.r
 #r2only
 [
 	e: disarm try [1 / 0]
@@ -6534,7 +6552,7 @@ Functions/control/try.r
 ; bug#822
 [error? try/except [make error! ""][0]]
 [try/except [do make error! ""][true]]
-Functions/control/unless.r
+functions/control/unless.r
 [
 	success: false
 	unless false [success: true]
@@ -6558,7 +6576,7 @@ Functions/control/unless.r
 	]
 	1 = f1
 ]
-Functions/control/until.r
+functions/control/until.r
 [
 	num: 0
 	until [num: num + 1 num > 9]
@@ -6591,7 +6609,7 @@ Functions/control/until.r
 	]
 	10 = num3
 ]
-Functions/control/while.r
+functions/control/while.r
 [
 	num: 0
 	while [num < 10] [num: num + 1]
@@ -6648,7 +6666,7 @@ Functions/control/while.r
 	]
 	10 = num3
 ]
-Functions/define/func.r
+functions/define/func.r
 ; recursive safety
 [
 	f: func [] [
@@ -6661,7 +6679,7 @@ Functions/define/func.r
 	]
 	do f 1
 ]
-Functions/define/unset.r
+functions/define/unset.r
 [
 	a: none
 	unset 'a
@@ -6673,7 +6691,7 @@ Functions/define/unset.r
 	unset 'a
 	not value? 'a
 ]
-Functions/define/use.r
+functions/define/use.r
 ; local word test
 [
 	a: 1
@@ -6724,10 +6742,15 @@ Functions/define/use.r
 	]
 	unset? f
 ]
-Functions/define/valueq.r
+functions/define/valueq.r
 [false == value? 'nonsense]
 [true == value? 'value?]
-Functions/series/at.r
+functions/series/append.r
+; bug#1776
+#r3crash
+#r2crash
+[a: copy [] loop 1000000 [a: append/only copy [] a]]
+functions/series/at.r
 [
 	blk: []
 	same? blk at blk 1
@@ -6817,7 +6840,7 @@ Functions/series/at.r
 	str: "12"
 	same? str at str -2147483648
 ]
-Functions/series/back.r
+functions/series/back.r
 [
 	a: [1]
 	same? a back a
@@ -6844,7 +6867,7 @@ Functions/series/back.r
 	a: "1"
 	same? a back a
 ]
-Functions/series/change.r
+functions/series/change.r
 [
 	blk1: at copy [1 2 3 4 5] 3
 	blk2: at copy [1 2 3 4 5] 3
@@ -6852,7 +6875,7 @@ Functions/series/change.r
 	change/part blk2 6 -2147483648
 	equal? head blk1 head blk2
 ]
-Functions/series/clear.r
+functions/series/clear.r
 [[] = clear []]
 [[] = clear copy [1]]
 [
@@ -6862,7 +6885,7 @@ Functions/series/clear.r
 ]
 ; none
 [none == clear none]
-Functions/series/copy.r
+functions/series/copy.r
 [
 	blk: []
 	all [
@@ -6896,7 +6919,11 @@ Functions/series/copy.r
 	error? try [copy/deep a]
 	true
 ]
-Functions/series/emptyq.r
+functions/series/difference.r
+; bug#799
+#r3only
+[equal? make typeset! [decimal!] difference make typeset! [decimal! integer!] make typeset! [integer!]]
+functions/series/emptyq.r
 [empty? []]
 [
 	blk: tail [1]
@@ -6905,9 +6932,12 @@ Functions/series/emptyq.r
 ]
 #r3
 [empty? none]
-Functions/series/exclude.r
+functions/series/exclude.r
 [empty? exclude [1 2] [2 1]]
-Functions/series/find.r
+; bug#799
+#r3only
+[equal? make typeset! [decimal!] exclude make typeset! [decimal! integer!] make typeset! [integer!]]
+functions/series/find.r
 #r2only
 [error? try [find none 1]]
 #r3only
@@ -6917,7 +6947,7 @@ Functions/series/find.r
 	blk: [1]
 	same? blk find blk 1
 ]
-Functions/series/insert.r
+functions/series/insert.r
 [
 	a: make block! 0
 	insert a 0
@@ -7241,12 +7271,16 @@ Functions/series/insert.r
 	insert/dup a 0 -2147483648
 	empty? a
 ]
-Functions/series/lengthq.r
+functions/series/intersect.r
+; bug#799
+#r3only
+[equal? make typeset! [integer!] intersect make typeset! [decimal! integer!] make typeset! [integer!]]
+functions/series/lengthq.r
 ; bug#1626: "Allow LENGTH? to take none as an argument, return none"
 ; bug#1688: "LENGTH? NONE returns TRUE" (should return NONE)
 #r3
 [none? length? none]
-Functions/series/next.r
+functions/series/next.r
 [
 	blk: [1]
 	same? tail blk next blk
@@ -7255,7 +7289,7 @@ Functions/series/next.r
 	blk: tail [1]
 	same? blk next blk
 ]
-Functions/series/ordinals.r
+functions/series/ordinals.r
 #r2only
 [error? try [first []]]
 #r2only
@@ -7361,7 +7395,7 @@ functions/series/parse.r
 [parse "" [not skip]]
 #r3only
 [parse "" [not fail]]
-Functions/series/pick.r
+functions/series/pick.r
 #64bit
 [error? try [pick at [1 2 3 4 5] 3 -9223372036854775808]]
 [none? pick at [1 2 3 4 5] 3 -2147483648]
@@ -7403,6 +7437,7 @@ Functions/series/pick.r
 #r2only
 [none? pick at "12345" 3 0]
 #r3only
+; bug#857
 [#"2" = pick at "12345" 3 0]
 [#"3" = pick at "12345" 3 1]
 [#"4" = pick at "12345" 3 2]
@@ -7411,12 +7446,12 @@ Functions/series/pick.r
 [none? pick at "12345" 3 2147483647]
 #64bit
 [error? try [pick at "12345" 3 9223372036854775807]]
-Functions/series/poke.r
+functions/series/poke.r
 [
 	poke a: #{00} 1 pick b: #{11} 1
 	a == b
 ]
-Functions/series/remove.r
+functions/series/remove.r
 [[] = remove []]
 [[] = head remove [1]]
 ; none
@@ -7432,7 +7467,7 @@ Functions/series/remove.r
 	remove/part a-bitset to integer! #"a"
 	none? find a-bitset #"a"
 ]
-Functions/series/skip.r
+functions/series/skip.r
 [
 	blk: []
 	same? blk skip blk 0
@@ -7485,14 +7520,18 @@ Functions/series/skip.r
 	blk: next [1 2 3]
 	same? head blk skip blk -2147483648
 ]
-Functions/series/tailq.r
+functions/series/tailq.r
 [tail? []]
 [
 	blk: tail [1]
 	clear head blk
 	tail? blk
 ]
-Functions/convert/as-binary.r
+functions/series/union.r
+; bug#799
+#r3only
+[equal? make typeset! [decimal! integer!] union make typeset! [decimal!] make typeset! [integer!]]
+functions/convert/as-binary.r
 #r2only
 [
 	a: "a"
@@ -7501,7 +7540,7 @@ Functions/convert/as-binary.r
 	change a "b"
 	b == to binary! a
 ]
-Functions/convert/as-string.r
+functions/convert/as-string.r
 #r2only
 [
 	a: #{00}
@@ -7510,7 +7549,8 @@ Functions/convert/as-string.r
 	change a #{01}
 	b == to string! a
 ]
-Functions/convert/load.r
+functions/convert/load.r
+; bug#858
 [
 	a: [ < ]
 	a = load mold a
@@ -7529,7 +7569,8 @@ Functions/convert/load.r
 		greater? load "9999999999999999999" load "9223372036854775807"
 	]
 ]
-Functions/convert/mold.r
+functions/convert/mold.r
+; bug#860
 ; cyclic block
 [
 	a: copy []
@@ -7547,12 +7588,18 @@ Functions/convert/mold.r
 	a: make object! [a: self]
 	string? mold a
 ]
-; deep nested block
+; deep nested block mold
 ; bug#876
 [
-	a: copy []
-	repeat i 10000 [a: append/only copy [] a]
-	string? mold a
+	n: 1
+	forever [
+		a: copy []
+		if error? try [
+			loop n [a: append/only copy [] a]
+			mold a
+		][break/return true]
+		n: n * 2
+	]
 ]
 ; mold/all decimal
 ; bug#1633
@@ -7566,6 +7613,8 @@ Functions/convert/mold.r
 ]
 ; bug#1753
 [c: last mold/all 1e16 (#"0" <= c) and (#"9" >= c)]
+; bug#719
+["()" = mold quote ()]
 datatypes/library.r
 [
 	success: library? a-library: load/library case [
@@ -7801,7 +7850,7 @@ datatypes/percent.r
 [1.1% = to percent! "1.1%"]
 #r3only
 [error? try [to percent! "t"]]
-Functions/math/equalq.r
+functions/math/equalq.r
 ; reflexivity test for native!
 [equal? :abs :abs]
 [not equal? :abs :add]
