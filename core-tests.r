@@ -6749,7 +6749,7 @@ functions/series/append.r
 ; bug#1776
 #r3crash
 #r2crash
-[a: copy [] loop 1000000 [a: append/only copy [] a]]
+[a: copy [] until [error? try [a: append/only copy [] a]]]
 functions/series/at.r
 [
 	blk: []
