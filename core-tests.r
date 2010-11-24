@@ -10241,15 +10241,15 @@ functions/file/make-dir.r
 ; bug#1674
 #r2only
 [
-	all [
-		e: disarm try [make-dir %/folder-to-save-test-files]
+	any [
+		not error? e: disarm try [make-dir %/folder-to-save-test-files]
 		e/type = 'access
 	]
 ]
 #r3only
 [
-	all [
-		e: try [make-dir %/folder-to-save-test-files]
+	any [
+		not error? e: try [make-dir %/folder-to-save-test-files]
 		e/type = 'access
 	]
 ]
