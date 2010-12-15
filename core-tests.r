@@ -1383,6 +1383,12 @@ datatypes/get-word.r
 	unset 'a
 	unset? :a
 ]
+datatypes/gob.r
+#r3only
+; minimum
+[gob? make gob! []]
+#r3only
+[gob! = type? make gob! []]
 datatypes/hash.r
 #r2only
 ; minimum
