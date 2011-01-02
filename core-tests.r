@@ -3240,7 +3240,8 @@ functions/math/multiply.r
 [-2147483648 = multiply -2 1073741824]
 #32bit
 [error? try [multiply -2 2147483647]]
-#32bit #r2crash
+#32bit
+#r2crash
 [error? try [multiply -1 -2147483648]]
 [1073741824 = multiply -1 -1073741824]
 [2 = multiply -1 -2]
@@ -6557,6 +6558,7 @@ functions/control/try.r
 ; testing TRY/EXCEPT
 ; bug#822
 [error? try/except [make error! ""][0]]
+#r3only
 [try/except [do make error! ""][true]]
 functions/control/unless.r
 [
@@ -8810,7 +8812,7 @@ functions/math/equivq.r
 	equiv? a-value a-value
 ]
 ; comparison of cyclic blocks
-#r2crash
+#r3
 #r3crash
 [
 	a-value: copy []
