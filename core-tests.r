@@ -8057,6 +8057,7 @@ functions/math/equalq.r
 	insert/only a-value a-value
 	equal? a-value a-value
 ]
+; bug#1049
 #r2crash
 #r3crash
 ; Comparison of cyclic blocks
@@ -8624,16 +8625,6 @@ functions/math/equalq.r
 ; Error in R2 (could be fixed).
 #r3only
 [not equal? make port! http:// make port! http://]
-; bug#1049
-#r3crash
-#r2crash
-[
-	a: copy []
-	insert/only a a
-	b: copy []
-	insert/only b b
-	equal? a b ; crash!
-]
 ; bug#859
 [
 	a: copy quote ()
