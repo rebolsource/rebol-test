@@ -2082,6 +2082,15 @@ datatypes/set-word.r
 	a: action!
 	equal? :a action!
 ]
+#r3only
+; bug#1817
+[
+	a: make map! []
+	a/b: make object! [
+		c: make map! []
+	]
+	integer? a/b/c/d: 1
+]
 datatypes/string.r
 [string? "ahoj"]
 [not string? 1]
