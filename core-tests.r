@@ -10290,3 +10290,8 @@ functions/file/make-dir.r
 ]
 ; bug#1810: REVERSE/part does not work for tuple!
 [3.2.1.4.5 = reverse/part 1.2.3.4.5 3]
+; bug#1820: Word USER can't be selected with path syntax
+[
+	b: [user 1 _user 2]
+	1 = b/user]
+]
