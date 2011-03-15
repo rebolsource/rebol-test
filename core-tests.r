@@ -10293,7 +10293,7 @@ functions/file/make-dir.r
 ; bug#1820: Word USER can't be selected with path syntax
 [
 	b: [user 1 _user 2]
-	1 = b/user]
+	1 = b/user
 ]
 ; bug#1822: DIFFERENCE on date!s problem
 [12:00 = difference 13/1/2011/12:00 13/1/2011]
