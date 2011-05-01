@@ -7412,6 +7412,8 @@ functions/series/parse.r
 [parse "" [not skip]]
 #r3only
 [parse "" [not fail]]
+; bug#1880
+[parse "12" ["" to end]]
 functions/series/pick.r
 #64bit
 [error? try [pick at [1 2 3 4 5] 3 -9223372036854775808]]
