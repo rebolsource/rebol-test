@@ -6331,6 +6331,11 @@ functions/control/loop.r
 	]
 	f 1
 ]
+functions/control/map-each.r
+; "return bug"
+[
+	integer? do does [map-each v [][] 1]
+]
 functions/control/reduce.r
 [[1 2] = reduce [1 1 + 1]]
 [
