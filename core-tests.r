@@ -5600,6 +5600,7 @@ functions/control/do.r
 ]
 ; infinite recursion for string
 #test3crash
+; bug#1896
 [
 	str: "do str"
 	error? try [do str]
@@ -6772,6 +6773,12 @@ functions/series/append.r
 #r3crash
 #r2crash
 [a: copy [] until [error? try [a: append/only copy [] a]]]
+; bug#1894
+#r3crash
+[
+	port: open/new %pokus.txt
+	append port newline
+]
 functions/series/at.r
 [
 	blk: []
@@ -8819,6 +8826,7 @@ functions/math/equivq.r
 	equiv? a-value a-value
 ]
 ; comparison of cyclic blocks
+; bug#1049
 #r3
 #r3crash
 [
