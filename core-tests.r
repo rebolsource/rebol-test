@@ -6779,6 +6779,7 @@ functions/series/append.r
 	port: open/new %pokus.txt
 	append port newline
 ]
+[block? append copy [] ()]
 functions/series/at.r
 [
 	blk: []
