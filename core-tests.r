@@ -5269,6 +5269,11 @@ functions/control/compose.r
 	blk: [(compose blk)]
 	error? try blk
 ]
+; #1906
+#r3crash
+[
+	b: copy [] insert/dup b 1 32768 compose b
+]
 functions/control/continue.r
 #r3only
 [
