@@ -9274,6 +9274,11 @@ functions/math/random.r
 		negative? random 1.0
 	]
 ]
+; bug#1875
+[
+	random/seed 0
+	2 = random/only next [1 2]
+]
 functions/math/strict-equalq.r
 [strict-equal? :abs :abs]
 ; reflexivity test for native!
