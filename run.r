@@ -30,7 +30,8 @@ do-core-tests: has [
 	print [
 		now
 		rebol/version
-		"Total:" succeeded + test-failures + dialect-failures + skipped
+		"Total:" succeeded + test-failures + crashes + dialect-failures
+			+ skipped
 		"Succeeded:" succeeded
 		"Test failures:" test-failures
 		"Crashes:" crashes
