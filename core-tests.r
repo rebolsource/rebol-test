@@ -2549,6 +2549,2302 @@ datatypes/word.r
 	a-value: 'a
 	:a-value == a-value
 ]
+functions/comparison/equalq.r
+; reflexivity test for native!
+[equal? :abs :abs]
+[not equal? :abs :add]
+[equal? :all :all]
+[not equal? :all :any]
+; reflexivity test for op!
+[equal? :+ :+]
+[not equal? :+ :-]
+; reflexivity test for function!
+; Uses func instead of make function! so the test is compatible.
+[equal? a-value: func [][] :a-value]
+; No structural equivalence for function!
+; Uses FUNC instead of make function! so the test is compatible.
+[not equal? func [][] func [][]]
+; reflexivity test for closure!
+; Uses CLOSURE to make the test compatible. On todo list for R2/Forward.
+#r3
+[equal? a-value: closure [][] :a-value]
+; No structural equivalence for closure!
+; Uses CLOSURE to make the test compatible. On todo list for R2/Forward.
+#r3
+[not equal? closure [][] closure [][]]
+[equal? a-value: #{00} a-value]
+; binary!
+; Same contents
+[equal? #{00} #{00}]
+; Different contents
+[not equal? #{00} #{01}]
+; Offset + similar contents at reference
+[equal? #{00} #[binary! #{0000} 2]]
+; Offset + similar contents at reference
+[equal? #{00} #[binary! #{0100} 2]]
+[equal? equal? #{00} #[binary! #{0100} 2] equal? #[binary! #{0100} 2] #{00}]
+; No binary! padding
+[not equal? #{00} #{0000}]
+[equal? equal? #{00} #{0000} equal? #{0000} #{00}]
+; Empty binary! not none
+[not equal? #{} none]
+[equal? equal? #{} none equal? none #{}]
+#r3only
+; email! vs. string!
+; RAMBO #3518
+[
+	a-value: to email! ""
+	equal? a-value to string! a-value
+]
+; email! vs. string! symmetry
+[
+	a-value: to email! ""
+	equal? equal? to string! a-value a-value equal? a-value to string! a-value
+]
+#r3only
+; file! vs. string!
+; RAMBO #3518
+[
+	a-value: %""
+	equal? a-value to string! a-value
+]
+; file! vs. string! symmetry
+[
+	a-value: %""
+	equal? equal? a-value to string! a-value equal? to string! a-value a-value
+]
+; image! same contents
+[equal? a-value: #[image! 1x1 #{000000}] a-value]
+[equal? #[image! 1x1 #{000000}] #[image! 1x1 #{000000}]]
+[equal? #[image! 1x1 #{}] #[image! 1x1 #{000000}]]
+; image! different size
+[not equal? #[image! 1x2 #{000000}] #[image! 1x1 #{000000}]]
+; image! different size
+[not equal? #[image! 2x1 #{000000}] #[image! 1x1 #{000000}]]
+; image! different rgb
+[not equal? #[image! 1x1 #{000001}] #[image! 1x1 #{000000}]]
+; image! alpha not specified = 0
+[equal? #[image! 1x1 #{000000} #{00}] #[image! 1x1 #{000000}]]
+; image! alpha different
+[not equal? #[image! 1x1 #{000000} #{01}] #[image! 1x1 #{000000}]]
+#r3only
+; Literal offset not spported in R2.
+[equal? #[image! 1x1 #{000000} 2] #[image! 1x1 #{000000} 2]]
+#r3only
+; Literal offset not spported in R2.
+[not equal? #[image! 1x1 #{000000} 2] #[image! 1x1 #{000000}]]
+[
+	a-value: #[image! 1x1 #{000000}]
+	not equal? a-value next a-value
+]
+#r3only
+; image! offset + structural equivalence
+[equal? #[image! 0x0 #{}] next #[image! 1x1 #{000000}]]
+#r3only
+; image! offset + structural equivalence
+[equal? #[image! 1x0 #{}] next #[image! 1x1 #{000000}]]
+#r3only
+; image! offset + structural equivalence
+[equal? #[image! 0x1 #{}] next #[image! 1x1 #{000000}]]
+#r2
+; image! offset + structural equivalence
+[not equal? #[image! 0x0 #{}] next #[image! 1x1 #{000000}]]
+#r2
+; image! offset + structural equivalence
+[not equal? #[image! 1x0 #{}] next #[image! 1x1 #{000000}]]
+#r2
+; image! offset + structural equivalence
+[not equal? #[image! 0x1 #{}] next #[image! 1x1 #{000000}]]
+; No implicit to binary! from image!
+[not equal? #{00} #[image! 1x1 #{000000}]]
+; No implicit to binary! from image!
+[not equal? #{00000000} #[image! 1x1 #{000000}]]
+; No implicit to binary! from image!
+[not equal? #{0000000000} #[image! 1x1 #{000000}]]
+[equal? equal? #{00} #[image! 1x1 #{00}] equal? #[image! 1x1 #{00}] #{00}]
+; No implicit to binary! from integer!
+[not equal? #{00} to integer! #{00}]
+[equal? equal? #{00} to integer! #{00} equal? to integer! #{00} #{00}]
+#r3only
+; issue! vs. string!
+; RAMBO #3518
+[not-equal? a-value: #a to string! a-value]
+[
+	a-value: #a
+	equal? equal? a-value to string! a-value equal? to string! a-value a-value
+]
+; No implicit to binary! from string!
+[not equal? a-value: "" to binary! a-value]
+[
+	a-value: ""
+	equal? equal? a-value to binary! a-value equal? to binary! a-value a-value
+]
+#r3only
+; tag! vs. string!
+; RAMBO #3518
+[equal? a-value: to tag! "" to string! a-value]
+[
+	a-value: to tag! ""
+	equal? equal? a-value to string! a-value equal? to string! a-value a-value
+]
+[equal? 0.0.0 0.0.0]
+[not equal? 0.0.1 0.0.0]
+; tuple! right-pads with 0
+[equal? 1.0.0 1.0.0.0.0.0.0.0.0.0]
+; tuple! right-pads with 0
+[equal? 1.0.0.0.0.0.0.0.0.0 1.0.0]
+; tuple! right-pads with 0
+[not equal? 1.0.0 0.0.0.0.0.0.0.1.0.0]
+; No implicit to binary! from tuple!
+[
+	a-value: 0.0.0.0
+	not equal? to binary! a-value a-value
+]
+[
+	a-value: 0.0.0.0
+	equal? equal? to binary! a-value a-value equal? a-value to binary! a-value
+]
+[equal? #[bitset! #{00}] #[bitset! #{00}]]
+; bitset! with no bits set does not equal empty bitset
+; This is because of the COMPLEMENT problem: bug#1085.
+[not equal? #[bitset! #{}] #[bitset! #{00}]]
+; No implicit to binary! from bitset!
+[not equal? #{00} #[bitset! #{00}]]
+[equal? equal? #[bitset! #{00}] #{00} equal? #{00} #[bitset! #{00}]]
+[equal? [] []]
+[equal? a-value: [] a-value]
+#r3only
+; Reflexivity for past-tail blocks
+; Error in R2.
+[
+	a-value: tail [1]
+	clear head a-value
+	equal? a-value a-value
+]
+; Reflexivity for cyclic blocks
+[
+	a-value: copy []
+	insert/only a-value a-value
+	equal? a-value a-value
+]
+; bug#1049
+#r2crash
+#r3crash
+; Comparison of cyclic blocks
+[
+	a-value: copy []
+	insert/only a-value a-value
+	b-value: copy []
+	insert/only b-value b-value
+	equal? a-value b-value
+]
+[not equal? [] none]
+[equal? equal? [] none equal? none []]
+; block! vs. paren!
+[not equal? [] first [()]]
+; block! vs. paren! symmetry
+[equal? equal? [] first [()] equal? first [()] []]
+; block! vs. path!
+[not equal? [a b] 'a/b]
+; block! vs. path! symmetry
+[
+	a-value: 'a/b
+	b-value: [a b]
+	equal? equal? :a-value :b-value equal? :b-value :a-value
+]
+; block! vs. lit-path!
+[not equal? [a b] first ['a/b]]
+; block! vs. lit-path! symmetry
+[
+	a-value: first ['a/b]
+	b-value: [a b]
+	equal? equal? :a-value :b-value equal? :b-value :a-value
+]
+; block! vs. set-path!
+[not equal? [a b] first [a/b:]]
+; block! vs. set-path! symmetry
+[
+	a-value: first [a/b:]
+	b-value: [a b]
+	equal? equal? :a-value :b-value equal? :b-value :a-value
+]
+; block! vs. get-path!
+[not equal? [a b] first [:a/b]]
+; block! vs. get-path! symmetry
+[
+	a-value: first [:a/b]
+	b-value: [a b]
+	equal? equal? :a-value :b-value equal? :b-value :a-value
+]
+[equal? decimal! decimal!]
+[not equal? decimal! integer!]
+[equal? equal? decimal! integer! equal? integer! decimal!]
+; datatype! vs. typeset!
+[not equal? number! integer!]
+; datatype! vs. typeset! symmetry
+[equal? equal? number! integer! equal? integer! number!]
+#r3only
+; datatype! vs. typeset!
+[not equal? integer! make typeset! [integer!]]
+#r3only
+; datatype! vs. typeset!
+[	not equal? integer! to typeset! [integer!]]
+#r3
+; datatype! vs. typeset!
+; Supported by R2/Forward.
+[not equal? integer! to-typeset [integer!]]
+; typeset! (or pseudo-type in R2)
+[equal? number! number!]
+; typeset! (or pseudo-type in R2)
+[not equal? number! series!]
+#r3only
+[equal? make typeset! [integer!] make typeset! [integer!]]
+#r3only
+[equal? to typeset! [integer!] to typeset! [integer!]]
+#r3
+; Supported by R2/Forward.
+[equal? to-typeset [integer!] to-typeset [integer!]]
+[equal? -1 -1]
+[equal? 0 0]
+[equal? 1 1]
+[equal? 0.0 0.0]
+[equal? 0.0 -0.0]
+[equal? 1.0 1.0]
+[equal? -1.0 -1.0]
+#64bit
+[equal? -9223372036854775808 -9223372036854775808]
+#64bit
+[equal? -9223372036854775807 -9223372036854775807]
+#64bit
+[equal? 9223372036854775807 9223372036854775807]
+#64bit
+[not equal? -9223372036854775808 -9223372036854775807]
+#64bit
+[not equal? -9223372036854775808 -1]
+#64bit
+[not equal? -9223372036854775808 0]
+#64bit
+[not equal? -9223372036854775808 1]
+#64bit
+[not equal? -9223372036854775808 9223372036854775806]
+#64bit
+[not equal? -9223372036854775807 -9223372036854775808]
+#64bit
+[not equal? -9223372036854775807 -1]
+#64bit
+[not equal? -9223372036854775807 0]
+#64bit
+[not equal? -9223372036854775807 1]
+#64bit
+[not equal? -9223372036854775807 9223372036854775806]
+#64bit
+[not equal? -9223372036854775807 9223372036854775807]
+#64bit
+[not equal? -1 -9223372036854775808]
+#64bit
+[not equal? -1 -9223372036854775807]
+[not equal? -1 0]
+[not equal? -1 1]
+#64bit
+[not equal? -1 9223372036854775806]
+#64bit
+[not equal? -1 9223372036854775807]
+#64bit
+[not equal? 0 -9223372036854775808]
+#64bit
+[not equal? 0 -9223372036854775807]
+[not equal? 0 -1]
+[not equal? 0 1]
+#64bit
+[not equal? 0 9223372036854775806]
+#64bit
+[not equal? 0 9223372036854775807]
+#64bit
+[not equal? 1 -9223372036854775808]
+#64bit
+[not equal? 1 -9223372036854775807]
+[not equal? 1 -1]
+[not equal? 1 0]
+#64bit
+[not equal? 1 9223372036854775806]
+#64bit
+[not equal? 1 9223372036854775807]
+#64bit
+[not equal? 9223372036854775806 -9223372036854775808]
+#64bit
+[not equal? 9223372036854775806 -9223372036854775807]
+#64bit
+[not equal? 9223372036854775806 -1]
+#64bit
+[not equal? 9223372036854775806 0]
+#64bit
+[not equal? 9223372036854775806 1]
+#64bit
+[not equal? 9223372036854775806 9223372036854775807]
+#64bit
+[not equal? 9223372036854775807 -9223372036854775808]
+#64bit
+[not equal? 9223372036854775807 -9223372036854775807]
+#64bit
+[not equal? 9223372036854775807 -1]
+#64bit
+[not equal? 9223372036854775807 0]
+#64bit
+[not equal? 9223372036854775807 1]
+#64bit
+[not equal? 9223372036854775807 9223372036854775806]
+; decimal! approximate equality
+[equal? 0.3 0.1 + 0.1 + 0.1]
+; decimal! approximate equality symmetry
+[equal? equal? 0.3 0.1 + 0.1 + 0.1 equal? 0.1 + 0.1 + 0.1 0.3]
+[equal? 0.15 - 0.05 0.1]
+[equal? equal? 0.15 - 0.05 0.1 equal? 0.1 0.15 - 0.05]
+[equal? -0.5 cosine 120]
+[equal? equal? -0.5 cosine 120 equal? cosine 120 -0.5]
+[equal? 0.5 * square-root 2.0 sine 45]
+[equal? equal? 0.5 * square-root 2.0 sine 45 equal? sine 45 0.5 * square-root 2.0]
+[equal? 0.5 sine 30]
+[equal? equal? 0.5 sine 30 equal? sine 30 0.5]
+[equal? 0.5 cosine 60]
+[equal? equal? 0.5 cosine 60 equal? cosine 60 0.5]
+[equal? 0.5 * square-root 3.0 sine 60]
+[equal? equal? 0.5 * square-root 3.0 sine 60 equal? sine 60 0.5 * square-root 3.0]
+[equal? 0.5 * square-root 3.0 cosine 30]
+[equal? equal? 0.5 * square-root 3.0 cosine 30 equal? cosine 30 0.5 * square-root 3.0]
+[equal? square-root 3.0 tangent 60]
+[equal? equal? square-root 3.0 tangent 60 equal? tangent 60 square-root 3.0]
+[equal? (square-root 3.0) / 3.0 tangent 30]
+[equal? equal? (square-root 3.0) / 3.0 tangent 30 equal? tangent 30 (square-root 3.0) / 3.0]
+[equal? 1.0 tangent 45]
+[equal? equal? 1.0 tangent 45 equal? tangent 45 1.0]
+[
+	num: square-root 2.0
+	equal? 2.0 num * num
+]
+[
+	num: square-root 2.0
+	equal? equal? 2.0 num * num equal? num * num 2.0
+]
+[
+	num: square-root 3.0
+	equal? 3.0 num * num
+]
+[
+	num: square-root 3.0
+	equal? equal? 3.0 num * num equal? num * num 3.0
+]
+; integer! vs. decimal!
+[equal? 0 0.0]
+; integer! vs. money!
+[equal? 0 $0]
+#r3only
+; integer! vs. percent!
+[equal? 0 0%]
+; decimal! vs. money!
+[equal? 0.0 $0]
+#r3only
+; decimal! vs. percent!
+[equal? 0.0 0%]
+#r3only
+; money! vs. percent!
+[equal? $0 0%]
+; integer! vs. decimal! symmetry
+[equal? equal? 1 1.0 equal? 1.0 1]
+; integer! vs. money! symmetry
+[equal? equal? 1 $1 equal? $1 1]
+#r3only
+; integer! vs. percent! symmetry
+[equal? equal? 1 100% equal? 100% 1]
+; decimal! vs. money! symmetry
+[equal? equal? 1.0 $1 equal? $1 1.0]
+#r3only
+; decimal! vs. percent! symmetry
+[equal? equal? 1.0 100% equal? 100% 1.0]
+#r3only
+; money! vs. percent! symmetry
+[equal? equal? $1 100% equal? 100% $1]
+#r3only
+; percent! approximate equality
+[equal? 10% + 10% + 10% 30%]
+#r3only
+; percent! approximate equality symmetry
+[equal? equal? 10% + 10% + 10% 30% equal? 30% 10% + 10% + 10%]
+[equal? 2-Jul-2009 2-Jul-2009]
+#r2only
+; date! ignores time portion
+[equal? 2-Jul-2009 2-Jul-2009/22:20]
+#r3only
+; date! doesn't ignore time portion
+[not equal? 2-Jul-2009 2-Jul-2009/22:20]
+[equal? equal? 2-Jul-2009 2-Jul-2009/22:20 equal? 2-Jul-2009/22:20 2-Jul-2009]
+; date! missing time and zone = 00:00:00+00:00
+[equal? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
+[	equal? equal? 2-Jul-2009 2-Jul-2009/00:00 equal? 2-Jul-2009/00:00 2-Jul-2009]
+; Timezone math in date!
+[equal? 2-Jul-2009/22:20 2-Jul-2009/20:20-2:00]
+[equal? 00:00 00:00]
+; time! missing components are 0
+[equal? 0:0 00:00:00.0000000000]
+[equal? equal? 0:0 00:00:00.0000000000 equal? 00:00:00.0000000000 0:0]
+; time! vs. integer!
+; bug#1103
+[not equal? 0:00 0]
+; integer! vs. time!
+; bug#1103
+[not equal? 0 00:00]
+[equal? #"a" #"a"]
+#r3only
+; char! vs. integer!
+; No implicit to char! from integer! in R3.
+[not equal? #"a" 97]
+; char! vs. integer! symmetry
+[equal? equal? #"a" 97 equal? 97 #"a"]
+#r3only
+; char! vs. decimal!
+; No implicit to char! from decimal! in R3.
+[not equal? #"a" 97.0]
+; char! vs. decimal! symmetry
+[equal? equal? #"a" 97.0 equal? 97.0 #"a"]
+#r3only
+; char! case
+[equal? #"a" #"A"]
+; string! case
+[equal? "a" "A"]
+; issue! case
+[equal? #a #A]
+; tag! case
+[equal? <a a="a"> <A A="A">]
+; url! case
+[equal? http://a.com httP://A.coM]
+; email! case
+[equal? a@a.com A@A.Com]
+[equal? 'a 'a]
+[equal? 'a 'A]
+[equal? equal? 'a 'A equal? 'A 'a]
+; word binding
+[equal? 'a use [a] ['a]]
+; word binding symmetry
+[equal? equal? 'a use [a] ['a] equal? use [a] ['a] 'a]
+; word! vs. get-word!
+[equal? 'a first [:a]]
+; word! vs. get-word! symmetry
+[equal? equal? 'a first [:a] equal? first [:a] 'a]
+; {word! vs. lit-word!
+[equal? 'a first ['a]]
+; word! vs. lit-word! symmetry
+[equal? equal? 'a first ['a] equal? first ['a] 'a]
+; word! vs. refinement!
+[equal? 'a /a]
+; word! vs. refinement! symmetry
+[equal? equal? 'a /a equal? /a 'a]
+; word! vs. set-word!
+[equal? 'a first [a:]]
+; word! vs. set-word! symmetry
+[equal? equal? 'a first [a:] equal? first [a:] 'a]
+; get-word! reflexivity
+[equal? first [:a] first [:a]]
+; get-word! vs. lit-word!
+[equal? first [:a] first ['a]]
+; get-word! vs. lit-word! symmetry
+[equal? equal? first [:a] first ['a] equal? first ['a] first [:a]]
+; get-word! vs. refinement!
+[equal? first [:a] /a]
+; get-word! vs. refinement! symmetry
+[equal? equal? first [:a] /a equal? /a first [:a]]
+; get-word! vs. set-word!
+[equal? first [:a] first [a:]]
+; get-word! vs. set-word! symmetry
+[equal? equal? first [:a] first [a:] equal? first [a:] first [:a]]
+; lit-word! reflexivity
+[equal? first ['a] first ['a]]
+; lit-word! vs. refinement!
+[equal? first ['a] /a]
+; lit-word! vs. refinement! symmetry
+[equal? equal? first ['a] /a equal? /a first ['a]]
+; lit-word! vs. set-word!
+[equal? first ['a] first [a:]]
+; lit-word! vs. set-word! symmetry
+[equal? equal? first ['a] first [a:] equal? first [a:] first ['a]]
+; refinement! reflexivity
+[equal? /a /a]
+; refinement! vs. set-word!
+[equal? /a first [a:]]
+; refinement! vs. set-word! symmetry
+[equal? equal? /a first [a:] equal? first [a:] /a]
+; set-word! reflexivity
+[equal? first [a:] first [a:]]
+[equal? true true]
+[equal? false false]
+[not equal? true false]
+[not equal? false true]
+; object! reflexivity
+[equal? a-value: make object! [a: 1] a-value]
+#r3only
+; object! simple structural equivalence
+[equal? make object! [a: 1] make object! [a: 1]]
+; object! different values
+[not equal? make object! [a: 1] make object! [a: 2]]
+; object! different words
+[not equal? make object! [a: 1] make object! [b: 1]]
+[not equal? make object! [a: 1] make object! []]
+#r3only
+; object! complex structural equivalence
+[
+	a-value: construct/only [
+		a: 1 b: 1.0 c: $1 d: 1%
+		e: [a 'a :a a: /a #"a" #{00}]
+		f: ["a" #a http://a a@a.com <a>]
+		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
+	]
+	b-value: construct/only [
+		a: 1 b: 1.0 c: $1 d: 1%
+		e: [a 'a :a a: /a #"a" #{00}]
+		f: ["a" #a http://a a@a.com <a>]
+		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
+	]
+	equal? a-value b-value
+]
+#r3only
+; object! complex structural equivalence
+; Slight differences.
+; bug#1133
+[
+	a-value: construct/only [c: $1]
+	b-value: construct/only [c: 100%]
+	equal? a-value b-value
+]
+#r3only
+[
+	a-value: construct/only [
+		a: 1 b: 1.0 c: $1 d: 1%
+		e: [a 'a :a a: /a #"a" #{00}]
+		f: ["a" #a http://a a@a.com <a>]
+		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
+	]
+	b-value: construct/only [
+		a: 1.0 b: $1 c: 100% d: 0.01
+		e: [/a a 'a :a a: #"A" #[binary! #{0000} 2]]
+		f: [#a <A> http://A a@A.com "A"]
+		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
+	]
+	equal? a-value b-value
+]
+#r3only
+; object! structural equivalence verified
+; Structural equality requires equality of the object's fields.
+[
+	a-value: construct/only [
+		a: 1 b: 1.0 c: $1 d: 1%
+		e: [a 'a :a a: /a #"a" #{00}]
+		f: ["a" #a http://a a@a.com <a>]
+		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
+	]
+	b-value: construct/only [
+		a: 1 b: 1.0 c: $1 d: 1%
+		e: [a 'a :a a: /a #"a" #{00}]
+		f: ["a" #a http://a a@a.com <a>]
+		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
+	]
+	test: :equal?
+	equal?
+		test a-value b-value
+		foreach [w v] a-value [
+			unless test :v select b-value w [break/return false]
+			true
+		]
+]
+#r3only
+; object! structural equivalence verified
+; Structural equality requires equality of the object's fields.
+[
+	a-value: construct/only [
+		a: 1 b: 1.0 c: $1 d: 1%
+		e: [a 'a :a a: /a #"a" #{00}]
+		f: ["a" #a http://a a@a.com <a>]
+		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
+	]
+	b-value: construct/only [
+		a: 1.0 b: $1 c: 100% d: 0.01
+		e: [/a a 'a :a a: #"A" #[binary! #{0000} 2]]
+		f: [#a <A> http://A a@A.com "A"]
+		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
+	]
+	test: :equal?
+	equal?
+		test a-value b-value
+		foreach [w v] a-value [
+			unless test :v select b-value w [break/return false]
+			true
+		]
+]
+; unset! comparison fails
+; Evaluates () to get unset! value, in case #[unset!] constructor fails.
+#r2only
+[error? try [equal? () ()]]
+#r3only
+[equal? () ()]
+; basic comparison with unset first argument fails
+#r2only
+[error? try [equal? () none]]
+#r3only
+[not-equal? () none]
+; basic comparison with unset second argument fails
+#r2only
+[error? try [equal? none ()]]
+#r3only
+[not-equal? none ()]
+#r3only
+; unset! symmetry
+[equal? equal? none () equal? () none]
+; unset! symmetry
+; Fails on R2 because there is no structural comparison of objects.
+#r2only
+[not equal? disarm try [equal? none ()] disarm try [equal? () none]]
+#r3only
+; basic comparison with unset first argument succeeds with = op
+; Code in R3 mezzanines depends on this.
+[not (() = none)]
+#r3only
+; basic comparison with unset first argument succeeds with != op
+; Code in R3 mezzanines depends on this.
+[() != none]
+; basic comparison with unset second argument fails with = op
+#r2only
+[error? try [none = ()]]
+#r3only
+[not none = ()]
+; basic comparison with unset second argument fails with != op
+#r2only
+[error? try [none != ()]]
+#r3only
+[none != ()]
+#r2only
+[error? try [() = ()]]
+#r3only
+[() = ()]
+#r2only
+[error? try [() != ()]]
+#r3only
+[not () != ()]
+#r3only
+; unset! symmetry with =
+[equal? none = () () = none]
+; unset! symmetry with =
+; Fails on R2 because there is no structural comparison of objects.
+#r2only
+[not equal? disarm try [none = ()] disarm try [() = none]]
+#r3only
+[equal? none = () () = none]
+#r3only
+; error! reflexivity
+; Evaluates (try [1 / 0]) to get error! value.
+[
+	a-value: none
+	set/any 'a-value (try [1 / 0])
+	equal? a-value a-value
+]
+#r3only
+; error! structural equivalence
+; Evaluates (try [1 / 0]) to get error! value.
+[equal? (try [1 / 0]) (try [1 / 0])]
+#r3only
+; error! structural equivalence
+[equal? (make error! "hello") (make error! "hello")]
+#r3only
+; error! difference in code
+[not equal? (try [1 / 0]) (make error! "hello")]
+#r3only
+; error! difference in data
+[not equal? (make error! "hello") (make error! "there")]
+#r3only
+; error! difference in op! code
+; bug#60: op! generates error! with offset code field
+[not equal? (try [1 / 0]) (try [2 / 0])]
+#r3only
+; error! basic comparison
+[not equal? (try [1 / 0]) none]
+#r3only
+; error! basic comparison
+[not equal? none (try [1 / 0])]
+#r3only
+; error! basic comparison symmetry
+[equal? equal? (try [1 / 0]) none equal? none (try [1 / 0])]
+#r3only
+; error! basic comparison with = op
+[not ((try [1 / 0]) = none)]
+#r3only
+; error! basic comparison with != op
+[(try [1 / 0]) != none]
+#r3only
+; error! basic comparison with = op
+[not (none = (try [1 / 0]))]
+#r3only
+; error! basic comparison with != op
+[none != (try [1 / 0])]
+#r3only
+; error! symmetry with = op
+[equal? not ((try [1 / 0]) = none) not (none = (try [1 / 0]))]
+#r3only
+; error! symmetry with != op
+[equal? (try [1 / 0]) != none none != (try [1 / 0])]
+#r3only
+; port! reflexivity
+; Error in R2 (could be fixed).
+[equal? p: make port! http:// p]
+; No structural equivalence for port!
+; Error in R2 (could be fixed).
+#r3only
+[not equal? make port! http:// make port! http://]
+; bug#859
+[
+	a: copy quote ()
+	insert/only a a
+	error? try [do a]
+]
+functions/comparison/equivq.r
+; reflexivity test for native!
+#r3
+[equiv? :abs :abs]
+#r3
+[equiv? :all :all]
+#r3
+[not equiv? :all :any]
+; reflexivity test for op!
+#r3
+[equiv? :+ :+]
+#r3
+[not equiv? :+ :-]
+; reflexivity test for function!
+; Uses func instead of make function! so the test is compatible.
+#r3
+[equiv? a-value: func [][] :a-value]
+; no structural equivalence for function!
+#r3
+[not equiv? func [][] func [][]]
+; reflexivity test for closure!
+; Uses CLOSURE to make the test compatible. On todo list for R2/Forward.
+#r3
+[equiv? a-value: closure [][] :a-value]
+; No structural equivalence for closure!
+; Uses CLOSURE to make the test compatible. On todo list for R2/Forward.
+#r3
+[not equiv? closure [][] closure [][]]
+; binary!
+; Same contents
+#r3
+[equiv? #{00} #{00}]
+; Different contents
+#r3
+[not equiv? #{00} #{01}]
+; Offset + similar contents at reference
+#r3
+[equiv? #{00} #[binary! #{0000} 2]]
+; Offset + similar contents at reference
+#r3
+[equiv? #{00} #[binary! #{0100} 2]]
+#r3
+[equal? equiv? #{00} #[binary! #{0100} 2] equiv? #[binary! #{0100} 2] #{00}]
+; No binary! padding
+#r3
+[not equiv? #{00} #{0000}]
+#r3
+[equal? equiv? #{00} #{0000} equiv? #{0000} #{00}]
+; Empty binary! not none
+#r3
+[not equiv? #{} none]
+; email versus string; RAMBO #3518
+#r3
+[
+	a-value: to email! ""
+	equiv? a-value to string! a-value
+]
+; symmetry
+#r3
+[
+	a-value: to email! ""
+	equal? equiv? to string! a-value a-value equiv? a-value to string! a-value
+]
+; file! vs. string!
+; RAMBO #3518
+#r3
+[
+	a-value: %""
+	equiv? a-value to string! a-value
+]
+; symmetry
+#r3
+[
+	a-value: %""
+	equal? equiv? a-value to string! a-value equiv? to string! a-value a-value
+]
+; image! same contents
+#r3
+[equiv? a-value: #[image! 1x1 #{000000}] a-value]
+#r3
+[equiv? #[image! 1x1 #{000000}] #[image! 1x1 #{000000}]]
+#r3
+[equiv? #[image! 1x1 #{}] #[image! 1x1 #{000000}]]
+#r3
+[not equiv? #{00} #[image! 1x1 #{00}]]
+; symmetry
+#r3
+[equal? equiv? #{00} #[image! 1x1 #{00}] equiv? #[image! 1x1 #{00}] #{00}]
+#r3
+[not equiv? #{00} to integer! #{00}]
+; symmetry
+#r3
+[equal? equiv? #{00} to integer! #{00} equiv? to integer! #{00} #{00}]
+; RAMBO #3518
+#r3
+[
+	a-value: #a
+	not-equiv? a-value to string! a-value
+]
+; symmetry
+#r3
+[
+	a-value: #a
+	equal? equiv? a-value to string! a-value equiv? to string! a-value a-value
+]
+#r3
+[not equiv? #{} none]
+; symmetry
+#r3
+[equal? equiv? #{} none equiv? none #{}]
+#r3
+[
+	a-value: ""
+	not equiv? a-value to binary! a-value
+]
+; symmetry
+#r3
+[
+	a-value: ""
+	equal? equiv? a-value to binary! a-value equiv? to binary! a-value a-value
+]
+; RAMBO #3518
+#r3
+[
+	a-value: to tag! ""
+	equiv? a-value to string! a-value
+]
+; symmetry
+#r3
+[
+	a-value: to tag! ""
+	equal? equiv? a-value to string! a-value equiv? to string! a-value a-value
+]
+#r3
+[
+	a-value: 0.0.0.0
+	not equiv? to binary! a-value a-value
+]
+; symmetry
+#r3
+[
+	a-value: 0.0.0.0
+	equal? equiv? to binary! a-value a-value equiv? a-value to binary! a-value
+]
+#r3
+[equiv? #[bitset! #{00}] #[bitset! #{00}]]
+#r3
+[not equiv? #[bitset! #{}] #[bitset! #{00}]]
+; block!
+#r3
+[equiv? [] []]
+; reflexivity
+#r3
+[
+	a-value: []
+	equiv? a-value a-value
+]
+; reflexivity for past-tail blocks
+#r3
+[
+	a-value: tail [1]
+	clear head a-value
+	equiv? a-value a-value
+]
+; reflexivity for cyclic blocks
+#r3
+[
+	a-value: copy []
+	insert/only a-value a-value
+	equiv? a-value a-value
+]
+; comparison of cyclic blocks
+; bug#1049
+#r3
+#r3crash
+[
+	a-value: copy []
+	insert/only a-value a-value
+	b-value: copy []
+	insert/only b-value b-value
+	equiv? a-value b-value
+]
+#r3
+[not equiv? [] none]
+#r3
+[equal? equiv? [] none equiv? none []]
+; block! vs. paren!
+#r3
+[not equiv? [] first [()]]
+; block! vs. paren! symmetry
+#r3
+[equal? equiv? [] first [()] equiv? first [()] []]
+; block! vs. path!
+#r3
+[not equiv? [a b] 'a/b]
+; block! vs. path! symmetry
+#r3
+[
+	a-value: 'a/b
+	b-value: [a b]
+	equal? equiv? :a-value :b-value equiv? :b-value :a-value
+]
+; block! vs. lit-path!
+#r3
+[not equal? [a b] first ['a/b]]
+; block! vs. lit-path! symmetry
+#r3
+[
+	a-value: first ['a/b]
+	b-value: [a b]
+	equal? equiv? :a-value :b-value equiv? :b-value :a-value
+]
+; block! vs. set-path!
+#r3
+[not equiv? [a b] first [a/b:]]
+; block! vs. set-path! symmetry
+#r3
+[
+	a-value: first [a/b:]
+	b-value: [a b]
+	equal? equiv? :a-value :b-value equiv? :b-value :a-value
+]
+; block! vs. get-path!
+#r3
+[not equiv? [a b] first [:a/b]]
+; block! vs. get-path! symmetry
+#r3
+[
+	a-value: first [:a/b]
+	b-value: [a b]
+	equal? equiv? :a-value :b-value equiv? :b-value :a-value
+]
+#r3
+[equiv? decimal! decimal!]
+#r3
+[not equiv? decimal! integer!]
+#r3
+[equal? equiv? decimal! integer! equiv? integer! decimal!]
+#r3
+[not equiv? number! integer!]
+; symmetry
+#r3
+[equal? equiv? number! integer! equiv? integer! number!]
+#r3only
+[not equiv? integer! make typeset! [integer!]]
+#r3only
+[equal? equiv? integer! make typeset! [integer!] equiv? make typeset! [integer!] integer!]
+; reflexivity
+#r3
+[equiv? -1 -1]
+; reflexivity
+#r3
+[equiv? 0 0]
+; reflexivity
+#r3
+[equiv? 1 1]
+; reflexivity
+#r3
+[equiv? 0.0 0.0]
+#r3
+[equiv? 0.0 -0.0]
+; reflexivity
+#r3
+[equiv? 1.0 1.0]
+; reflexivity
+#r3
+[equiv? -1.0 -1.0]
+; reflexivity
+#64bit
+#r3
+[equiv? -9223372036854775808 -9223372036854775808]
+; reflexivity
+#64bit
+#r3
+[equiv? -9223372036854775807 -9223372036854775807]
+; reflexivity
+#64bit
+#r3
+[equiv? 9223372036854775807 9223372036854775807]
+; -9223372036854775808 not equiv?
+#64bit
+#r3
+[not equiv? -9223372036854775808 -9223372036854775807]
+#64bit
+#r3
+[not equiv? -9223372036854775808 -1]
+#64bit
+#r3
+[not equiv? -9223372036854775808 0]
+#64bit
+#r3
+[not equiv? -9223372036854775808 1]
+#64bit
+#r3
+[not equiv? -9223372036854775808 9223372036854775806]
+#64bit
+#r3
+[not equiv? -9223372036854775808 9223372036854775807]
+; -9223372036854775807 not equiv?
+#64bit
+#r3
+[not equiv? -9223372036854775807 -9223372036854775808]
+#64bit
+#r3
+[not equiv? -9223372036854775807 -1]
+#64bit
+#r3
+[not equiv? -9223372036854775807 0]
+#64bit
+#r3
+[not equiv? -9223372036854775807 1]
+#64bit
+#r3
+[not equiv? -9223372036854775807 9223372036854775806]
+#64bit
+#r3
+[not equiv? -9223372036854775807 9223372036854775807]
+; -1 not equiv?
+#64bit
+#r3
+[not equiv? -1 -9223372036854775808]
+#64bit
+#r3
+[not equiv? -1 -9223372036854775807]
+#r3
+[not equiv? -1 0]
+#r3
+[not equiv? -1 1]
+#64bit
+#r3
+[not equiv? -1 9223372036854775806]
+#64bit
+#r3
+[not equiv? -1 9223372036854775807]
+; 0 not equiv?
+#64bit
+#r3
+[not equiv? 0 -9223372036854775808]
+#64bit
+#r3
+[not equiv? 0 -9223372036854775807]
+#r3
+[not equiv? 0 -1]
+#r3
+[not equiv? 0 1]
+#64bit
+#r3
+[not equiv? 0 9223372036854775806]
+#64bit
+#r3
+[not equiv? 0 9223372036854775807]
+; 1 not equiv?
+#64bit
+#r3
+[not equiv? 1 -9223372036854775808]
+#64bit
+#r3
+[not equiv? 1 -9223372036854775807]
+#r3
+[not equiv? 1 -1]
+#r3
+[not equiv? 1 0]
+#64bit
+#r3
+[not equiv? 1 9223372036854775806]
+#64bit
+#r3
+[not equiv? 1 9223372036854775807]
+; 9223372036854775806 not equiv?
+#64bit
+#r3
+[not equiv? 9223372036854775806 -9223372036854775808]
+#64bit
+#r3
+[not equiv? 9223372036854775806 -9223372036854775807]
+#64bit
+#r3
+[not equiv? 9223372036854775806 -1]
+#64bit
+#r3
+[not equiv? 9223372036854775806 0]
+#64bit
+#r3
+[not equiv? 9223372036854775806 1]
+#64bit
+#r3
+[not equiv? 9223372036854775806 9223372036854775807]
+; 9223372036854775807 not equiv?
+#64bit
+#r3
+[not equiv? 9223372036854775807 -9223372036854775808]
+#64bit
+#r3
+[not equiv? 9223372036854775807 -9223372036854775807]
+#64bit
+#r3
+[not equiv? 9223372036854775807 -1]
+#64bit
+#r3
+[not equiv? 9223372036854775807 0]
+#64bit
+#r3
+[not equiv? 9223372036854775807 1]
+#64bit
+#r3
+[not equiv? 9223372036854775807 9223372036854775806]
+; "decimal tolerance"
+#r3
+; bug#1134
+[not equiv? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}]
+; symmetry
+#r3
+[
+	equal? equiv? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}
+		equiv? to decimal! #{3FD3333333333334} to decimal! #{3FD3333333333333}
+]
+#r3
+[not equiv? to decimal! #{3FB9999999999999} to decimal! #{3FB999999999999A}]
+; symmetry
+#r3
+[
+	equal? equiv? to decimal! #{3FB9999999999999} to decimal! #{3FB999999999999A}
+		equiv? to decimal! #{3FB999999999999A} to decimal! #{3FB9999999999999}
+]
+; ignores datatype differences
+#r3
+[equiv? 0 0.0]
+; ignores datatype differences
+#r3
+[equiv? 0 $0]
+; ignores datatype differences
+#r3only
+[equiv? 0 0%]
+; ignores datatype differences
+#r3
+[equiv? 0.0 $0]
+; ignores datatype differences
+#r3only
+[equiv? 0.0 0%]
+; ignores datatype differences
+#r3only
+[equiv? $0 0%]
+; symmetry
+#r3
+[equal? equiv? 1 1.0 equiv? 1.0 1]
+; symmetry
+#r3
+[equal? equiv? 1 $1 equiv? $1 1]
+; symmetry
+#r3only
+[equal? equiv? 1 100% equiv? 100% 1]
+; symmetry
+#r3
+[equal? equiv? 1.0 $1 equiv? $1 1.0]
+; symmetry
+#r3only
+[equal? equiv? 1.0 100% equiv? 100% 1.0]
+; symmetry
+#r3only
+[equal? equiv? $1 100% equiv? 100% $1]
+; approximate equality
+#r3only
+[equiv? 10% + 10% + 10% 30%]
+; symmetry
+#r3only
+[equal? equiv? 10% + 10% + 10% 30% equiv? 30% 10% + 10% + 10%]
+; date!; approximate equality
+#r3
+[not equiv? 2-Jul-2009 2-Jul-2009/22:20]
+; symmetry
+#r3
+[equal? equiv? 2-Jul-2009 2-Jul-2009/22:20 equiv? 2-Jul-2009/22:20 2-Jul-2009]
+; missing time = 00:00:00+00:00, by time compatibility standards
+#r3
+[equiv? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
+; symmetry
+#r3
+[equal? equiv? 2-Jul-2009 2-Jul-2009/00:00 equiv? 2-Jul-2009/00:00 2-Jul-2009]
+; timezone in date!
+#r3
+[equiv? 2-Jul-2009/22:20 2-Jul-2009/20:20-2:00]
+; time!; reflexivity
+#r3
+[equiv? 00:00 00:00]
+; char!; symmetry
+#r3
+[equal? equiv? #"a" 97 equiv? 97 #"a"]
+; symmetry
+#r3
+[equal? equiv? #"a" 97.0 equiv? 97.0 #"a"]
+; case
+#r3
+[equiv? #"a" #"A"]
+; case
+#r3
+[equiv? "a" "A"]
+; words; reflexivity
+#r3
+[equiv? 'a 'a]
+; aliases
+#r3
+[equiv? 'a 'A]
+; symmetry
+#r3
+[equal? equiv? 'a 'A equiv? 'A 'a]
+; binding
+#r3
+[not equiv? 'a use [a] ['a]]
+; symmetry
+#r3
+[equal? equiv? 'a use [a] ['a] equiv? use [a] ['a] 'a]
+; different word types
+#r3
+[equiv? 'a first [:a]]
+; symmetry
+#r3
+[equal? equiv? 'a first [:a] equiv? first [:a] 'a]
+; different word types
+#r3
+[equiv? 'a first ['a]]
+; symmetry
+#r3
+[equal? equiv? 'a first ['a] equiv? first ['a] 'a]
+; different word types
+#r3
+[equiv? 'a /a]
+; symmetry
+#r3
+[equal? equiv? 'a /a equiv? /a 'a]
+; different word types
+#r3
+[equiv? 'a first [a:]]
+; symmetry
+#r3
+[equal? equiv? 'a first [a:] equiv? first [a:] 'a]
+; reflexivity
+#r3
+[equiv? first [:a] first [:a]]
+; different word types
+#r3
+[equiv? first [:a] first ['a]]
+; symmetry
+#r3
+[equal? equiv? first [:a] first ['a] equiv? first ['a] first [:a]]
+; different word types
+#r3
+[equiv? first [:a] /a]
+; symmetry
+#r3
+[equal? equiv? first [:a] /a equiv? /a first [:a]]
+; different word types
+#r3
+[equiv? first [:a] first [a:]]
+; symmetry
+#r3
+[equal? equiv? first [:a] first [a:] equiv? first [a:] first [:a]]
+; reflexivity
+#r3
+[equiv? first ['a] first ['a]]
+; different word types
+#r3
+[equiv? first ['a] /a]
+; symmetry
+#r3
+[equal? equiv? first ['a] /a equiv? /a first ['a]]
+; different word types
+#r3
+[equiv? first ['a] first [a:]]
+; symmetry
+#r3
+[equal? equiv? first ['a] first [a:] equiv? first [a:] first ['a]]
+; reflexivity
+#r3
+[equiv? /a /a]
+; different word types
+#r3
+[equiv? /a first [a:]]
+; symmetry
+#r3
+[equal? equiv? /a first [a:] equiv? first [a:] /a]
+; reflexivity
+#r3
+[equiv? first [a:] first [a:]]
+; logic! values
+#r3
+[equiv? true true]
+#r3
+[equiv? false false]
+#r3
+[not equiv? true false]
+#r3
+[not equiv? false true]
+; port! values; reflexivity; in this case the error should not be generated, I think
+#r3
+[
+	p: make port! http://
+	any [
+		error? try [equiv? p p]
+		equiv? p p
+	]
+]
+functions/comparison/sameq.r
+[same? :abs :abs]
+; reflexivity test for native!
+[same? :all :all]
+; reflexivity test for op!
+[same? :+ :+]
+; reflexivity test for function!
+[
+	a-value: func [] []
+	same? :a-value :a-value
+]
+; no structural equality for function!
+[not same? func [] [] func [] []]
+; reflexivity test for closure!
+#r3
+[
+	a-value: closure [] []
+	same? :a-value :a-value
+]
+; no structural equality for closure!
+#r3
+[not same? closure [] [] closure [] []]
+; reflexivity test for native!
+[same? :all :all]
+; reflexivity test for op!
+[same? :+ :+]
+; reflexivity test for function!
+[
+	a-value: func [] []
+	same? :a-value :a-value
+]
+; no structural equality for function!
+[not same? func [] [] func [] []]
+; reflexivity test for closure!
+#r3
+[
+	a-value: closure [] []
+	same? :a-value :a-value
+]
+; no structural equality for closure!
+#r3
+[not same? closure [] [] closure [] []]
+; binary!
+[not same? #{00} #{00}]
+; binary versus bitset
+[not same? #{00} #[bitset! #{00}]]
+; symmetry
+[equal? same? #[bitset! #{00}] #{00} same? #{00} #[bitset! #{00}]]
+; email versus string
+[
+	a-value: to email! ""
+	not same? a-value to string! a-value
+]
+; symmetry
+[
+	a-value: to email! ""
+	equal? same? to string! a-value a-value same? a-value to string! a-value
+]
+[
+	a-value: %""
+	not same? a-value to string! a-value
+]
+; symmetry
+[
+	a-value: %""
+	equal? same? a-value to string! a-value same? to string! a-value a-value
+]
+[	not same? #{00} #[image! 1x1 #{00}]]
+; symmetry
+[equal? same? #{00} #[image! 1x1 #{00}] same? #[image! 1x1 #{00}] #{00}]
+[not same? #{00} to integer! #{00}]
+; symmetry
+[equal? same? #{00} to integer! #{00} same? to integer! #{00} #{00}]
+[
+	a-value: #a
+	not same? a-value to string! a-value
+]
+; symmetry
+[
+	a-value: #a
+	equal? same? a-value to string! a-value same? to string! a-value a-value
+]
+[not same? #{} none]
+; symmetry
+[equal? same? #{} none same? none #{}]
+[
+	a-value: ""
+	not same? a-value to binary! a-value
+]
+; symmetry
+[
+	a-value: ""
+	equal? same? a-value to binary! a-value same? to binary! a-value a-value
+]
+[
+	a-value: to tag! ""
+	not same? a-value to string! a-value
+]
+; symmetry
+[
+	a-value: to tag! ""
+	equal? same? a-value to string! a-value same? to string! a-value a-value
+]
+[
+	a-value: 0.0.0.0
+	not same? to binary! a-value a-value
+]
+; symmetry
+[
+	a-value: 0.0.0.0
+	equal? same? to binary! a-value a-value same? a-value to binary! a-value
+]
+[not same? #[bitset! #{00}] #[bitset! #{00}]]
+[not same? #[bitset! #{}] #[bitset! #{00}]]
+; block!
+[not same? [] []]
+; reflexivity
+[
+	a-value: []
+	same? a-value a-value
+]
+; reflexivity for past-tail blocks
+[
+	a-value: tail [1]
+	clear head a-value
+	same? a-value a-value
+]
+; reflexivity for cyclic blocks
+[
+	a-value: copy []
+	insert/only a-value a-value
+	same? a-value a-value
+]
+; comparison of cyclic blocks
+[
+	a-value: copy []
+	insert/only a-value a-value
+	b-value: copy []
+	insert/only b-value b-value
+	not same? a-value b-value
+]
+#r2only
+[
+	a-value: first ['a/b]
+	parse :a-value [b-value:]
+	not same? :a-value :b-value
+]
+#r3only
+[
+	a-value: first ['a/b]
+	parse :a-value [b-value:]
+	same? :a-value :b-value
+]
+; symmetry
+[
+	a-value: first ['a/b]
+	parse :a-value [b-value:]
+	equal? same? :a-value :b-value same? :b-value :a-value
+]
+[not same? [] none]
+; symmetry
+[equal? same? [] none same? none []]
+#r2only
+[
+	a-value: first [()]
+	parse a-value [b-value:]
+	not same? a-value b-value
+]
+#r3only
+[
+	a-value: first [()]
+	parse a-value [b-value:]
+	same? a-value b-value
+]
+; symmetry
+[
+	a-value: first [()]
+	parse a-value [b-value:]
+	equal? same? a-value b-value same? b-value a-value
+]
+#r2only
+[
+	a-value: 'a/b
+	parse a-value [b-value:]
+	not same? :a-value :b-value
+]
+#r3only
+[
+	a-value: 'a/b
+	parse a-value [b-value:]
+	same? :a-value :b-value
+]
+; symmetry
+[
+	a-value: 'a/b
+	parse a-value [b-value:]
+	equal? same? :a-value :b-value same? :b-value :a-value
+]
+#r2only
+[
+	a-value: first [a/b:]
+	parse :a-value [b-value:]
+	not same? :a-value :b-value
+]
+#r3only
+[
+	a-value: first [a/b:]
+	parse :a-value [b-value:]
+	same? :a-value :b-value
+]
+; symmetry
+[
+	a-value: first [a/b:]
+	parse :a-value [b-value:]
+	equal? same? :a-value :b-value same? :b-value :a-value
+]
+[not same? number! integer!]
+; symmetry
+[equal? same? number! integer! same? integer! number!]
+; reflexivity
+[same? -1 -1]
+; reflexivity
+[same? 0 0]
+; reflexivity
+[same? 1 1]
+; reflexivity
+[same? 0.0 0.0]
+[not same? 0.0 -0.0]
+; reflexivity
+[same? 1.0 1.0]
+; reflexivity
+[same? -1.0 -1.0]
+#64bit
+; reflexivity
+[same? -9223372036854775808 -9223372036854775808]
+#64bit
+; reflexivity
+[same? -9223372036854775807 -9223372036854775807]
+#64bit
+; reflexivity
+[same? 9223372036854775807 9223372036854775807]
+#64bit
+; -9223372036854775808 not same?
+[not same? -9223372036854775808 -9223372036854775807]
+#64bit
+[not same? -9223372036854775808 -1]
+#64bit
+[not same? -9223372036854775808 0]
+#64bit
+[not same? -9223372036854775808 1]
+#64bit
+[not same? -9223372036854775808 9223372036854775806]
+#64bit
+[not same? -9223372036854775808 9223372036854775807]
+#64bit
+; -9223372036854775807 not same?
+[not same? -9223372036854775807 -9223372036854775808]
+#64bit
+[not same? -9223372036854775807 -1]
+#64bit
+[not same? -9223372036854775807 0]
+#64bit
+[not same? -9223372036854775807 1]
+#64bit
+[not same? -9223372036854775807 9223372036854775806]
+#64bit
+[not same? -9223372036854775807 9223372036854775807]
+#64bit
+; -1 not same?
+[not same? -1 -9223372036854775808]
+#64bit
+[not same? -1 -9223372036854775807]
+[not same? -1 0]
+[not same? -1 1]
+#64bit
+[not same? -1 9223372036854775806]
+#64bit
+[not same? -1 9223372036854775807]
+#64bit
+; 0 not same?
+[not same? 0 -9223372036854775808]
+#64bit
+[not same? 0 -9223372036854775807]
+[not same? 0 -1]
+[not same? 0 1]
+#64bit
+[not same? 0 9223372036854775806]
+#64bit
+[not same? 0 9223372036854775807]
+#64bit
+; 1 not same?
+[not same? 1 -9223372036854775808]
+#64bit
+[not same? 1 -9223372036854775807]
+[not same? 1 -1]
+[not same? 1 0]
+#64bit
+[not same? 1 9223372036854775806]
+#64bit
+[not same? 1 9223372036854775807]
+#64bit
+; 9223372036854775806 not same?
+[not same? 9223372036854775806 -9223372036854775808]
+#64bit
+[not same? 9223372036854775806 -9223372036854775807]
+#64bit
+[not same? 9223372036854775806 -1]
+#64bit
+[not same? 9223372036854775806 0]
+#64bit
+[not same? 9223372036854775806 1]
+#64bit
+[not same? 9223372036854775806 9223372036854775807]
+#64bit
+; 9223372036854775807 not same?
+[not same? 9223372036854775807 -9223372036854775808]
+#64bit
+[not same? 9223372036854775807 -9223372036854775807]
+#64bit
+[not same? 9223372036854775807 -1]
+#64bit
+[not same? 9223372036854775807 0]
+#64bit
+[not same? 9223372036854775807 1]
+#64bit
+[not same? 9223372036854775807 9223372036854775806]
+; "decimal tolerance"
+[not same? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}]
+; symmetry
+[
+	equal? same? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}
+		same? to decimal! #{3FD3333333333334} to decimal! #{3FD3333333333333}
+]
+[not same? to decimal! #{3FB9999999999999} to decimal! #{3FB999999999999A}]
+; symmetry
+[
+	equal? same? to decimal! #{3FB9999999999999} to decimal! #{3FB999999999999A}
+		same? to decimal! #{3FB999999999999A} to decimal! #{3FB9999999999999}
+]
+; datatype differences
+[not same? 0 0.0]
+; datatype differences
+[not same? 0 $0]
+#r3only
+; datatype differences
+[not same? 0 0%]
+; datatype differences
+[not same? 0.0 $0]
+#r3only
+; datatype differences
+[not same? 0.0 0%]
+#r3only
+; datatype differences
+[not same? $0 0%]
+; symmetry
+[equal? same? 1 1.0 same? 1.0 1]
+; symmetry
+[equal? same? 1 $1 same? $1 1]
+#r3only
+; symmetry
+[equal? same? 1 100% same? 100% 1]
+; symmetry
+[equal? same? 1.0 $1 same? $1 1.0]
+#r3only
+; symmetry
+[equal? same? 1.0 100% same? 100% 1.0]
+#r3only
+; symmetry
+[equal? same? $1 100% same? 100% $1]
+#r3only
+; approximate equality
+[not same? 10% + 10% + 10% 30%]
+#r3only
+; symmetry
+[equal? same? 10% + 10% + 10% 30% same? 30% 10% + 10% + 10%]
+; date!; approximate equality
+[not same? 2-Jul-2009 2-Jul-2009/22:20]
+; symmetry
+[equal? same? 2-Jul-2009 2-Jul-2009/22:20 same? 2-Jul-2009/22:20 2-Jul-2009]
+; missing time is considered a difference
+[not same? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
+; symmetry
+[equal? not same? 2-Jul-2009 2-Jul-2009/00:00 not same? 2-Jul-2009/00:00 2-Jul-2009]
+; no timezone math
+[not same? 2-Jul-2009/22:20 2-Jul-2009/20:20-2:00]
+; time!
+[same? 00:00 00:00]
+; missing components are 0
+[same? 00:00 00:00:00]
+; no timezone math
+[not same? 22:20 20:20]
+; char!; symmetry
+[equal? same? #"a" 97 same? 97 #"a"]
+; symmetry
+[equal? same? #"a" 97.0 same? 97.0 #"a"]
+; case
+[not same? #"a" #"A"]
+; case
+[not same? "a" "A"]
+; words; reflexivity
+[same? 'a 'a]
+; aliases
+[not same? 'a 'A]
+; symmetry
+[equal? same? 'a 'A same? 'A 'a]
+; binding
+[not same? 'a use [a] ['a]]
+; symmetry
+[equal? same? 'a use [a] ['a] same? use [a] ['a] 'a]
+; different word types
+#r2only
+[same? 'a first [:a]]
+#r3only
+[not same? 'a first [:a]]
+; symmetry
+[equal? same? 'a first [:a] same? first [:a] 'a]
+; different word types
+#r2only
+[same? 'a first ['a]]
+#r3only
+[not same? 'a first ['a]]
+; symmetry
+[equal? same? 'a first ['a] same? first ['a] 'a]
+; different word types
+[not same? 'a /a]
+; symmetry
+[equal? same? 'a /a same? /a 'a]
+; different word types
+#r2only
+[same? 'a first [a:]]
+#r3only
+[not same? 'a first [a:]]
+; symmetry
+[equal? same? 'a first [a:] same? first [a:] 'a]
+; reflexivity
+[same? first [:a] first [:a]]
+; different word types
+#r2only
+[same? first [:a] first ['a]]
+#r3only
+[not same? first [:a] first ['a]]
+; symmetry
+[equal? same? first [:a] first ['a] same? first ['a] first [:a]]
+; different word types
+[not same? first [:a] /a]
+; symmetry
+[equal? same? first [:a] /a same? /a first [:a]]
+; different word types
+#r2only
+[same? first [:a] first [a:]]
+#r3only
+[not same? first [:a] first [a:]]
+; symmetry
+[equal? same? first [:a] first [a:] same? first [a:] first [:a]]
+; reflexivity
+[same? first ['a] first ['a]]
+; different word types
+[not same? first ['a] /a]
+; symmetry
+[equal? same? first ['a] /a same? /a first ['a]]
+; different word types
+#r2only
+[same? first ['a] first [a:]]
+#r3only
+[not same? first ['a] first [a:]]
+; symmetry
+[equal? same? first ['a] first [a:] same? first [a:] first ['a]]
+; reflexivity
+[same? /a /a]
+; different word types
+[not same? /a first [a:]]
+; symmetry
+[equal? same? /a first [a:] same? first [a:] /a]
+; reflexivity
+[same? first [a:] first [a:]]
+; logic! values
+[same? true true]
+[same? false false]
+[not same? true false]
+[not same? false true]
+; port! values; reflexivity; in this case the error should not be generated, I think
+[
+	p: make port! http://
+	any [
+		error? try [same? p p]
+		same? p p
+	]
+]
+functions/comparison/strict-equalq.r
+[strict-equal? :abs :abs]
+; reflexivity test for native!
+[strict-equal? :all :all]
+; reflexivity test for op!
+[strict-equal? :+ :+]
+; reflexivity test for function!
+[
+	a-value: func [] []
+	strict-equal? :a-value :a-value
+]
+; no structural equality for function!
+[not strict-equal? func [] [] func [] []]
+; reflexivity test for closure!
+#r3
+[
+	a-value: closure [] []
+	strict-equal? :a-value :a-value
+]
+; no structural equality for closure!
+#r3
+[not strict-equal? closure [] [] closure [] []]
+; binary!
+[strict-equal? #{00} #{00}]
+; binary versus bitset
+[not strict-equal? #{00} #[bitset! #{00}]]
+; symmetry
+[equal? strict-equal? #[bitset! #{00}] #{00} strict-equal? #{00} #[bitset! #{00}]]
+; email versus string
+[
+	a-value: to email! ""
+	not strict-equal? a-value to string! a-value
+]
+; symmetry
+[
+	a-value: to email! ""
+	equal? strict-equal? to string! a-value a-value strict-equal? a-value to string! a-value
+]
+[
+	a-value: %""
+	not strict-equal? a-value to string! a-value
+]
+; symmetry
+[
+	a-value: %""
+	equal? strict-equal? a-value to string! a-value strict-equal? to string! a-value a-value
+]
+[	not strict-equal? #{00} #[image! 1x1 #{00}]]
+; symmetry
+[	equal? strict-equal? #{00} #[image! 1x1 #{00}] strict-equal? #[image! 1x1 #{00}] #{00}]
+[	not strict-equal? #{00} to integer! #{00}]
+; symmetry
+[	equal? strict-equal? #{00} to integer! #{00} strict-equal? to integer! #{00} #{00}]
+[
+	a-value: #a
+	not strict-equal? a-value to string! a-value
+]
+; symmetry
+[
+	a-value: #a
+	equal? strict-equal? a-value to string! a-value strict-equal? to string! a-value a-value
+]
+[not strict-equal? #{} none]
+; symmetry
+[	equal? strict-equal? #{} none strict-equal? none #{}]
+[
+	a-value: ""
+	not strict-equal? a-value to binary! a-value
+]
+; symmetry
+[
+	a-value: ""
+	equal? strict-equal? a-value to binary! a-value strict-equal? to binary! a-value a-value
+]
+[
+	a-value: to tag! ""
+	not strict-equal? a-value to string! a-value
+]
+; symmetry
+[
+	a-value: to tag! ""
+	equal? strict-equal? a-value to string! a-value strict-equal? to string! a-value a-value
+]
+[
+	a-value: 0.0.0.0
+	not strict-equal? to binary! a-value a-value
+]
+; symmetry
+[
+	a-value: 0.0.0.0
+	equal? strict-equal? to binary! a-value a-value strict-equal? a-value to binary! a-value
+]
+[strict-equal? #[bitset! #{00}] #[bitset! #{00}]]
+[not strict-equal? #[bitset! #{}] #[bitset! #{00}]]
+; block!
+[strict-equal? [] []]
+; reflexivity
+[
+	a-value: []
+	strict-equal? a-value a-value
+]
+; reflexivity for past-tail blocks
+[
+	a-value: tail [1]
+	clear head a-value
+	strict-equal? a-value a-value
+]
+; reflexivity for cyclic blocks
+[
+	a-value: copy []
+	insert/only a-value a-value
+	strict-equal? a-value a-value
+]
+#r2crash
+#r3crash
+; bug#1066
+; comparison of cyclic blocks
+[
+	a-value: copy []
+	insert/only a-value a-value
+	b-value: copy []
+	insert/only b-value b-value
+	strict-equal? a-value b-value
+]
+#r2only
+[
+	a-value: first ['a/b]
+	parse :a-value [b-value:]
+	not strict-equal? :a-value :b-value
+]
+#r3only
+[
+	a-value: first ['a/b]
+	parse :a-value [b-value:]
+	strict-equal? :a-value :b-value
+]
+; symmetry
+[
+	a-value: first ['a/b]
+	parse :a-value [b-value:]
+	equal? strict-equal? :a-value :b-value strict-equal? :b-value :a-value
+]
+[not strict-equal? [] none]
+; symmetry
+[equal? strict-equal? [] none strict-equal? none []]
+#r2only
+[
+	a-value: first [()]
+	parse a-value [b-value:]
+	not strict-equal? a-value b-value
+]
+#r3only
+[
+	a-value: first [()]
+	parse a-value [b-value:]
+	strict-equal? a-value b-value
+]
+; symmetry
+[
+	a-value: first [()]
+	parse a-value [b-value:]
+	equal? strict-equal? a-value b-value strict-equal? b-value a-value
+]
+#r2only
+[
+	a-value: 'a/b
+	parse a-value [b-value:]
+	not strict-equal? :a-value :b-value
+]
+#r3only
+[
+	a-value: 'a/b
+	parse a-value [b-value:]
+	strict-equal? :a-value :b-value
+]
+; symmetry
+[
+	a-value: 'a/b
+	parse a-value [b-value:]
+	equal? strict-equal? :a-value :b-value strict-equal? :b-value :a-value
+]
+#r2only
+[
+	a-value: first [a/b:]
+	parse :a-value [b-value:]
+	not strict-equal? :a-value :b-value
+]
+#r3only
+[
+	a-value: first [a/b:]
+	parse :a-value [b-value:]
+	strict-equal? :a-value :b-value
+]
+; symmetry
+[
+	a-value: first [a/b:]
+	parse :a-value [b-value:]
+	equal? strict-equal? :a-value :b-value strict-equal? :b-value :a-value
+]
+[not strict-equal? number! integer!]
+; symmetry
+[equal? strict-equal? number! integer! strict-equal? integer! number!]
+; reflexivity
+[strict-equal? -1 -1]
+; reflexivity
+[strict-equal? 0 0]
+; reflexivity
+[strict-equal? 1 1]
+; reflexivity
+[strict-equal? 0.0 0.0]
+[strict-equal? 0.0 -0.0]
+; reflexivity
+[strict-equal? 1.0 1.0]
+; reflexivity
+[strict-equal? -1.0 -1.0]
+#64bit
+; reflexivity
+[strict-equal? -9223372036854775808 -9223372036854775808]
+#64bit
+; reflexivity
+[strict-equal? -9223372036854775807 -9223372036854775807]
+#64bit
+; reflexivity
+[strict-equal? 9223372036854775807 9223372036854775807]
+#64bit
+; -9223372036854775808 not strict-equal?
+[not strict-equal? -9223372036854775808 -9223372036854775807]
+#64bit
+[not strict-equal? -9223372036854775808 -1]
+#64bit
+[not strict-equal? -9223372036854775808 0]
+#64bit
+[not strict-equal? -9223372036854775808 1]
+#64bit
+[not strict-equal? -9223372036854775808 9223372036854775806]
+#64bit
+[not strict-equal? -9223372036854775808 9223372036854775807]
+#64bit
+; -9223372036854775807 not strict-equal?
+[not strict-equal? -9223372036854775807 -9223372036854775808]
+#64bit
+[not strict-equal? -9223372036854775807 -1]
+#64bit
+[not strict-equal? -9223372036854775807 0]
+#64bit
+[not strict-equal? -9223372036854775807 1]
+#64bit
+[not strict-equal? -9223372036854775807 9223372036854775806]
+#64bit
+[not strict-equal? -9223372036854775807 9223372036854775807]
+#64bit
+; -1 not strict-equal?
+[not strict-equal? -1 -9223372036854775808]
+#64bit
+[not strict-equal? -1 -9223372036854775807]
+[not strict-equal? -1 0]
+[not strict-equal? -1 1]
+#64bit
+[not strict-equal? -1 9223372036854775806]
+#64bit
+[not strict-equal? -1 9223372036854775807]
+#64bit
+; 0 not strict-equal?
+[not strict-equal? 0 -9223372036854775808]
+#64bit
+[not strict-equal? 0 -9223372036854775807]
+[not strict-equal? 0 -1]
+[not strict-equal? 0 1]
+#64bit
+[not strict-equal? 0 9223372036854775806]
+#64bit
+[not strict-equal? 0 9223372036854775807]
+#64bit
+; 1 not strict-equal?
+[not strict-equal? 1 -9223372036854775808]
+#64bit
+[not strict-equal? 1 -9223372036854775807]
+[not strict-equal? 1 -1]
+[not strict-equal? 1 0]
+#64bit
+[not strict-equal? 1 9223372036854775806]
+#64bit
+[not strict-equal? 1 9223372036854775807]
+#64bit
+; 9223372036854775806 not strict-equal?
+[not strict-equal? 9223372036854775806 -9223372036854775808]
+#64bit
+[not strict-equal? 9223372036854775806 -9223372036854775807]
+#64bit
+[not strict-equal? 9223372036854775806 -1]
+#64bit
+[not strict-equal? 9223372036854775806 0]
+#64bit
+[not strict-equal? 9223372036854775806 1]
+#64bit
+[not strict-equal? 9223372036854775806 9223372036854775807]
+#64bit
+; 9223372036854775807 not strict-equal?
+[not strict-equal? 9223372036854775807 -9223372036854775808]
+#64bit
+[not strict-equal? 9223372036854775807 -9223372036854775807]
+#64bit
+[not strict-equal? 9223372036854775807 -1]
+#64bit
+[not strict-equal? 9223372036854775807 0]
+#64bit
+[not strict-equal? 9223372036854775807 1]
+#64bit
+[not strict-equal? 9223372036854775807 9223372036854775806]
+; "decimal tolerance"
+[not strict-equal? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}]
+; symmetry
+[
+	equal? strict-equal? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}
+		strict-equal? to decimal! #{3FD3333333333334} to decimal! #{3FD3333333333333}
+]
+[not strict-equal? to decimal! #{3FB9999999999999} to decimal! #{3FB999999999999A}]
+; symmetry
+[
+	equal? strict-equal? to decimal! #{3FB9999999999999} to decimal! #{3FB999999999999A}
+		strict-equal? to decimal! #{3FB999999999999A} to decimal! #{3FB9999999999999}
+]
+; datatype differences
+[not strict-equal? 0 0.0]
+; datatype differences
+[not strict-equal? 0 $0]
+#r3only
+; datatype differences
+[not strict-equal? 0 0%]
+; datatype differences
+[not strict-equal? 0.0 $0]
+#r3only
+; datatype differences
+[not strict-equal? 0.0 0%]
+#r3only
+; datatype differences
+[not strict-equal? $0 0%]
+; symmetry
+[equal? strict-equal? 1 1.0 strict-equal? 1.0 1]
+; symmetry
+[equal? strict-equal? 1 $1 strict-equal? $1 1]
+#r3only
+; symmetry
+[equal? strict-equal? 1 100% strict-equal? 100% 1]
+; symmetry
+[equal? strict-equal? 1.0 $1 strict-equal? $1 1.0]
+#r3only
+; symmetry
+[equal? strict-equal? 1.0 100% strict-equal? 100% 1.0]
+#r3only
+; symmetry
+[equal? strict-equal? $1 100% strict-equal? 100% $1]
+#r3only
+; approximate equality
+[not strict-equal? 10% + 10% + 10% 30%]
+#r3only
+; symmetry
+[equal? strict-equal? 10% + 10% + 10% 30% strict-equal? 30% 10% + 10% + 10%]
+; date!; approximate equality
+#r2only
+[strict-equal? 2-Jul-2009 2-Jul-2009/22:20]
+#r3only
+[not strict-equal? 2-Jul-2009 2-Jul-2009/22:20]
+; symmetry
+[equal? strict-equal? 2-Jul-2009 2-Jul-2009/22:20 strict-equal? 2-Jul-2009/22:20 2-Jul-2009]
+; missing time = 00:00:00+00:00, by time compatibility standards
+#r2only
+[strict-equal? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
+#r3only
+[not strict-equal? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
+; symmetry
+[equal? strict-equal? 2-Jul-2009 2-Jul-2009/00:00 strict-equal? 2-Jul-2009/00:00 2-Jul-2009]
+; no timezone math in date!
+[not strict-equal? 2-Jul-2009/22:20 2-Jul-2009/20:20-2:00]
+; time!
+[strict-equal? 00:00 00:00]
+; char!; symmetry
+[equal? strict-equal? #"a" 97 strict-equal? 97 #"a"]
+; symmetry
+[equal? strict-equal? #"a" 97.0 strict-equal? 97.0 #"a"]
+; case
+[not strict-equal? #"a" #"A"]
+; case
+[not strict-equal? "a" "A"]
+; words; reflexivity
+[strict-equal? 'a 'a]
+; aliases
+[not strict-equal? 'a 'A]
+; symmetry
+[equal? strict-equal? 'a 'A strict-equal? 'A 'a]
+; binding
+[not strict-equal? 'a use [a] ['a]]
+; symmetry
+[equal? strict-equal? 'a use [a] ['a] strict-equal? use [a] ['a] 'a]
+; different word types
+[not strict-equal? 'a first [:a]]
+; symmetry
+[equal? strict-equal? 'a first [:a] strict-equal? first [:a] 'a]
+; different word types
+[not strict-equal? 'a first ['a]]
+; symmetry
+[equal? strict-equal? 'a first ['a] strict-equal? first ['a] 'a]
+; different word types
+[not strict-equal? 'a /a]
+; symmetry
+[equal? strict-equal? 'a /a strict-equal? /a 'a]
+; different word types
+[not strict-equal? 'a first [a:]]
+; symmetry
+[equal? strict-equal? 'a first [a:] strict-equal? first [a:] 'a]
+; reflexivity
+[strict-equal? first [:a] first [:a]]
+; different word types
+[not strict-equal? first [:a] first ['a]]
+; symmetry
+[equal? strict-equal? first [:a] first ['a] strict-equal? first ['a] first [:a]]
+; different word types
+[not strict-equal? first [:a] /a]
+; symmetry
+[equal? strict-equal? first [:a] /a strict-equal? /a first [:a]]
+; different word types
+[not strict-equal? first [:a] first [a:]]
+; symmetry
+[equal? strict-equal? first [:a] first [a:] strict-equal? first [a:] first [:a]]
+; reflexivity
+[strict-equal? first ['a] first ['a]]
+; different word types
+[not strict-equal? first ['a] /a]
+; symmetry
+[equal? strict-equal? first ['a] /a strict-equal? /a first ['a]]
+; different word types
+[not strict-equal? first ['a] first [a:]]
+; symmetry
+[equal? strict-equal? first ['a] first [a:] strict-equal? first [a:] first ['a]]
+; reflexivity
+[strict-equal? /a /a]
+; different word types
+[not strict-equal? /a first [a:]]
+; symmetry
+[equal? strict-equal? /a first [a:] strict-equal? first [a:] /a]
+; reflexivity
+[strict-equal? first [a:] first [a:]]
+; logic! values
+[strict-equal? true true]
+[strict-equal? false false]
+[not strict-equal? true false]
+[not strict-equal? false true]
+; port! values; reflexivity; in this case the error should not be generated, I think
+[
+	p: make port! http://
+	any [
+		error? try [strict-equal? p p]
+		strict-equal? p p
+	]
+]
 functions/datatype/as-pair.r
 #r3only
 ; bug#1624
@@ -2650,6 +4946,7 @@ functions/math/add.r
 #64bit
 [-9223372036854775807 = add 0 -9223372036854775807]
 [-1 = add 0 -1]
+; bug#28
 [0 = add 0 0]
 [1 = add 0 1]
 #64bit
@@ -3530,6 +5827,16 @@ functions/math/power.r
 [4 = power 2 2]
 [0.5 = power 2 -1]
 [0.1 = power 10 -1]
+functions/math/random.r
+; bug#1084
+#r3only
+[
+	random/seed 0
+	not any [
+		negative? random 1.0
+		negative? random 1.0
+	]
+]
 functions/math/remainder.r
 #64bit
 ; integer! tests
@@ -6710,7 +9017,7 @@ functions/define/func.r
 	]
 	do f 1
 ]
-functions/define/unset.r
+functions/context/unset.r
 [
 	a: none
 	unset 'a
@@ -6722,7 +9029,7 @@ functions/define/unset.r
 	unset 'a
 	not value? 'a
 ]
-functions/define/use.r
+functions/context/use.r
 ; local word test
 [
 	a: 1
@@ -6773,7 +9080,7 @@ functions/define/use.r
 	]
 	unset? f
 ]
-functions/define/valueq.r
+functions/context/valueq.r
 [false == value? 'nonsense]
 [true == value? 'value?]
 functions/series/append.r
@@ -7911,2312 +10218,6 @@ datatypes/percent.r
 [1.1% = to percent! "1.1%"]
 #r3only
 [error? try [to percent! "t"]]
-functions/math/equalq.r
-; reflexivity test for native!
-[equal? :abs :abs]
-[not equal? :abs :add]
-[equal? :all :all]
-[not equal? :all :any]
-; reflexivity test for op!
-[equal? :+ :+]
-[not equal? :+ :-]
-; reflexivity test for function!
-; Uses func instead of make function! so the test is compatible.
-[equal? a-value: func [][] :a-value]
-; No structural equivalence for function!
-; Uses FUNC instead of make function! so the test is compatible.
-[not equal? func [][] func [][]]
-; reflexivity test for closure!
-; Uses CLOSURE to make the test compatible. On todo list for R2/Forward.
-#r3
-[equal? a-value: closure [][] :a-value]
-; No structural equivalence for closure!
-; Uses CLOSURE to make the test compatible. On todo list for R2/Forward.
-#r3
-[not equal? closure [][] closure [][]]
-[equal? a-value: #{00} a-value]
-; binary!
-; Same contents
-[equal? #{00} #{00}]
-; Different contents
-[not equal? #{00} #{01}]
-; Offset + similar contents at reference
-[equal? #{00} #[binary! #{0000} 2]]
-; Offset + similar contents at reference
-[equal? #{00} #[binary! #{0100} 2]]
-[equal? equal? #{00} #[binary! #{0100} 2] equal? #[binary! #{0100} 2] #{00}]
-; No binary! padding
-[not equal? #{00} #{0000}]
-[equal? equal? #{00} #{0000} equal? #{0000} #{00}]
-; Empty binary! not none
-[not equal? #{} none]
-[equal? equal? #{} none equal? none #{}]
-#r3only
-; email! vs. string!
-; RAMBO #3518
-[
-	a-value: to email! ""
-	equal? a-value to string! a-value
-]
-; email! vs. string! symmetry
-[
-	a-value: to email! ""
-	equal? equal? to string! a-value a-value equal? a-value to string! a-value
-]
-#r3only
-; file! vs. string!
-; RAMBO #3518
-[
-	a-value: %""
-	equal? a-value to string! a-value
-]
-; file! vs. string! symmetry
-[
-	a-value: %""
-	equal? equal? a-value to string! a-value equal? to string! a-value a-value
-]
-; image! same contents
-[equal? a-value: #[image! 1x1 #{000000}] a-value]
-[equal? #[image! 1x1 #{000000}] #[image! 1x1 #{000000}]]
-[equal? #[image! 1x1 #{}] #[image! 1x1 #{000000}]]
-; image! different size
-[not equal? #[image! 1x2 #{000000}] #[image! 1x1 #{000000}]]
-; image! different size
-[not equal? #[image! 2x1 #{000000}] #[image! 1x1 #{000000}]]
-; image! different rgb
-[not equal? #[image! 1x1 #{000001}] #[image! 1x1 #{000000}]]
-; image! alpha not specified = 0
-[equal? #[image! 1x1 #{000000} #{00}] #[image! 1x1 #{000000}]]
-; image! alpha different
-[not equal? #[image! 1x1 #{000000} #{01}] #[image! 1x1 #{000000}]]
-#r3only
-; Literal offset not spported in R2.
-[equal? #[image! 1x1 #{000000} 2] #[image! 1x1 #{000000} 2]]
-#r3only
-; Literal offset not spported in R2.
-[not equal? #[image! 1x1 #{000000} 2] #[image! 1x1 #{000000}]]
-[
-	a-value: #[image! 1x1 #{000000}]
-	not equal? a-value next a-value
-]
-#r3only
-; image! offset + structural equivalence
-[equal? #[image! 0x0 #{}] next #[image! 1x1 #{000000}]]
-#r3only
-; image! offset + structural equivalence
-[equal? #[image! 1x0 #{}] next #[image! 1x1 #{000000}]]
-#r3only
-; image! offset + structural equivalence
-[equal? #[image! 0x1 #{}] next #[image! 1x1 #{000000}]]
-#r2
-; image! offset + structural equivalence
-[not equal? #[image! 0x0 #{}] next #[image! 1x1 #{000000}]]
-#r2
-; image! offset + structural equivalence
-[not equal? #[image! 1x0 #{}] next #[image! 1x1 #{000000}]]
-#r2
-; image! offset + structural equivalence
-[not equal? #[image! 0x1 #{}] next #[image! 1x1 #{000000}]]
-; No implicit to binary! from image!
-[not equal? #{00} #[image! 1x1 #{000000}]]
-; No implicit to binary! from image!
-[not equal? #{00000000} #[image! 1x1 #{000000}]]
-; No implicit to binary! from image!
-[not equal? #{0000000000} #[image! 1x1 #{000000}]]
-[equal? equal? #{00} #[image! 1x1 #{00}] equal? #[image! 1x1 #{00}] #{00}]
-; No implicit to binary! from integer!
-[not equal? #{00} to integer! #{00}]
-[equal? equal? #{00} to integer! #{00} equal? to integer! #{00} #{00}]
-#r3only
-; issue! vs. string!
-; RAMBO #3518
-[not-equal? a-value: #a to string! a-value]
-[
-	a-value: #a
-	equal? equal? a-value to string! a-value equal? to string! a-value a-value
-]
-; No implicit to binary! from string!
-[not equal? a-value: "" to binary! a-value]
-[
-	a-value: ""
-	equal? equal? a-value to binary! a-value equal? to binary! a-value a-value
-]
-#r3only
-; tag! vs. string!
-; RAMBO #3518
-[equal? a-value: to tag! "" to string! a-value]
-[
-	a-value: to tag! ""
-	equal? equal? a-value to string! a-value equal? to string! a-value a-value
-]
-[equal? 0.0.0 0.0.0]
-[not equal? 0.0.1 0.0.0]
-; tuple! right-pads with 0
-[equal? 1.0.0 1.0.0.0.0.0.0.0.0.0]
-; tuple! right-pads with 0
-[equal? 1.0.0.0.0.0.0.0.0.0 1.0.0]
-; tuple! right-pads with 0
-[not equal? 1.0.0 0.0.0.0.0.0.0.1.0.0]
-; No implicit to binary! from tuple!
-[
-	a-value: 0.0.0.0
-	not equal? to binary! a-value a-value
-]
-[
-	a-value: 0.0.0.0
-	equal? equal? to binary! a-value a-value equal? a-value to binary! a-value
-]
-[equal? #[bitset! #{00}] #[bitset! #{00}]]
-; bitset! with no bits set does not equal empty bitset
-; This is because of the COMPLEMENT problem: bug#1085.
-[not equal? #[bitset! #{}] #[bitset! #{00}]]
-; No implicit to binary! from bitset!
-[not equal? #{00} #[bitset! #{00}]]
-[equal? equal? #[bitset! #{00}] #{00} equal? #{00} #[bitset! #{00}]]
-[equal? [] []]
-[equal? a-value: [] a-value]
-#r3only
-; Reflexivity for past-tail blocks
-; Error in R2.
-[
-	a-value: tail [1]
-	clear head a-value
-	equal? a-value a-value
-]
-; Reflexivity for cyclic blocks
-[
-	a-value: copy []
-	insert/only a-value a-value
-	equal? a-value a-value
-]
-; bug#1049
-#r2crash
-#r3crash
-; Comparison of cyclic blocks
-[
-	a-value: copy []
-	insert/only a-value a-value
-	b-value: copy []
-	insert/only b-value b-value
-	equal? a-value b-value
-]
-[not equal? [] none]
-[equal? equal? [] none equal? none []]
-; block! vs. paren!
-[not equal? [] first [()]]
-; block! vs. paren! symmetry
-[equal? equal? [] first [()] equal? first [()] []]
-; block! vs. path!
-[not equal? [a b] 'a/b]
-; block! vs. path! symmetry
-[
-	a-value: 'a/b
-	b-value: [a b]
-	equal? equal? :a-value :b-value equal? :b-value :a-value
-]
-; block! vs. lit-path!
-[not equal? [a b] first ['a/b]]
-; block! vs. lit-path! symmetry
-[
-	a-value: first ['a/b]
-	b-value: [a b]
-	equal? equal? :a-value :b-value equal? :b-value :a-value
-]
-; block! vs. set-path!
-[not equal? [a b] first [a/b:]]
-; block! vs. set-path! symmetry
-[
-	a-value: first [a/b:]
-	b-value: [a b]
-	equal? equal? :a-value :b-value equal? :b-value :a-value
-]
-; block! vs. get-path!
-[not equal? [a b] first [:a/b]]
-; block! vs. get-path! symmetry
-[
-	a-value: first [:a/b]
-	b-value: [a b]
-	equal? equal? :a-value :b-value equal? :b-value :a-value
-]
-[equal? decimal! decimal!]
-[not equal? decimal! integer!]
-[equal? equal? decimal! integer! equal? integer! decimal!]
-; datatype! vs. typeset!
-[not equal? number! integer!]
-; datatype! vs. typeset! symmetry
-[equal? equal? number! integer! equal? integer! number!]
-#r3only
-; datatype! vs. typeset!
-[not equal? integer! make typeset! [integer!]]
-#r3only
-; datatype! vs. typeset!
-[	not equal? integer! to typeset! [integer!]]
-#r3
-; datatype! vs. typeset!
-; Supported by R2/Forward.
-[not equal? integer! to-typeset [integer!]]
-; typeset! (or pseudo-type in R2)
-[equal? number! number!]
-; typeset! (or pseudo-type in R2)
-[not equal? number! series!]
-#r3only
-[equal? make typeset! [integer!] make typeset! [integer!]]
-#r3only
-[equal? to typeset! [integer!] to typeset! [integer!]]
-#r3
-; Supported by R2/Forward.
-[equal? to-typeset [integer!] to-typeset [integer!]]
-[equal? -1 -1]
-[equal? 0 0]
-[equal? 1 1]
-[equal? 0.0 0.0]
-[equal? 0.0 -0.0]
-[equal? 1.0 1.0]
-[equal? -1.0 -1.0]
-#64bit
-[equal? -9223372036854775808 -9223372036854775808]
-#64bit
-[equal? -9223372036854775807 -9223372036854775807]
-#64bit
-[equal? 9223372036854775807 9223372036854775807]
-#64bit
-[not equal? -9223372036854775808 -9223372036854775807]
-#64bit
-[not equal? -9223372036854775808 -1]
-#64bit
-[not equal? -9223372036854775808 0]
-#64bit
-[not equal? -9223372036854775808 1]
-#64bit
-[not equal? -9223372036854775808 9223372036854775806]
-#64bit
-[not equal? -9223372036854775807 -9223372036854775808]
-#64bit
-[not equal? -9223372036854775807 -1]
-#64bit
-[not equal? -9223372036854775807 0]
-#64bit
-[not equal? -9223372036854775807 1]
-#64bit
-[not equal? -9223372036854775807 9223372036854775806]
-#64bit
-[not equal? -9223372036854775807 9223372036854775807]
-#64bit
-[not equal? -1 -9223372036854775808]
-#64bit
-[not equal? -1 -9223372036854775807]
-[not equal? -1 0]
-[not equal? -1 1]
-#64bit
-[not equal? -1 9223372036854775806]
-#64bit
-[not equal? -1 9223372036854775807]
-#64bit
-[not equal? 0 -9223372036854775808]
-#64bit
-[not equal? 0 -9223372036854775807]
-[not equal? 0 -1]
-[not equal? 0 1]
-#64bit
-[not equal? 0 9223372036854775806]
-#64bit
-[not equal? 0 9223372036854775807]
-#64bit
-[not equal? 1 -9223372036854775808]
-#64bit
-[not equal? 1 -9223372036854775807]
-[not equal? 1 -1]
-[not equal? 1 0]
-#64bit
-[not equal? 1 9223372036854775806]
-#64bit
-[not equal? 1 9223372036854775807]
-#64bit
-[not equal? 9223372036854775806 -9223372036854775808]
-#64bit
-[not equal? 9223372036854775806 -9223372036854775807]
-#64bit
-[not equal? 9223372036854775806 -1]
-#64bit
-[not equal? 9223372036854775806 0]
-#64bit
-[not equal? 9223372036854775806 1]
-#64bit
-[not equal? 9223372036854775806 9223372036854775807]
-#64bit
-[not equal? 9223372036854775807 -9223372036854775808]
-#64bit
-[not equal? 9223372036854775807 -9223372036854775807]
-#64bit
-[not equal? 9223372036854775807 -1]
-#64bit
-[not equal? 9223372036854775807 0]
-#64bit
-[not equal? 9223372036854775807 1]
-#64bit
-[not equal? 9223372036854775807 9223372036854775806]
-; decimal! approximate equality
-[equal? 0.3 0.1 + 0.1 + 0.1]
-; decimal! approximate equality symmetry
-[equal? equal? 0.3 0.1 + 0.1 + 0.1 equal? 0.1 + 0.1 + 0.1 0.3]
-[equal? 0.15 - 0.05 0.1]
-[equal? equal? 0.15 - 0.05 0.1 equal? 0.1 0.15 - 0.05]
-[equal? -0.5 cosine 120]
-[equal? equal? -0.5 cosine 120 equal? cosine 120 -0.5]
-[equal? 0.5 * square-root 2.0 sine 45]
-[equal? equal? 0.5 * square-root 2.0 sine 45 equal? sine 45 0.5 * square-root 2.0]
-[equal? 0.5 sine 30]
-[equal? equal? 0.5 sine 30 equal? sine 30 0.5]
-[equal? 0.5 cosine 60]
-[equal? equal? 0.5 cosine 60 equal? cosine 60 0.5]
-[equal? 0.5 * square-root 3.0 sine 60]
-[equal? equal? 0.5 * square-root 3.0 sine 60 equal? sine 60 0.5 * square-root 3.0]
-[equal? 0.5 * square-root 3.0 cosine 30]
-[equal? equal? 0.5 * square-root 3.0 cosine 30 equal? cosine 30 0.5 * square-root 3.0]
-[equal? square-root 3.0 tangent 60]
-[equal? equal? square-root 3.0 tangent 60 equal? tangent 60 square-root 3.0]
-[equal? (square-root 3.0) / 3.0 tangent 30]
-[equal? equal? (square-root 3.0) / 3.0 tangent 30 equal? tangent 30 (square-root 3.0) / 3.0]
-[equal? 1.0 tangent 45]
-[equal? equal? 1.0 tangent 45 equal? tangent 45 1.0]
-[
-	num: square-root 2.0
-	equal? 2.0 num * num
-]
-[
-	num: square-root 2.0
-	equal? equal? 2.0 num * num equal? num * num 2.0
-]
-[
-	num: square-root 3.0
-	equal? 3.0 num * num
-]
-[
-	num: square-root 3.0
-	equal? equal? 3.0 num * num equal? num * num 3.0
-]
-; integer! vs. decimal!
-[equal? 0 0.0]
-; integer! vs. money!
-[equal? 0 $0]
-#r3only
-; integer! vs. percent!
-[equal? 0 0%]
-; decimal! vs. money!
-[equal? 0.0 $0]
-#r3only
-; decimal! vs. percent!
-[equal? 0.0 0%]
-#r3only
-; money! vs. percent!
-[equal? $0 0%]
-; integer! vs. decimal! symmetry
-[equal? equal? 1 1.0 equal? 1.0 1]
-; integer! vs. money! symmetry
-[equal? equal? 1 $1 equal? $1 1]
-#r3only
-; integer! vs. percent! symmetry
-[equal? equal? 1 100% equal? 100% 1]
-; decimal! vs. money! symmetry
-[equal? equal? 1.0 $1 equal? $1 1.0]
-#r3only
-; decimal! vs. percent! symmetry
-[equal? equal? 1.0 100% equal? 100% 1.0]
-#r3only
-; money! vs. percent! symmetry
-[equal? equal? $1 100% equal? 100% $1]
-#r3only
-; percent! approximate equality
-[equal? 10% + 10% + 10% 30%]
-#r3only
-; percent! approximate equality symmetry
-[equal? equal? 10% + 10% + 10% 30% equal? 30% 10% + 10% + 10%]
-[equal? 2-Jul-2009 2-Jul-2009]
-#r2only
-; date! ignores time portion
-[equal? 2-Jul-2009 2-Jul-2009/22:20]
-#r3only
-; date! doesn't ignore time portion
-[not equal? 2-Jul-2009 2-Jul-2009/22:20]
-[equal? equal? 2-Jul-2009 2-Jul-2009/22:20 equal? 2-Jul-2009/22:20 2-Jul-2009]
-; date! missing time and zone = 00:00:00+00:00
-[equal? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
-[	equal? equal? 2-Jul-2009 2-Jul-2009/00:00 equal? 2-Jul-2009/00:00 2-Jul-2009]
-; Timezone math in date!
-[equal? 2-Jul-2009/22:20 2-Jul-2009/20:20-2:00]
-[equal? 00:00 00:00]
-; time! missing components are 0
-[equal? 0:0 00:00:00.0000000000]
-[equal? equal? 0:0 00:00:00.0000000000 equal? 00:00:00.0000000000 0:0]
-; time! vs. integer!
-; bug#1103
-[not equal? 0:00 0]
-; integer! vs. time!
-; bug#1103
-[not equal? 0 00:00]
-[equal? #"a" #"a"]
-#r3only
-; char! vs. integer!
-; No implicit to char! from integer! in R3.
-[not equal? #"a" 97]
-; char! vs. integer! symmetry
-[equal? equal? #"a" 97 equal? 97 #"a"]
-#r3only
-; char! vs. decimal!
-; No implicit to char! from decimal! in R3.
-[not equal? #"a" 97.0]
-; char! vs. decimal! symmetry
-[equal? equal? #"a" 97.0 equal? 97.0 #"a"]
-#r3only
-; char! case
-[equal? #"a" #"A"]
-; string! case
-[equal? "a" "A"]
-; issue! case
-[equal? #a #A]
-; tag! case
-[equal? <a a="a"> <A A="A">]
-; url! case
-[equal? http://a.com httP://A.coM]
-; email! case
-[equal? a@a.com A@A.Com]
-[equal? 'a 'a]
-[equal? 'a 'A]
-[equal? equal? 'a 'A equal? 'A 'a]
-; word binding
-[equal? 'a use [a] ['a]]
-; word binding symmetry
-[equal? equal? 'a use [a] ['a] equal? use [a] ['a] 'a]
-; word! vs. get-word!
-[equal? 'a first [:a]]
-; word! vs. get-word! symmetry
-[equal? equal? 'a first [:a] equal? first [:a] 'a]
-; {word! vs. lit-word!
-[equal? 'a first ['a]]
-; word! vs. lit-word! symmetry
-[equal? equal? 'a first ['a] equal? first ['a] 'a]
-; word! vs. refinement!
-[equal? 'a /a]
-; word! vs. refinement! symmetry
-[equal? equal? 'a /a equal? /a 'a]
-; word! vs. set-word!
-[equal? 'a first [a:]]
-; word! vs. set-word! symmetry
-[equal? equal? 'a first [a:] equal? first [a:] 'a]
-; get-word! reflexivity
-[equal? first [:a] first [:a]]
-; get-word! vs. lit-word!
-[equal? first [:a] first ['a]]
-; get-word! vs. lit-word! symmetry
-[equal? equal? first [:a] first ['a] equal? first ['a] first [:a]]
-; get-word! vs. refinement!
-[equal? first [:a] /a]
-; get-word! vs. refinement! symmetry
-[equal? equal? first [:a] /a equal? /a first [:a]]
-; get-word! vs. set-word!
-[equal? first [:a] first [a:]]
-; get-word! vs. set-word! symmetry
-[equal? equal? first [:a] first [a:] equal? first [a:] first [:a]]
-; lit-word! reflexivity
-[equal? first ['a] first ['a]]
-; lit-word! vs. refinement!
-[equal? first ['a] /a]
-; lit-word! vs. refinement! symmetry
-[equal? equal? first ['a] /a equal? /a first ['a]]
-; lit-word! vs. set-word!
-[equal? first ['a] first [a:]]
-; lit-word! vs. set-word! symmetry
-[equal? equal? first ['a] first [a:] equal? first [a:] first ['a]]
-; refinement! reflexivity
-[equal? /a /a]
-; refinement! vs. set-word!
-[equal? /a first [a:]]
-; refinement! vs. set-word! symmetry
-[equal? equal? /a first [a:] equal? first [a:] /a]
-; set-word! reflexivity
-[equal? first [a:] first [a:]]
-[equal? true true]
-[equal? false false]
-[not equal? true false]
-[not equal? false true]
-; object! reflexivity
-[equal? a-value: make object! [a: 1] a-value]
-#r3only
-; object! simple structural equivalence
-[equal? make object! [a: 1] make object! [a: 1]]
-; object! different values
-[not equal? make object! [a: 1] make object! [a: 2]]
-; object! different words
-[not equal? make object! [a: 1] make object! [b: 1]]
-[not equal? make object! [a: 1] make object! []]
-#r3only
-; object! complex structural equivalence
-[
-	a-value: construct/only [
-		a: 1 b: 1.0 c: $1 d: 1%
-		e: [a 'a :a a: /a #"a" #{00}]
-		f: ["a" #a http://a a@a.com <a>]
-		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
-	]
-	b-value: construct/only [
-		a: 1 b: 1.0 c: $1 d: 1%
-		e: [a 'a :a a: /a #"a" #{00}]
-		f: ["a" #a http://a a@a.com <a>]
-		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
-	]
-	equal? a-value b-value
-]
-#r3only
-; object! complex structural equivalence
-; Slight differences.
-; bug#1133
-[
-	a-value: construct/only [c: $1]
-	b-value: construct/only [c: 100%]
-	equal? a-value b-value
-]
-#r3only
-[
-	a-value: construct/only [
-		a: 1 b: 1.0 c: $1 d: 1%
-		e: [a 'a :a a: /a #"a" #{00}]
-		f: ["a" #a http://a a@a.com <a>]
-		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
-	]
-	b-value: construct/only [
-		a: 1.0 b: $1 c: 100% d: 0.01
-		e: [/a a 'a :a a: #"A" #[binary! #{0000} 2]]
-		f: [#a <A> http://A a@A.com "A"]
-		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
-	]
-	equal? a-value b-value
-]
-#r3only
-; object! structural equivalence verified
-; Structural equality requires equality of the object's fields.
-[
-	a-value: construct/only [
-		a: 1 b: 1.0 c: $1 d: 1%
-		e: [a 'a :a a: /a #"a" #{00}]
-		f: ["a" #a http://a a@a.com <a>]
-		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
-	]
-	b-value: construct/only [
-		a: 1 b: 1.0 c: $1 d: 1%
-		e: [a 'a :a a: /a #"a" #{00}]
-		f: ["a" #a http://a a@a.com <a>]
-		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
-	]
-	test: :equal?
-	equal?
-		test a-value b-value
-		foreach [w v] a-value [
-			unless test :v select b-value w [break/return false]
-			true
-		]
-]
-#r3only
-; object! structural equivalence verified
-; Structural equality requires equality of the object's fields.
-[
-	a-value: construct/only [
-		a: 1 b: 1.0 c: $1 d: 1%
-		e: [a 'a :a a: /a #"a" #{00}]
-		f: ["a" #a http://a a@a.com <a>]
-		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
-	]
-	b-value: construct/only [
-		a: 1.0 b: $1 c: 100% d: 0.01
-		e: [/a a 'a :a a: #"A" #[binary! #{0000} 2]]
-		f: [#a <A> http://A a@A.com "A"]
-		g: :a/b/(c: 'd/e/f)/(b/d: [:f/g h/i])
-	]
-	test: :equal?
-	equal?
-		test a-value b-value
-		foreach [w v] a-value [
-			unless test :v select b-value w [break/return false]
-			true
-		]
-]
-; unset! comparison fails
-; Evaluates () to get unset! value, in case #[unset!] constructor fails.
-#r2only
-[error? try [equal? () ()]]
-#r3only
-[equal? () ()]
-; basic comparison with unset first argument fails
-#r2only
-[error? try [equal? () none]]
-#r3only
-[not-equal? () none]
-; basic comparison with unset second argument fails
-#r2only
-[error? try [equal? none ()]]
-#r3only
-[not-equal? none ()]
-#r3only
-; unset! symmetry
-[equal? equal? none () equal? () none]
-; unset! symmetry
-; Fails on R2 because there is no structural comparison of objects.
-#r2only
-[not equal? disarm try [equal? none ()] disarm try [equal? () none]]
-#r3only
-; basic comparison with unset first argument succeeds with = op
-; Code in R3 mezzanines depends on this.
-[not (() = none)]
-#r3only
-; basic comparison with unset first argument succeeds with != op
-; Code in R3 mezzanines depends on this.
-[() != none]
-; basic comparison with unset second argument fails with = op
-#r2only
-[error? try [none = ()]]
-#r3only
-[not none = ()]
-; basic comparison with unset second argument fails with != op
-#r2only
-[error? try [none != ()]]
-#r3only
-[none != ()]
-#r2only
-[error? try [() = ()]]
-#r3only
-[() = ()]
-#r2only
-[error? try [() != ()]]
-#r3only
-[not () != ()]
-#r3only
-; unset! symmetry with =
-[equal? none = () () = none]
-; unset! symmetry with =
-; Fails on R2 because there is no structural comparison of objects.
-#r2only
-[not equal? disarm try [none = ()] disarm try [() = none]]
-#r3only
-[equal? none = () () = none]
-#r3only
-; error! reflexivity
-; Evaluates (try [1 / 0]) to get error! value.
-[
-	a-value: none
-	set/any 'a-value (try [1 / 0])
-	equal? a-value a-value
-]
-#r3only
-; error! structural equivalence
-; Evaluates (try [1 / 0]) to get error! value.
-[equal? (try [1 / 0]) (try [1 / 0])]
-#r3only
-; error! structural equivalence
-[equal? (make error! "hello") (make error! "hello")]
-#r3only
-; error! difference in code
-[not equal? (try [1 / 0]) (make error! "hello")]
-#r3only
-; error! difference in data
-[not equal? (make error! "hello") (make error! "there")]
-#r3only
-; error! difference in op! code
-; bug#60: op! generates error! with offset code field
-[not equal? (try [1 / 0]) (try [2 / 0])]
-#r3only
-; error! basic comparison
-[not equal? (try [1 / 0]) none]
-#r3only
-; error! basic comparison
-[not equal? none (try [1 / 0])]
-#r3only
-; error! basic comparison symmetry
-[equal? equal? (try [1 / 0]) none equal? none (try [1 / 0])]
-#r3only
-; error! basic comparison with = op
-[not ((try [1 / 0]) = none)]
-#r3only
-; error! basic comparison with != op
-[(try [1 / 0]) != none]
-#r3only
-; error! basic comparison with = op
-[not (none = (try [1 / 0]))]
-#r3only
-; error! basic comparison with != op
-[none != (try [1 / 0])]
-#r3only
-; error! symmetry with = op
-[equal? not ((try [1 / 0]) = none) not (none = (try [1 / 0]))]
-#r3only
-; error! symmetry with != op
-[equal? (try [1 / 0]) != none none != (try [1 / 0])]
-#r3only
-; port! reflexivity
-; Error in R2 (could be fixed).
-[equal? p: make port! http:// p]
-; No structural equivalence for port!
-; Error in R2 (could be fixed).
-#r3only
-[not equal? make port! http:// make port! http://]
-; bug#859
-[
-	a: copy quote ()
-	insert/only a a
-	error? try [do a]
-]
-functions/math/equivq.r
-; reflexivity test for native!
-#r3
-[equiv? :abs :abs]
-#r3
-[equiv? :all :all]
-#r3
-[not equiv? :all :any]
-; reflexivity test for op!
-#r3
-[equiv? :+ :+]
-#r3
-[not equiv? :+ :-]
-; reflexivity test for function!
-; Uses func instead of make function! so the test is compatible.
-#r3
-[equiv? a-value: func [][] :a-value]
-; no structural equivalence for function!
-#r3
-[not equiv? func [][] func [][]]
-; reflexivity test for closure!
-; Uses CLOSURE to make the test compatible. On todo list for R2/Forward.
-#r3
-[equiv? a-value: closure [][] :a-value]
-; No structural equivalence for closure!
-; Uses CLOSURE to make the test compatible. On todo list for R2/Forward.
-#r3
-[not equiv? closure [][] closure [][]]
-; binary!
-; Same contents
-#r3
-[equiv? #{00} #{00}]
-; Different contents
-#r3
-[not equiv? #{00} #{01}]
-; Offset + similar contents at reference
-#r3
-[equiv? #{00} #[binary! #{0000} 2]]
-; Offset + similar contents at reference
-#r3
-[equiv? #{00} #[binary! #{0100} 2]]
-#r3
-[equal? equiv? #{00} #[binary! #{0100} 2] equiv? #[binary! #{0100} 2] #{00}]
-; No binary! padding
-#r3
-[not equiv? #{00} #{0000}]
-#r3
-[equal? equiv? #{00} #{0000} equiv? #{0000} #{00}]
-; Empty binary! not none
-#r3
-[not equiv? #{} none]
-; email versus string; RAMBO #3518
-#r3
-[
-	a-value: to email! ""
-	equiv? a-value to string! a-value
-]
-; symmetry
-#r3
-[
-	a-value: to email! ""
-	equal? equiv? to string! a-value a-value equiv? a-value to string! a-value
-]
-; file! vs. string!
-; RAMBO #3518
-#r3
-[
-	a-value: %""
-	equiv? a-value to string! a-value
-]
-; symmetry
-#r3
-[
-	a-value: %""
-	equal? equiv? a-value to string! a-value equiv? to string! a-value a-value
-]
-; image! same contents
-#r3
-[equiv? a-value: #[image! 1x1 #{000000}] a-value]
-#r3
-[equiv? #[image! 1x1 #{000000}] #[image! 1x1 #{000000}]]
-#r3
-[equiv? #[image! 1x1 #{}] #[image! 1x1 #{000000}]]
-#r3
-[not equiv? #{00} #[image! 1x1 #{00}]]
-; symmetry
-#r3
-[equal? equiv? #{00} #[image! 1x1 #{00}] equiv? #[image! 1x1 #{00}] #{00}]
-#r3
-[not equiv? #{00} to integer! #{00}]
-; symmetry
-#r3
-[equal? equiv? #{00} to integer! #{00} equiv? to integer! #{00} #{00}]
-; RAMBO #3518
-#r3
-[
-	a-value: #a
-	not-equiv? a-value to string! a-value
-]
-; symmetry
-#r3
-[
-	a-value: #a
-	equal? equiv? a-value to string! a-value equiv? to string! a-value a-value
-]
-#r3
-[not equiv? #{} none]
-; symmetry
-#r3
-[equal? equiv? #{} none equiv? none #{}]
-#r3
-[
-	a-value: ""
-	not equiv? a-value to binary! a-value
-]
-; symmetry
-#r3
-[
-	a-value: ""
-	equal? equiv? a-value to binary! a-value equiv? to binary! a-value a-value
-]
-; RAMBO #3518
-#r3
-[
-	a-value: to tag! ""
-	equiv? a-value to string! a-value
-]
-; symmetry
-#r3
-[
-	a-value: to tag! ""
-	equal? equiv? a-value to string! a-value equiv? to string! a-value a-value
-]
-#r3
-[
-	a-value: 0.0.0.0
-	not equiv? to binary! a-value a-value
-]
-; symmetry
-#r3
-[
-	a-value: 0.0.0.0
-	equal? equiv? to binary! a-value a-value equiv? a-value to binary! a-value
-]
-#r3
-[equiv? #[bitset! #{00}] #[bitset! #{00}]]
-#r3
-[not equiv? #[bitset! #{}] #[bitset! #{00}]]
-; block!
-#r3
-[equiv? [] []]
-; reflexivity
-#r3
-[
-	a-value: []
-	equiv? a-value a-value
-]
-; reflexivity for past-tail blocks
-#r3
-[
-	a-value: tail [1]
-	clear head a-value
-	equiv? a-value a-value
-]
-; reflexivity for cyclic blocks
-#r3
-[
-	a-value: copy []
-	insert/only a-value a-value
-	equiv? a-value a-value
-]
-; comparison of cyclic blocks
-; bug#1049
-#r3
-#r3crash
-[
-	a-value: copy []
-	insert/only a-value a-value
-	b-value: copy []
-	insert/only b-value b-value
-	equiv? a-value b-value
-]
-#r3
-[not equiv? [] none]
-#r3
-[equal? equiv? [] none equiv? none []]
-; block! vs. paren!
-#r3
-[not equiv? [] first [()]]
-; block! vs. paren! symmetry
-#r3
-[equal? equiv? [] first [()] equiv? first [()] []]
-; block! vs. path!
-#r3
-[not equiv? [a b] 'a/b]
-; block! vs. path! symmetry
-#r3
-[
-	a-value: 'a/b
-	b-value: [a b]
-	equal? equiv? :a-value :b-value equiv? :b-value :a-value
-]
-; block! vs. lit-path!
-#r3
-[not equal? [a b] first ['a/b]]
-; block! vs. lit-path! symmetry
-#r3
-[
-	a-value: first ['a/b]
-	b-value: [a b]
-	equal? equiv? :a-value :b-value equiv? :b-value :a-value
-]
-; block! vs. set-path!
-#r3
-[not equiv? [a b] first [a/b:]]
-; block! vs. set-path! symmetry
-#r3
-[
-	a-value: first [a/b:]
-	b-value: [a b]
-	equal? equiv? :a-value :b-value equiv? :b-value :a-value
-]
-; block! vs. get-path!
-#r3
-[not equiv? [a b] first [:a/b]]
-; block! vs. get-path! symmetry
-#r3
-[
-	a-value: first [:a/b]
-	b-value: [a b]
-	equal? equiv? :a-value :b-value equiv? :b-value :a-value
-]
-#r3
-[equiv? decimal! decimal!]
-#r3
-[not equiv? decimal! integer!]
-#r3
-[equal? equiv? decimal! integer! equiv? integer! decimal!]
-#r3
-[not equiv? number! integer!]
-; symmetry
-#r3
-[equal? equiv? number! integer! equiv? integer! number!]
-#r3only
-[not equiv? integer! make typeset! [integer!]]
-#r3only
-[equal? equiv? integer! make typeset! [integer!] equiv? make typeset! [integer!] integer!]
-; reflexivity
-#r3
-[equiv? -1 -1]
-; reflexivity
-#r3
-[equiv? 0 0]
-; reflexivity
-#r3
-[equiv? 1 1]
-; reflexivity
-#r3
-[equiv? 0.0 0.0]
-#r3
-[equiv? 0.0 -0.0]
-; reflexivity
-#r3
-[equiv? 1.0 1.0]
-; reflexivity
-#r3
-[equiv? -1.0 -1.0]
-; reflexivity
-#64bit
-#r3
-[equiv? -9223372036854775808 -9223372036854775808]
-; reflexivity
-#64bit
-#r3
-[equiv? -9223372036854775807 -9223372036854775807]
-; reflexivity
-#64bit
-#r3
-[equiv? 9223372036854775807 9223372036854775807]
-; -9223372036854775808 not equiv?
-#64bit
-#r3
-[not equiv? -9223372036854775808 -9223372036854775807]
-#64bit
-#r3
-[not equiv? -9223372036854775808 -1]
-#64bit
-#r3
-[not equiv? -9223372036854775808 0]
-#64bit
-#r3
-[not equiv? -9223372036854775808 1]
-#64bit
-#r3
-[not equiv? -9223372036854775808 9223372036854775806]
-#64bit
-#r3
-[not equiv? -9223372036854775808 9223372036854775807]
-; -9223372036854775807 not equiv?
-#64bit
-#r3
-[not equiv? -9223372036854775807 -9223372036854775808]
-#64bit
-#r3
-[not equiv? -9223372036854775807 -1]
-#64bit
-#r3
-[not equiv? -9223372036854775807 0]
-#64bit
-#r3
-[not equiv? -9223372036854775807 1]
-#64bit
-#r3
-[not equiv? -9223372036854775807 9223372036854775806]
-#64bit
-#r3
-[not equiv? -9223372036854775807 9223372036854775807]
-; -1 not equiv?
-#64bit
-#r3
-[not equiv? -1 -9223372036854775808]
-#64bit
-#r3
-[not equiv? -1 -9223372036854775807]
-#r3
-[not equiv? -1 0]
-#r3
-[not equiv? -1 1]
-#64bit
-#r3
-[not equiv? -1 9223372036854775806]
-#64bit
-#r3
-[not equiv? -1 9223372036854775807]
-; 0 not equiv?
-#64bit
-#r3
-[not equiv? 0 -9223372036854775808]
-#64bit
-#r3
-[not equiv? 0 -9223372036854775807]
-#r3
-[not equiv? 0 -1]
-#r3
-[not equiv? 0 1]
-#64bit
-#r3
-[not equiv? 0 9223372036854775806]
-#64bit
-#r3
-[not equiv? 0 9223372036854775807]
-; 1 not equiv?
-#64bit
-#r3
-[not equiv? 1 -9223372036854775808]
-#64bit
-#r3
-[not equiv? 1 -9223372036854775807]
-#r3
-[not equiv? 1 -1]
-#r3
-[not equiv? 1 0]
-#64bit
-#r3
-[not equiv? 1 9223372036854775806]
-#64bit
-#r3
-[not equiv? 1 9223372036854775807]
-; 9223372036854775806 not equiv?
-#64bit
-#r3
-[not equiv? 9223372036854775806 -9223372036854775808]
-#64bit
-#r3
-[not equiv? 9223372036854775806 -9223372036854775807]
-#64bit
-#r3
-[not equiv? 9223372036854775806 -1]
-#64bit
-#r3
-[not equiv? 9223372036854775806 0]
-#64bit
-#r3
-[not equiv? 9223372036854775806 1]
-#64bit
-#r3
-[not equiv? 9223372036854775806 9223372036854775807]
-; 9223372036854775807 not equiv?
-#64bit
-#r3
-[not equiv? 9223372036854775807 -9223372036854775808]
-#64bit
-#r3
-[not equiv? 9223372036854775807 -9223372036854775807]
-#64bit
-#r3
-[not equiv? 9223372036854775807 -1]
-#64bit
-#r3
-[not equiv? 9223372036854775807 0]
-#64bit
-#r3
-[not equiv? 9223372036854775807 1]
-#64bit
-#r3
-[not equiv? 9223372036854775807 9223372036854775806]
-; "decimal tolerance"
-#r3
-; bug#1134
-[not equiv? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}]
-; symmetry
-#r3
-[
-	equal? equiv? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}
-		equiv? to decimal! #{3FD3333333333334} to decimal! #{3FD3333333333333}
-]
-#r3
-[not equiv? to decimal! #{3FB9999999999999} to decimal! #{3FB999999999999A}]
-; symmetry
-#r3
-[
-	equal? equiv? to decimal! #{3FB9999999999999} to decimal! #{3FB999999999999A}
-		equiv? to decimal! #{3FB999999999999A} to decimal! #{3FB9999999999999}
-]
-; ignores datatype differences
-#r3
-[equiv? 0 0.0]
-; ignores datatype differences
-#r3
-[equiv? 0 $0]
-; ignores datatype differences
-#r3only
-[equiv? 0 0%]
-; ignores datatype differences
-#r3
-[equiv? 0.0 $0]
-; ignores datatype differences
-#r3only
-[equiv? 0.0 0%]
-; ignores datatype differences
-#r3only
-[equiv? $0 0%]
-; symmetry
-#r3
-[equal? equiv? 1 1.0 equiv? 1.0 1]
-; symmetry
-#r3
-[equal? equiv? 1 $1 equiv? $1 1]
-; symmetry
-#r3only
-[equal? equiv? 1 100% equiv? 100% 1]
-; symmetry
-#r3
-[equal? equiv? 1.0 $1 equiv? $1 1.0]
-; symmetry
-#r3only
-[equal? equiv? 1.0 100% equiv? 100% 1.0]
-; symmetry
-#r3only
-[equal? equiv? $1 100% equiv? 100% $1]
-; approximate equality
-#r3only
-[equiv? 10% + 10% + 10% 30%]
-; symmetry
-#r3only
-[equal? equiv? 10% + 10% + 10% 30% equiv? 30% 10% + 10% + 10%]
-; date!; approximate equality
-#r3
-[not equiv? 2-Jul-2009 2-Jul-2009/22:20]
-; symmetry
-#r3
-[equal? equiv? 2-Jul-2009 2-Jul-2009/22:20 equiv? 2-Jul-2009/22:20 2-Jul-2009]
-; missing time = 00:00:00+00:00, by time compatibility standards
-#r3
-[equiv? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
-; symmetry
-#r3
-[equal? equiv? 2-Jul-2009 2-Jul-2009/00:00 equiv? 2-Jul-2009/00:00 2-Jul-2009]
-; timezone in date!
-#r3
-[equiv? 2-Jul-2009/22:20 2-Jul-2009/20:20-2:00]
-; time!; reflexivity
-#r3
-[equiv? 00:00 00:00]
-; char!; symmetry
-#r3
-[equal? equiv? #"a" 97 equiv? 97 #"a"]
-; symmetry
-#r3
-[equal? equiv? #"a" 97.0 equiv? 97.0 #"a"]
-; case
-#r3
-[equiv? #"a" #"A"]
-; case
-#r3
-[equiv? "a" "A"]
-; words; reflexivity
-#r3
-[equiv? 'a 'a]
-; aliases
-#r3
-[equiv? 'a 'A]
-; symmetry
-#r3
-[equal? equiv? 'a 'A equiv? 'A 'a]
-; binding
-#r3
-[not equiv? 'a use [a] ['a]]
-; symmetry
-#r3
-[equal? equiv? 'a use [a] ['a] equiv? use [a] ['a] 'a]
-; different word types
-#r3
-[equiv? 'a first [:a]]
-; symmetry
-#r3
-[equal? equiv? 'a first [:a] equiv? first [:a] 'a]
-; different word types
-#r3
-[equiv? 'a first ['a]]
-; symmetry
-#r3
-[equal? equiv? 'a first ['a] equiv? first ['a] 'a]
-; different word types
-#r3
-[equiv? 'a /a]
-; symmetry
-#r3
-[equal? equiv? 'a /a equiv? /a 'a]
-; different word types
-#r3
-[equiv? 'a first [a:]]
-; symmetry
-#r3
-[equal? equiv? 'a first [a:] equiv? first [a:] 'a]
-; reflexivity
-#r3
-[equiv? first [:a] first [:a]]
-; different word types
-#r3
-[equiv? first [:a] first ['a]]
-; symmetry
-#r3
-[equal? equiv? first [:a] first ['a] equiv? first ['a] first [:a]]
-; different word types
-#r3
-[equiv? first [:a] /a]
-; symmetry
-#r3
-[equal? equiv? first [:a] /a equiv? /a first [:a]]
-; different word types
-#r3
-[equiv? first [:a] first [a:]]
-; symmetry
-#r3
-[equal? equiv? first [:a] first [a:] equiv? first [a:] first [:a]]
-; reflexivity
-#r3
-[equiv? first ['a] first ['a]]
-; different word types
-#r3
-[equiv? first ['a] /a]
-; symmetry
-#r3
-[equal? equiv? first ['a] /a equiv? /a first ['a]]
-; different word types
-#r3
-[equiv? first ['a] first [a:]]
-; symmetry
-#r3
-[equal? equiv? first ['a] first [a:] equiv? first [a:] first ['a]]
-; reflexivity
-#r3
-[equiv? /a /a]
-; different word types
-#r3
-[equiv? /a first [a:]]
-; symmetry
-#r3
-[equal? equiv? /a first [a:] equiv? first [a:] /a]
-; reflexivity
-#r3
-[equiv? first [a:] first [a:]]
-; logic! values
-#r3
-[equiv? true true]
-#r3
-[equiv? false false]
-#r3
-[not equiv? true false]
-#r3
-[not equiv? false true]
-; port! values; reflexivity; in this case the error should not be generated, I think
-#r3
-[
-	p: make port! http://
-	any [
-		error? try [equiv? p p]
-		equiv? p p
-	]
-]
-functions/math/random.r
-; bug#1084
-#r3only
-[
-	random/seed 0
-	not any [
-		negative? random 1.0
-		negative? random 1.0
-	]
-]
-functions/math/strict-equalq.r
-[strict-equal? :abs :abs]
-; reflexivity test for native!
-[strict-equal? :all :all]
-; reflexivity test for op!
-[strict-equal? :+ :+]
-; reflexivity test for function!
-[
-	a-value: func [] []
-	strict-equal? :a-value :a-value
-]
-; no structural equality for function!
-[not strict-equal? func [] [] func [] []]
-; reflexivity test for closure!
-#r3
-[
-	a-value: closure [] []
-	strict-equal? :a-value :a-value
-]
-; no structural equality for closure!
-#r3
-[not strict-equal? closure [] [] closure [] []]
-; binary!
-[strict-equal? #{00} #{00}]
-; binary versus bitset
-[not strict-equal? #{00} #[bitset! #{00}]]
-; symmetry
-[equal? strict-equal? #[bitset! #{00}] #{00} strict-equal? #{00} #[bitset! #{00}]]
-; email versus string
-[
-	a-value: to email! ""
-	not strict-equal? a-value to string! a-value
-]
-; symmetry
-[
-	a-value: to email! ""
-	equal? strict-equal? to string! a-value a-value strict-equal? a-value to string! a-value
-]
-[
-	a-value: %""
-	not strict-equal? a-value to string! a-value
-]
-; symmetry
-[
-	a-value: %""
-	equal? strict-equal? a-value to string! a-value strict-equal? to string! a-value a-value
-]
-[	not strict-equal? #{00} #[image! 1x1 #{00}]]
-; symmetry
-[	equal? strict-equal? #{00} #[image! 1x1 #{00}] strict-equal? #[image! 1x1 #{00}] #{00}]
-[	not strict-equal? #{00} to integer! #{00}]
-; symmetry
-[	equal? strict-equal? #{00} to integer! #{00} strict-equal? to integer! #{00} #{00}]
-[
-	a-value: #a
-	not strict-equal? a-value to string! a-value
-]
-; symmetry
-[
-	a-value: #a
-	equal? strict-equal? a-value to string! a-value strict-equal? to string! a-value a-value
-]
-[not strict-equal? #{} none]
-; symmetry
-[	equal? strict-equal? #{} none strict-equal? none #{}]
-[
-	a-value: ""
-	not strict-equal? a-value to binary! a-value
-]
-; symmetry
-[
-	a-value: ""
-	equal? strict-equal? a-value to binary! a-value strict-equal? to binary! a-value a-value
-]
-[
-	a-value: to tag! ""
-	not strict-equal? a-value to string! a-value
-]
-; symmetry
-[
-	a-value: to tag! ""
-	equal? strict-equal? a-value to string! a-value strict-equal? to string! a-value a-value
-]
-[
-	a-value: 0.0.0.0
-	not strict-equal? to binary! a-value a-value
-]
-; symmetry
-[
-	a-value: 0.0.0.0
-	equal? strict-equal? to binary! a-value a-value strict-equal? a-value to binary! a-value
-]
-[strict-equal? #[bitset! #{00}] #[bitset! #{00}]]
-[not strict-equal? #[bitset! #{}] #[bitset! #{00}]]
-; block!
-[strict-equal? [] []]
-; reflexivity
-[
-	a-value: []
-	strict-equal? a-value a-value
-]
-; reflexivity for past-tail blocks
-[
-	a-value: tail [1]
-	clear head a-value
-	strict-equal? a-value a-value
-]
-; reflexivity for cyclic blocks
-[
-	a-value: copy []
-	insert/only a-value a-value
-	strict-equal? a-value a-value
-]
-#r2crash
-#r3crash
-; bug#1066
-; comparison of cyclic blocks
-[
-	a-value: copy []
-	insert/only a-value a-value
-	b-value: copy []
-	insert/only b-value b-value
-	strict-equal? a-value b-value
-]
-#r2only
-[
-	a-value: first ['a/b]
-	parse :a-value [b-value:]
-	not strict-equal? :a-value :b-value
-]
-#r3only
-[
-	a-value: first ['a/b]
-	parse :a-value [b-value:]
-	strict-equal? :a-value :b-value
-]
-; symmetry
-[
-	a-value: first ['a/b]
-	parse :a-value [b-value:]
-	equal? strict-equal? :a-value :b-value strict-equal? :b-value :a-value
-]
-[not strict-equal? [] none]
-; symmetry
-[equal? strict-equal? [] none strict-equal? none []]
-#r2only
-[
-	a-value: first [()]
-	parse a-value [b-value:]
-	not strict-equal? a-value b-value
-]
-#r3only
-[
-	a-value: first [()]
-	parse a-value [b-value:]
-	strict-equal? a-value b-value
-]
-; symmetry
-[
-	a-value: first [()]
-	parse a-value [b-value:]
-	equal? strict-equal? a-value b-value strict-equal? b-value a-value
-]
-#r2only
-[
-	a-value: 'a/b
-	parse a-value [b-value:]
-	not strict-equal? :a-value :b-value
-]
-#r3only
-[
-	a-value: 'a/b
-	parse a-value [b-value:]
-	strict-equal? :a-value :b-value
-]
-; symmetry
-[
-	a-value: 'a/b
-	parse a-value [b-value:]
-	equal? strict-equal? :a-value :b-value strict-equal? :b-value :a-value
-]
-#r2only
-[
-	a-value: first [a/b:]
-	parse :a-value [b-value:]
-	not strict-equal? :a-value :b-value
-]
-#r3only
-[
-	a-value: first [a/b:]
-	parse :a-value [b-value:]
-	strict-equal? :a-value :b-value
-]
-; symmetry
-[
-	a-value: first [a/b:]
-	parse :a-value [b-value:]
-	equal? strict-equal? :a-value :b-value strict-equal? :b-value :a-value
-]
-[not strict-equal? number! integer!]
-; symmetry
-[equal? strict-equal? number! integer! strict-equal? integer! number!]
-; reflexivity
-[strict-equal? -1 -1]
-; reflexivity
-[strict-equal? 0 0]
-; reflexivity
-[strict-equal? 1 1]
-; reflexivity
-[strict-equal? 0.0 0.0]
-[strict-equal? 0.0 -0.0]
-; reflexivity
-[strict-equal? 1.0 1.0]
-; reflexivity
-[strict-equal? -1.0 -1.0]
-#64bit
-; reflexivity
-[strict-equal? -9223372036854775808 -9223372036854775808]
-#64bit
-; reflexivity
-[strict-equal? -9223372036854775807 -9223372036854775807]
-#64bit
-; reflexivity
-[strict-equal? 9223372036854775807 9223372036854775807]
-#64bit
-; -9223372036854775808 not strict-equal?
-[not strict-equal? -9223372036854775808 -9223372036854775807]
-#64bit
-[not strict-equal? -9223372036854775808 -1]
-#64bit
-[not strict-equal? -9223372036854775808 0]
-#64bit
-[not strict-equal? -9223372036854775808 1]
-#64bit
-[not strict-equal? -9223372036854775808 9223372036854775806]
-#64bit
-[not strict-equal? -9223372036854775808 9223372036854775807]
-#64bit
-; -9223372036854775807 not strict-equal?
-[not strict-equal? -9223372036854775807 -9223372036854775808]
-#64bit
-[not strict-equal? -9223372036854775807 -1]
-#64bit
-[not strict-equal? -9223372036854775807 0]
-#64bit
-[not strict-equal? -9223372036854775807 1]
-#64bit
-[not strict-equal? -9223372036854775807 9223372036854775806]
-#64bit
-[not strict-equal? -9223372036854775807 9223372036854775807]
-#64bit
-; -1 not strict-equal?
-[not strict-equal? -1 -9223372036854775808]
-#64bit
-[not strict-equal? -1 -9223372036854775807]
-[not strict-equal? -1 0]
-[not strict-equal? -1 1]
-#64bit
-[not strict-equal? -1 9223372036854775806]
-#64bit
-[not strict-equal? -1 9223372036854775807]
-#64bit
-; 0 not strict-equal?
-[not strict-equal? 0 -9223372036854775808]
-#64bit
-[not strict-equal? 0 -9223372036854775807]
-[not strict-equal? 0 -1]
-[not strict-equal? 0 1]
-#64bit
-[not strict-equal? 0 9223372036854775806]
-#64bit
-[not strict-equal? 0 9223372036854775807]
-#64bit
-; 1 not strict-equal?
-[not strict-equal? 1 -9223372036854775808]
-#64bit
-[not strict-equal? 1 -9223372036854775807]
-[not strict-equal? 1 -1]
-[not strict-equal? 1 0]
-#64bit
-[not strict-equal? 1 9223372036854775806]
-#64bit
-[not strict-equal? 1 9223372036854775807]
-#64bit
-; 9223372036854775806 not strict-equal?
-[not strict-equal? 9223372036854775806 -9223372036854775808]
-#64bit
-[not strict-equal? 9223372036854775806 -9223372036854775807]
-#64bit
-[not strict-equal? 9223372036854775806 -1]
-#64bit
-[not strict-equal? 9223372036854775806 0]
-#64bit
-[not strict-equal? 9223372036854775806 1]
-#64bit
-[not strict-equal? 9223372036854775806 9223372036854775807]
-#64bit
-; 9223372036854775807 not strict-equal?
-[not strict-equal? 9223372036854775807 -9223372036854775808]
-#64bit
-[not strict-equal? 9223372036854775807 -9223372036854775807]
-#64bit
-[not strict-equal? 9223372036854775807 -1]
-#64bit
-[not strict-equal? 9223372036854775807 0]
-#64bit
-[not strict-equal? 9223372036854775807 1]
-#64bit
-[not strict-equal? 9223372036854775807 9223372036854775806]
-; "decimal tolerance"
-[not strict-equal? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}]
-; symmetry
-[
-	equal? strict-equal? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}
-		strict-equal? to decimal! #{3FD3333333333334} to decimal! #{3FD3333333333333}
-]
-[not strict-equal? to decimal! #{3FB9999999999999} to decimal! #{3FB999999999999A}]
-; symmetry
-[
-	equal? strict-equal? to decimal! #{3FB9999999999999} to decimal! #{3FB999999999999A}
-		strict-equal? to decimal! #{3FB999999999999A} to decimal! #{3FB9999999999999}
-]
-; datatype differences
-[not strict-equal? 0 0.0]
-; datatype differences
-[not strict-equal? 0 $0]
-#r3only
-; datatype differences
-[not strict-equal? 0 0%]
-; datatype differences
-[not strict-equal? 0.0 $0]
-#r3only
-; datatype differences
-[not strict-equal? 0.0 0%]
-#r3only
-; datatype differences
-[not strict-equal? $0 0%]
-; symmetry
-[equal? strict-equal? 1 1.0 strict-equal? 1.0 1]
-; symmetry
-[equal? strict-equal? 1 $1 strict-equal? $1 1]
-#r3only
-; symmetry
-[equal? strict-equal? 1 100% strict-equal? 100% 1]
-; symmetry
-[equal? strict-equal? 1.0 $1 strict-equal? $1 1.0]
-#r3only
-; symmetry
-[equal? strict-equal? 1.0 100% strict-equal? 100% 1.0]
-#r3only
-; symmetry
-[equal? strict-equal? $1 100% strict-equal? 100% $1]
-#r3only
-; approximate equality
-[not strict-equal? 10% + 10% + 10% 30%]
-#r3only
-; symmetry
-[equal? strict-equal? 10% + 10% + 10% 30% strict-equal? 30% 10% + 10% + 10%]
-; date!; approximate equality
-#r2only
-[strict-equal? 2-Jul-2009 2-Jul-2009/22:20]
-#r3only
-[not strict-equal? 2-Jul-2009 2-Jul-2009/22:20]
-; symmetry
-[equal? strict-equal? 2-Jul-2009 2-Jul-2009/22:20 strict-equal? 2-Jul-2009/22:20 2-Jul-2009]
-; missing time = 00:00:00+00:00, by time compatibility standards
-#r2only
-[strict-equal? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
-#r3only
-[not strict-equal? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
-; symmetry
-[equal? strict-equal? 2-Jul-2009 2-Jul-2009/00:00 strict-equal? 2-Jul-2009/00:00 2-Jul-2009]
-; no timezone math in date!
-[not strict-equal? 2-Jul-2009/22:20 2-Jul-2009/20:20-2:00]
-; time!
-[strict-equal? 00:00 00:00]
-; char!; symmetry
-[equal? strict-equal? #"a" 97 strict-equal? 97 #"a"]
-; symmetry
-[equal? strict-equal? #"a" 97.0 strict-equal? 97.0 #"a"]
-; case
-[not strict-equal? #"a" #"A"]
-; case
-[not strict-equal? "a" "A"]
-; words; reflexivity
-[strict-equal? 'a 'a]
-; aliases
-[not strict-equal? 'a 'A]
-; symmetry
-[equal? strict-equal? 'a 'A strict-equal? 'A 'a]
-; binding
-[not strict-equal? 'a use [a] ['a]]
-; symmetry
-[equal? strict-equal? 'a use [a] ['a] strict-equal? use [a] ['a] 'a]
-; different word types
-[not strict-equal? 'a first [:a]]
-; symmetry
-[equal? strict-equal? 'a first [:a] strict-equal? first [:a] 'a]
-; different word types
-[not strict-equal? 'a first ['a]]
-; symmetry
-[equal? strict-equal? 'a first ['a] strict-equal? first ['a] 'a]
-; different word types
-[not strict-equal? 'a /a]
-; symmetry
-[equal? strict-equal? 'a /a strict-equal? /a 'a]
-; different word types
-[not strict-equal? 'a first [a:]]
-; symmetry
-[equal? strict-equal? 'a first [a:] strict-equal? first [a:] 'a]
-; reflexivity
-[strict-equal? first [:a] first [:a]]
-; different word types
-[not strict-equal? first [:a] first ['a]]
-; symmetry
-[equal? strict-equal? first [:a] first ['a] strict-equal? first ['a] first [:a]]
-; different word types
-[not strict-equal? first [:a] /a]
-; symmetry
-[equal? strict-equal? first [:a] /a strict-equal? /a first [:a]]
-; different word types
-[not strict-equal? first [:a] first [a:]]
-; symmetry
-[equal? strict-equal? first [:a] first [a:] strict-equal? first [a:] first [:a]]
-; reflexivity
-[strict-equal? first ['a] first ['a]]
-; different word types
-[not strict-equal? first ['a] /a]
-; symmetry
-[equal? strict-equal? first ['a] /a strict-equal? /a first ['a]]
-; different word types
-[not strict-equal? first ['a] first [a:]]
-; symmetry
-[equal? strict-equal? first ['a] first [a:] strict-equal? first [a:] first ['a]]
-; reflexivity
-[strict-equal? /a /a]
-; different word types
-[not strict-equal? /a first [a:]]
-; symmetry
-[equal? strict-equal? /a first [a:] strict-equal? first [a:] /a]
-; reflexivity
-[strict-equal? first [a:] first [a:]]
-; logic! values
-[strict-equal? true true]
-[strict-equal? false false]
-[not strict-equal? true false]
-[not strict-equal? false true]
-; port! values; reflexivity; in this case the error should not be generated, I think
-[
-	p: make port! http://
-	any [
-		error? try [strict-equal? p p]
-		strict-equal? p p
-	]
-]
-functions/math/sameq.r
-[same? :abs :abs]
-; reflexivity test for native!
-[same? :all :all]
-; reflexivity test for op!
-[same? :+ :+]
-; reflexivity test for function!
-[
-	a-value: func [] []
-	same? :a-value :a-value
-]
-; no structural equality for function!
-[not same? func [] [] func [] []]
-; reflexivity test for closure!
-#r3
-[
-	a-value: closure [] []
-	same? :a-value :a-value
-]
-; no structural equality for closure!
-#r3
-[not same? closure [] [] closure [] []]
-; reflexivity test for native!
-[same? :all :all]
-; reflexivity test for op!
-[same? :+ :+]
-; reflexivity test for function!
-[
-	a-value: func [] []
-	same? :a-value :a-value
-]
-; no structural equality for function!
-[not same? func [] [] func [] []]
-; reflexivity test for closure!
-#r3
-[
-	a-value: closure [] []
-	same? :a-value :a-value
-]
-; no structural equality for closure!
-#r3
-[not same? closure [] [] closure [] []]
-; binary!
-[not same? #{00} #{00}]
-; binary versus bitset
-[not same? #{00} #[bitset! #{00}]]
-; symmetry
-[equal? same? #[bitset! #{00}] #{00} same? #{00} #[bitset! #{00}]]
-; email versus string
-[
-	a-value: to email! ""
-	not same? a-value to string! a-value
-]
-; symmetry
-[
-	a-value: to email! ""
-	equal? same? to string! a-value a-value same? a-value to string! a-value
-]
-[
-	a-value: %""
-	not same? a-value to string! a-value
-]
-; symmetry
-[
-	a-value: %""
-	equal? same? a-value to string! a-value same? to string! a-value a-value
-]
-[	not same? #{00} #[image! 1x1 #{00}]]
-; symmetry
-[equal? same? #{00} #[image! 1x1 #{00}] same? #[image! 1x1 #{00}] #{00}]
-[not same? #{00} to integer! #{00}]
-; symmetry
-[equal? same? #{00} to integer! #{00} same? to integer! #{00} #{00}]
-[
-	a-value: #a
-	not same? a-value to string! a-value
-]
-; symmetry
-[
-	a-value: #a
-	equal? same? a-value to string! a-value same? to string! a-value a-value
-]
-[not same? #{} none]
-; symmetry
-[equal? same? #{} none same? none #{}]
-[
-	a-value: ""
-	not same? a-value to binary! a-value
-]
-; symmetry
-[
-	a-value: ""
-	equal? same? a-value to binary! a-value same? to binary! a-value a-value
-]
-[
-	a-value: to tag! ""
-	not same? a-value to string! a-value
-]
-; symmetry
-[
-	a-value: to tag! ""
-	equal? same? a-value to string! a-value same? to string! a-value a-value
-]
-[
-	a-value: 0.0.0.0
-	not same? to binary! a-value a-value
-]
-; symmetry
-[
-	a-value: 0.0.0.0
-	equal? same? to binary! a-value a-value same? a-value to binary! a-value
-]
-[not same? #[bitset! #{00}] #[bitset! #{00}]]
-[not same? #[bitset! #{}] #[bitset! #{00}]]
-; block!
-[not same? [] []]
-; reflexivity
-[
-	a-value: []
-	same? a-value a-value
-]
-; reflexivity for past-tail blocks
-[
-	a-value: tail [1]
-	clear head a-value
-	same? a-value a-value
-]
-; reflexivity for cyclic blocks
-[
-	a-value: copy []
-	insert/only a-value a-value
-	same? a-value a-value
-]
-; comparison of cyclic blocks
-[
-	a-value: copy []
-	insert/only a-value a-value
-	b-value: copy []
-	insert/only b-value b-value
-	not same? a-value b-value
-]
-#r2only
-[
-	a-value: first ['a/b]
-	parse :a-value [b-value:]
-	not same? :a-value :b-value
-]
-#r3only
-[
-	a-value: first ['a/b]
-	parse :a-value [b-value:]
-	same? :a-value :b-value
-]
-; symmetry
-[
-	a-value: first ['a/b]
-	parse :a-value [b-value:]
-	equal? same? :a-value :b-value same? :b-value :a-value
-]
-[not same? [] none]
-; symmetry
-[equal? same? [] none same? none []]
-#r2only
-[
-	a-value: first [()]
-	parse a-value [b-value:]
-	not same? a-value b-value
-]
-#r3only
-[
-	a-value: first [()]
-	parse a-value [b-value:]
-	same? a-value b-value
-]
-; symmetry
-[
-	a-value: first [()]
-	parse a-value [b-value:]
-	equal? same? a-value b-value same? b-value a-value
-]
-#r2only
-[
-	a-value: 'a/b
-	parse a-value [b-value:]
-	not same? :a-value :b-value
-]
-#r3only
-[
-	a-value: 'a/b
-	parse a-value [b-value:]
-	same? :a-value :b-value
-]
-; symmetry
-[
-	a-value: 'a/b
-	parse a-value [b-value:]
-	equal? same? :a-value :b-value same? :b-value :a-value
-]
-#r2only
-[
-	a-value: first [a/b:]
-	parse :a-value [b-value:]
-	not same? :a-value :b-value
-]
-#r3only
-[
-	a-value: first [a/b:]
-	parse :a-value [b-value:]
-	same? :a-value :b-value
-]
-; symmetry
-[
-	a-value: first [a/b:]
-	parse :a-value [b-value:]
-	equal? same? :a-value :b-value same? :b-value :a-value
-]
-[not same? number! integer!]
-; symmetry
-[equal? same? number! integer! same? integer! number!]
-; reflexivity
-[same? -1 -1]
-; reflexivity
-[same? 0 0]
-; reflexivity
-[same? 1 1]
-; reflexivity
-[same? 0.0 0.0]
-[not same? 0.0 -0.0]
-; reflexivity
-[same? 1.0 1.0]
-; reflexivity
-[same? -1.0 -1.0]
-#64bit
-; reflexivity
-[same? -9223372036854775808 -9223372036854775808]
-#64bit
-; reflexivity
-[same? -9223372036854775807 -9223372036854775807]
-#64bit
-; reflexivity
-[same? 9223372036854775807 9223372036854775807]
-#64bit
-; -9223372036854775808 not same?
-[not same? -9223372036854775808 -9223372036854775807]
-#64bit
-[not same? -9223372036854775808 -1]
-#64bit
-[not same? -9223372036854775808 0]
-#64bit
-[not same? -9223372036854775808 1]
-#64bit
-[not same? -9223372036854775808 9223372036854775806]
-#64bit
-[not same? -9223372036854775808 9223372036854775807]
-#64bit
-; -9223372036854775807 not same?
-[not same? -9223372036854775807 -9223372036854775808]
-#64bit
-[not same? -9223372036854775807 -1]
-#64bit
-[not same? -9223372036854775807 0]
-#64bit
-[not same? -9223372036854775807 1]
-#64bit
-[not same? -9223372036854775807 9223372036854775806]
-#64bit
-[not same? -9223372036854775807 9223372036854775807]
-#64bit
-; -1 not same?
-[not same? -1 -9223372036854775808]
-#64bit
-[not same? -1 -9223372036854775807]
-[not same? -1 0]
-[not same? -1 1]
-#64bit
-[not same? -1 9223372036854775806]
-#64bit
-[not same? -1 9223372036854775807]
-#64bit
-; 0 not same?
-[not same? 0 -9223372036854775808]
-#64bit
-[not same? 0 -9223372036854775807]
-[not same? 0 -1]
-[not same? 0 1]
-#64bit
-[not same? 0 9223372036854775806]
-#64bit
-[not same? 0 9223372036854775807]
-#64bit
-; 1 not same?
-[not same? 1 -9223372036854775808]
-#64bit
-[not same? 1 -9223372036854775807]
-[not same? 1 -1]
-[not same? 1 0]
-#64bit
-[not same? 1 9223372036854775806]
-#64bit
-[not same? 1 9223372036854775807]
-#64bit
-; 9223372036854775806 not same?
-[not same? 9223372036854775806 -9223372036854775808]
-#64bit
-[not same? 9223372036854775806 -9223372036854775807]
-#64bit
-[not same? 9223372036854775806 -1]
-#64bit
-[not same? 9223372036854775806 0]
-#64bit
-[not same? 9223372036854775806 1]
-#64bit
-[not same? 9223372036854775806 9223372036854775807]
-#64bit
-; 9223372036854775807 not same?
-[not same? 9223372036854775807 -9223372036854775808]
-#64bit
-[not same? 9223372036854775807 -9223372036854775807]
-#64bit
-[not same? 9223372036854775807 -1]
-#64bit
-[not same? 9223372036854775807 0]
-#64bit
-[not same? 9223372036854775807 1]
-#64bit
-[not same? 9223372036854775807 9223372036854775806]
-; "decimal tolerance"
-[not same? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}]
-; symmetry
-[
-	equal? same? to decimal! #{3FD3333333333333} to decimal! #{3FD3333333333334}
-		same? to decimal! #{3FD3333333333334} to decimal! #{3FD3333333333333}
-]
-[not same? to decimal! #{3FB9999999999999} to decimal! #{3FB999999999999A}]
-; symmetry
-[
-	equal? same? to decimal! #{3FB9999999999999} to decimal! #{3FB999999999999A}
-		same? to decimal! #{3FB999999999999A} to decimal! #{3FB9999999999999}
-]
-; datatype differences
-[not same? 0 0.0]
-; datatype differences
-[not same? 0 $0]
-#r3only
-; datatype differences
-[not same? 0 0%]
-; datatype differences
-[not same? 0.0 $0]
-#r3only
-; datatype differences
-[not same? 0.0 0%]
-#r3only
-; datatype differences
-[not same? $0 0%]
-; symmetry
-[equal? same? 1 1.0 same? 1.0 1]
-; symmetry
-[equal? same? 1 $1 same? $1 1]
-#r3only
-; symmetry
-[equal? same? 1 100% same? 100% 1]
-; symmetry
-[equal? same? 1.0 $1 same? $1 1.0]
-#r3only
-; symmetry
-[equal? same? 1.0 100% same? 100% 1.0]
-#r3only
-; symmetry
-[equal? same? $1 100% same? 100% $1]
-#r3only
-; approximate equality
-[not same? 10% + 10% + 10% 30%]
-#r3only
-; symmetry
-[equal? same? 10% + 10% + 10% 30% same? 30% 10% + 10% + 10%]
-; date!; approximate equality
-[not same? 2-Jul-2009 2-Jul-2009/22:20]
-; symmetry
-[equal? same? 2-Jul-2009 2-Jul-2009/22:20 same? 2-Jul-2009/22:20 2-Jul-2009]
-; missing time is considered a difference
-[not same? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
-; symmetry
-[equal? not same? 2-Jul-2009 2-Jul-2009/00:00 not same? 2-Jul-2009/00:00 2-Jul-2009]
-; no timezone math
-[not same? 2-Jul-2009/22:20 2-Jul-2009/20:20-2:00]
-; time!
-[same? 00:00 00:00]
-; missing components are 0
-[same? 00:00 00:00:00]
-; no timezone math
-[not same? 22:20 20:20]
-; char!; symmetry
-[equal? same? #"a" 97 same? 97 #"a"]
-; symmetry
-[equal? same? #"a" 97.0 same? 97.0 #"a"]
-; case
-[not same? #"a" #"A"]
-; case
-[not same? "a" "A"]
-; words; reflexivity
-[same? 'a 'a]
-; aliases
-[not same? 'a 'A]
-; symmetry
-[equal? same? 'a 'A same? 'A 'a]
-; binding
-[not same? 'a use [a] ['a]]
-; symmetry
-[equal? same? 'a use [a] ['a] same? use [a] ['a] 'a]
-; different word types
-#r2only
-[same? 'a first [:a]]
-#r3only
-[not same? 'a first [:a]]
-; symmetry
-[equal? same? 'a first [:a] same? first [:a] 'a]
-; different word types
-#r2only
-[same? 'a first ['a]]
-#r3only
-[not same? 'a first ['a]]
-; symmetry
-[equal? same? 'a first ['a] same? first ['a] 'a]
-; different word types
-[not same? 'a /a]
-; symmetry
-[equal? same? 'a /a same? /a 'a]
-; different word types
-#r2only
-[same? 'a first [a:]]
-#r3only
-[not same? 'a first [a:]]
-; symmetry
-[equal? same? 'a first [a:] same? first [a:] 'a]
-; reflexivity
-[same? first [:a] first [:a]]
-; different word types
-#r2only
-[same? first [:a] first ['a]]
-#r3only
-[not same? first [:a] first ['a]]
-; symmetry
-[equal? same? first [:a] first ['a] same? first ['a] first [:a]]
-; different word types
-[not same? first [:a] /a]
-; symmetry
-[equal? same? first [:a] /a same? /a first [:a]]
-; different word types
-#r2only
-[same? first [:a] first [a:]]
-#r3only
-[not same? first [:a] first [a:]]
-; symmetry
-[equal? same? first [:a] first [a:] same? first [a:] first [:a]]
-; reflexivity
-[same? first ['a] first ['a]]
-; different word types
-[not same? first ['a] /a]
-; symmetry
-[equal? same? first ['a] /a same? /a first ['a]]
-; different word types
-#r2only
-[same? first ['a] first [a:]]
-#r3only
-[not same? first ['a] first [a:]]
-; symmetry
-[equal? same? first ['a] first [a:] same? first [a:] first ['a]]
-; reflexivity
-[same? /a /a]
-; different word types
-[not same? /a first [a:]]
-; symmetry
-[equal? same? /a first [a:] same? first [a:] /a]
-; reflexivity
-[same? first [a:] first [a:]]
-; logic! values
-[same? true true]
-[same? false false]
-[not same? true false]
-[not same? false true]
-; port! values; reflexivity; in this case the error should not be generated, I think
-[
-	p: make port! http://
-	any [
-		error? try [same? p p]
-		same? p p
-	]
-]
 ; bug#1422: "Rebol crashes when opening the 128th port"
 #r3crash
 [error? try [repeat n 200 [try [close open open join tcp://localhost: n]]] true]
@@ -10321,3 +10322,9 @@ functions/file/make-dir.r
 ]
 ; bug#1822: DIFFERENCE on date!s problem
 [12:00 = difference 13/1/2011/12:00 13/1/2011]
+functions/reflectors/body-of.r
+; bug#49
+[
+	f: func [] []
+	not same? body-of :f body-of :f
+]
