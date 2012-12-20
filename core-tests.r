@@ -9626,6 +9626,10 @@ functions/series/intersect.r
 ; bug#799
 #r3only
 [equal? make typeset! [integer!] intersect make typeset! [decimal! integer!] make typeset! [integer!]]
+functions/series/last
+; bug#2
+[value? try [last #"c"]]
+[value? try [last 7]]
 functions/series/lengthq.r
 ; bug#1626: "Allow LENGTH? to take none as an argument, return none"
 ; bug#1688: "LENGTH? NONE returns TRUE" (should return NONE)
