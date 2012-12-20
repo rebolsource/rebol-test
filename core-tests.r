@@ -2047,6 +2047,12 @@ datatypes/set-path.r
 	a/b: 5
 	5 == a/b
 ]
+; bug#1
+[
+	o: make object! [a: 0x0]
+    o/a/x: 71830
+	o/a/x = 71830
+]
 #r2crash
 ; set-path evaluation order
 [
