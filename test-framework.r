@@ -2,7 +2,7 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 19-Nov-2010/15:00:45+1:00
+	Date: 20-Dec-2012/21:58:31+1:00
 	Purpose: "Test framework"
 ]
 
@@ -197,9 +197,9 @@ make object! compose [
 
 		log [
 			"^(line)"
-			rebol/version
-			" "
 			now
+			" "
+			rebol/version
 			" Total: " succeeded + test-failures + crashes + dialect-failures
 				+ skipped
 			" Succeeded: " succeeded

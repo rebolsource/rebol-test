@@ -2,7 +2,7 @@ Rebol [
 	Title: "Core tests run"
 	File: %core-tests-run.r
 	Author: "Ladislav Mecir"
-	Date: 18-Nov-2010/11:23:15+1:00
+	Date: 20-Dec-2012/21:58:31+1:00
 	Purpose: "Core tests"
 ]
 
@@ -33,9 +33,9 @@ do-core-tests: has [
 		"Total:" succeeded + test-failures + crashes + dialect-failures
 			+ skipped
 		"Succeeded:" succeeded
-		"Test failures:" test-failures
+		"Test-failures:" test-failures
 		"Crashes:" crashes
-		"Dialect failures:" dialect-failures
+		"Dialect-failures:" dialect-failures
 		"Skipped:" skipped
 	]
 ]

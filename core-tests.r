@@ -1593,6 +1593,7 @@ datatypes/money.r
 ]
 [$11 = make money! 11]
 [$1.1 = make money! "1.1"]
+; bug#4
 [$11 = to money! 11]
 [$1.1 = to money! "1.1"]
 ["$1.10" = mold $1.10]
@@ -2250,6 +2251,12 @@ datatypes/string.r
 ["ahoj" = #[string! "ahoj"]]
 ["1" = to string! 1]
 [{""} = mold ""]
+; bug#6
+[
+	a: copy []
+	insert/only a a
+	string? mold a
+]
 datatypes/symbol.r
 #r2only
 [symbol! = type? make symbol! "xx"]
@@ -8953,6 +8960,9 @@ functions/control/until.r
 	]
 	10 = num3
 ]
+functions/control/wait
+; bug#5
+[wait 0:0:0.3 true]
 functions/control/while.r
 [
 	num: 0
@@ -9909,6 +9919,9 @@ functions/series/union.r
 ; bug#799
 #r3only
 [equal? make typeset! [decimal! integer!] union make typeset! [decimal!] make typeset! [integer!]]
+functions/string/decompress.r
+; bug#3
+[value? try [decompress #{AAAAAAAAAAAAAAAAAAAA}]]
 functions/convert/as-binary.r
 #r2only
 [
