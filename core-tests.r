@@ -4858,6 +4858,9 @@ functions/comparison/strict-equalq.r
 		strict-equal? p p
 	]
 ]
+functions/comparison/maximum-of.r
+; bug#8
+[3 = first maximum-of [1 2 3]]
 functions/datatype/as-pair.r
 #r3only
 ; bug#1624
@@ -9241,6 +9244,8 @@ functions/series/change.r
 	change/part blk2 6 -2147483648
 	equal? head blk1 head blk2
 ]
+; bug#9
+[equal? "tr" change/part "str" "" 1]
 functions/series/clear.r
 [[] = clear []]
 [[] = clear copy [1]]
