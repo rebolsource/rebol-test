@@ -8326,7 +8326,7 @@ functions/control/forall.r
 	e: disarm try [f]
 	e/near = [f]
 ]
-functions/control/foreach
+functions/control/foreach.r
 [
 	out: copy ""
 	str: "abcdef"
@@ -8980,7 +8980,7 @@ functions/control/until.r
 	]
 	10 = num3
 ]
-functions/control/wait
+functions/control/wait.r
 ; bug#5
 [wait 0:0:0.3 true]
 functions/control/while.r
@@ -9658,7 +9658,7 @@ functions/series/intersect.r
 ; bug#799
 #r3only
 [equal? make typeset! [integer!] intersect make typeset! [decimal! integer!] make typeset! [integer!]]
-functions/series/last
+functions/series/last.r
 ; bug#2
 [value? try [last #"c"]]
 [value? try [last 7]]
