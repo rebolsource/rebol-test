@@ -5850,6 +5850,11 @@ functions/math/random.r
 		negative? random 1.0
 	]
 ]
+; bug#1875
+[
+	random/seed 0
+	2 = random/only next [1 2]
+]
 functions/math/remainder.r
 #64bit
 ; integer! tests
