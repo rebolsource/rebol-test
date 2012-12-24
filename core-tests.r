@@ -397,7 +397,12 @@ datatypes/closure.r
 	f: closure [] ['a]
 	'a == f
 ]
-; two-function return tests
+; bug#21
+[
+	c: closure [a][return a]
+	1 == c 1
+]
+; two-function return test
 [
 	g: closure [f [any-function!]] [f [return 1] 2]
 	1 = g :do
@@ -1338,6 +1343,11 @@ datatypes/function.r
 	]
 	f 1
 ]
+; bug#19
+[
+	f: func [/r x] [x]
+	2 == f/r/r 1 2
+]
 ; bug#1659
 ; inline function test
 [
@@ -1845,6 +1855,8 @@ datatypes/pair.r
 #r2only
 [1x2 = make pair! [1 2]]
 [1x1 = to pair! 1]
+; bug#17
+[error? try [to pair! [0.4]]]
 #r2only
 [1x2 = to pair! [1 2]]
 ["1x1" = mold 1x1]
@@ -8314,7 +8326,7 @@ functions/control/forall.r
 	e: disarm try [f]
 	e/near = [f]
 ]
-functions/control/foreach.r
+functions/control/foreach
 [
 	out: copy ""
 	str: "abcdef"
@@ -9951,6 +9963,14 @@ functions/convert/as-string.r
 	b == to string! a
 ]
 functions/convert/load.r
+; bug#16
+[block? load [1]]
+; bug#20
+[block? load/all "1"]
+; bug#22a
+[error? try [load "':a"]]
+; bug#22b
+[error? try [load "':a:"]]
 ; bug#858
 [
 	a: [ < ]
@@ -9988,6 +10008,12 @@ functions/convert/mold.r
 [
 	a: make object! [a: self]
 	string? mold a
+]
+; closure mold
+; bug#23
+[
+	c: closure [a] [print a]
+	equal? "make closure! [[a][print a]]" mold :c
 ]
 ; deep nested block mold
 ; bug#876
@@ -10272,6 +10298,9 @@ datatypes/percent.r
 ; bug#1679
 #r3only
 ["foo" = decompress/gzip #{1F8B0800EF46BE4C00034BCBCF07002165738C03000000}]
+functions/convert/to.r
+; bug#12
+[image? to image! make gob! []]
 functions/context/bind.r
 ; BIND works 'as expected' in object spec
 ; bug#1549
