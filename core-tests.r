@@ -9963,8 +9963,6 @@ functions/convert/as-string.r
 	b == to string! a
 ]
 functions/convert/load.r
-; bug#16
-[block? load [1]]
 ; bug#20
 [block? load/all "1"]
 ; bug#22a
