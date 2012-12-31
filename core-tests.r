@@ -2018,6 +2018,11 @@ datatypes/path.r
 	a-value: file://a
 	file://a/1 = a-value/1
 ]
+; bug#26
+[
+	b: [b 1]
+	1 = b/b
+]
 #r2crash
 ; path evaluation order
 [
