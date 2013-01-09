@@ -9733,6 +9733,18 @@ functions/series/ordinals.r
 [9 = ninth [1 2 3 4 5 6 7 8 9 10 11]]
 [10 = tenth [1 2 3 4 5 6 7 8 9 10 11]]
 functions/series/parse.r
+; bug#682: parse thru tag!
+[
+	t: none
+	parse "<tag>text</tag>" [thru <tag> copy t to </tag>]
+	t == "text"
+]
+; THRU advances the input position correctly.
+[
+	i: 0
+	parse "a." [any [thru "a" (i: i + 1 j: if i > 1 [[end skip]]) j]]
+	i == 1
+]
 ; bug#1280
 [
 	parse "" [(i: 0) 3 [["a" |] (i: i + 1)]]
