@@ -13,6 +13,9 @@
 #r3only
 ; the test is not meant to be used with the R2 interpreter
 
+#r3
+; the test can work with R2 if using R2/Forward
+
 #r2crash
 ; the test crashes the R2 interpreter
 
