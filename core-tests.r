@@ -1530,6 +1530,33 @@ datatypes/logic.r
 [true = to logic! "f"]
 ["true" = mold true]
 ["false" = mold false]
+datatypes/map.r
+#r3only
+[empty? make map! []]
+#r3only
+[empty? make map! 4]
+#r3only
+; The length of a map is the number of key/value pairs it holds.
+[2 == length? make map! [a 1 b 2]]
+#r3only
+[m: make map! [a 1 b 2] 1 == m/a]
+#r3only
+[m: make map! [a 1 b 2] 2 == m/b]
+#r3only
+[m: make map! [a 1 b 2] none? m/c]
+#r3only
+[m: make map! [a 1 b 2] m/c: 3 3 == m/c]
+#r3only
+; Maps contain key/value pairs and must be created from blocks of even length.
+[error? try [make map! [1]]]
+#r3only
+[empty? clear make map! [a 1 b 2]]
+#r3only
+[empty? clear make map! [a 1 b 2]]
+#r3only
+#r3crash
+; bug#1930: Lookup crashes on empty hashed map.
+[m: make map! 8 clear m none? m/a]
 datatypes/module.r
 #r3only
 [module? make module! [[] []]]
@@ -9733,6 +9760,18 @@ functions/series/ordinals.r
 [9 = ninth [1 2 3 4 5 6 7 8 9 10 11]]
 [10 = tenth [1 2 3 4 5 6 7 8 9 10 11]]
 functions/series/parse.r
+; bug#682: parse thru tag!
+[
+	t: none
+	parse "<tag>text</tag>" [thru <tag> copy t to </tag>]
+	t == "text"
+]
+; THRU advances the input position correctly.
+[
+	i: 0
+	parse "a." [any [thru "a" (i: i + 1 j: if i > 1 [[end skip]]) j]]
+	i == 1
+]
 ; bug#1280
 [
 	parse "" [(i: 0) 3 [["a" |] (i: i + 1)]]
