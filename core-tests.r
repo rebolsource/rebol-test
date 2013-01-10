@@ -1,12 +1,3 @@
-; header test
-; update it when updating the tests
-[
-	header-test: make object! [
-		date: 10-Jan-2013/23:46:06+1:00
-		type: "core tests"
-	]
-	true
-]
 datatypes/action.r
 [action? :abs]
 [not action? 1]
