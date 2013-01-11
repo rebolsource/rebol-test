@@ -2,7 +2,7 @@ Rebol [
 	Title: "Core tests run safe"
 	File: %core-tests-run-safe.r
 	Author: "Ladislav Mecir"
-	Date: 20-Dec-2012/21:58:31+1:00
+	Date: 11-Jan-2013/20:44:20+1:00
 	Purpose: "Core tests"
 ]
 
@@ -29,4 +29,3 @@ do-core-tests: has [
 ]
 
 do-core-tests
-halt
