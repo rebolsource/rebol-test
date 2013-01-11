@@ -12,9 +12,8 @@ do %test-framework.r
 ; appropriate flags depending on the interpreter version.
 
 do-core-tests: has [
-	flags crash-flags result log-file
-	succeeded test-failures crashes dialect-failures skipped
-][
+	flags crash-flags result log-file summary
+] [
 	; Check if we run R3 or R2.
 	set [flags crash-flags] pick [
 		[[#64bit #r3only #r2crash #r3] [#r3crash #test3crash]]
@@ -22,22 +21,12 @@ do-core-tests: has [
 	] found? in system 'catalog
 
 	print "Testing ..."
-	result: do-tests %core-tests.r flags crash-flags %cps
-	set [log-file succeeded test-failures crashes dialect-failures skipped]
-		result
+	result: do-tests %core-tests.r flags crash-flags %s
+	set [log-file summary] result
 
 	print ["Done, see the log file:" log-file]
-	print [
-		now
-		rebol/version
-		"Total:" succeeded + test-failures + crashes + dialect-failures
-			+ skipped
-		"Succeeded:" succeeded
-		"Test-failures:" test-failures
-		"Crashes:" crashes
-		"Dialect-failures:" dialect-failures
-		"Skipped:" skipped
-	]
+	print summary
 ]
 
 do-core-tests
+halt

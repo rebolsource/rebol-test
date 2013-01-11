@@ -2,7 +2,7 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 20-Dec-2012/21:58:31+1:00
+	Date: 11-Jan-2013/14:28:24+1:00
 	Purpose: "Test framework"
 ]
 
@@ -14,7 +14,7 @@ make object! compose [
 
 	log-file: none
 	
-	log: func [report [block!]][
+	log: func [report [block!]] [
 		write/append log-file to binary! rejoin report
 	]
 
@@ -25,7 +25,21 @@ make object! compose [
 	dialect-failures: none
 	succeeded: none
 
-	failures: none
+	; checksums
+	interpreter-checksum: none
+	test-checksum: none
+
+	; to remember whether to log only failures only
+	; (logging failures only is not crash proof)
+	failures-only: none
+
+	; for r2 and r3 compatibility:
+	unless value? 'spec-of [spec-of: :third]
+	read-binary: either find spec-of :read /binary [
+		func [source [port! file! url! block!]] [read/binary source]
+	] [
+		:read
+	]
 
 	exceptions: make object! [
 		return: "return/exit out of the test code"
@@ -61,7 +75,7 @@ make object! compose [
 		emit-test [any-function!]
 		/local flags path position flag source current-dir failure
 		test-file-name
-	][
+	] [
 		current-dir: what-dir
 		print ["file:" test-file]
 		log ["^/file: " test-file "^/^/"]
@@ -72,7 +86,7 @@ make object! compose [
 				change-dir first split-path test-file
 			]
 			test-file: read test-file
-		][
+		] [
 			dialect-failures: dialect-failures + 1
 			log [{^/"failed, dialect: cannot access the file"^/}]
 			exit
@@ -112,7 +126,7 @@ make object! compose [
 				]
 				any whitespace
 			]
-		][
+		] [
 			dialect-failures: dialect-failures + 1
 			log [
 				"^/file: " test-file-name
@@ -129,7 +143,7 @@ make object! compose [
 		flags [block!]
 		source [string!]
 		/local test-block exception
-	][
+	] [
 		unless empty? intersect crash-markers flags [
 			crashes: crashes + 1
 			exit
@@ -140,12 +154,12 @@ make object! compose [
 			exit
 		]
 
-		unless failures [log [source]]
-		if error? try [test-block: load source][
+		unless failures-only [log [source]]
+		if error? try [test-block: load source] [
 			test-failures: test-failures + 1
-			log either failures [
+			log either failures-only [
 				[source "^/"]
-			][[{ "failed, cannot load test source"^/}]]
+			] [[{ "failed, cannot load test source"^/}]]
 			exit
 		]
 
@@ -159,12 +173,12 @@ make object! compose [
 
 		either test-block = "succeeded" [
 			succeeded: succeeded + 1
-			unless failures [log [{ "} test-block {"^/}]]
-		][
+			unless failures-only [log [{ "} test-block {"^/}]]
+		] [
 			test-failures: test-failures + 1
-			log either failures [
+			log either failures-only [
 				[source "^/"]
-			][reduce [{ "} test-block {"^/}]]
+			] [reduce [{ "} test-block {"^/}]]
 		]
 	]
 
@@ -175,16 +189,25 @@ make object! compose [
 		crash-flags [block!] {crash-marking flags}
 		log-file-prefix [file!]
 		/only-failures
-	][
+		/local summary
+	] [
 		allowed-flags: flags
 		crash-markers: crash-flags
 		
-		failures: only-failures
+		failures-only: only-failures
+
+		; calculate checksums
+		interpreter-checksum: checksum/method read-binary system/options/boot 'sha1
+		test-checksum: checksum/method read-binary file 'sha1
 		
 		log-file: log-file-prefix
 		repeat i length? version: system/version [
 			append log-file "_"
 			append log-file mold version/:i
+		]
+		foreach checksum reduce [interpreter-checksum test-checksum] [
+			append log-file "_"
+			append log-file copy/part skip mold checksum 2 6
 		]
 		append log-file ".log"
 		log-file: clean-path log-file
@@ -195,22 +218,30 @@ make object! compose [
 
 		parse-test-file file :process-vector
 
-		log [
+		summary: rejoin [
 			"^(line)"
-			now
-			" "
-			rebol/version
-			" Total: " succeeded + test-failures + crashes + dialect-failures
+			"system/version: " system/version
+			"^(line)"
+			"interpreter-checksum: " interpreter-checksum
+			"^(line)"
+			"test-checksum: " test-checksum
+			"^(line)"
+			"Total: " succeeded + test-failures + crashes + dialect-failures
 				+ skipped
-			" Succeeded: " succeeded
-			" Test-failures: " test-failures
-			" Crashes: " crashes
-			" Dialect-failures: " dialect-failures
-			" Skipped: " skipped
 			"^(line)"
+			"Succeeded: " succeeded
+			"^(line)"
+			"Test-failures: " test-failures
+			"^(line)"
+			"Crashes: " crashes
+			"^(line)"
+			"Dialect-failures: " dialect-failures
+			"^(line)"
+			"Skipped: " skipped
 		]
-		reduce [
-			log-file succeeded test-failures crashes dialect-failures skipped
-		]
+
+		log [summary]
+
+		reduce [log-file summary]
 	]
 ]
