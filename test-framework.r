@@ -2,7 +2,7 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 11-Jan-2013/14:28:24+1:00
+	Date: 12-Jan-2013/4:03:33+1:00
 	Purpose: "Test framework"
 ]
 
@@ -29,7 +29,7 @@ make object! compose [
 	interpreter-checksum: none
 	test-checksum: none
 
-	; to remember whether to log only failures only
+	; to remember whether to log only failures
 	; (logging failures only is not crash proof)
 	failures-only: none
 
@@ -189,7 +189,7 @@ make object! compose [
 		crash-flags [block!] {crash-marking flags}
 		log-file-prefix [file!]
 		/only-failures
-		/local summary
+		/local summary interpreter
 	] [
 		allowed-flags: flags
 		crash-markers: crash-flags
@@ -197,7 +197,19 @@ make object! compose [
 		failures-only: only-failures
 
 		; calculate checksums
-		interpreter-checksum: checksum/method read-binary system/options/boot 'sha1
+		case [
+			#"/" = first system/options/boot [
+				interpreter-checksum: checksum/method read-binary
+					system/options/boot 'sha1
+			]
+			string? system/script/args [
+				interpreter-checksum: checksum/method read-binary
+					to-rebol-file system/script/args 'sha1
+			]
+			none [
+				interpreter-checksum: to binary! "none"
+			] 
+		]
 		test-checksum: checksum/method read-binary file 'sha1
 		
 		log-file: log-file-prefix
