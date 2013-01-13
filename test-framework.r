@@ -2,7 +2,7 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 12-Jan-2013/4:03:33+1:00
+	Date: 13-Jan-2013/10:40:59+1:00
 	Purpose: "Test framework"
 ]
 
@@ -51,30 +51,25 @@ make object! compose [
 
 	whitespace: charset [#"^A" - #" " "^(7F)^(A0)"]
 	source-end: none
-	source-check: none
 	parse-source: [
-		(source-check: none)
 		any [
-			source-check
-			[
-				source-end: ["{" | {"}] (
-					set/any 'source-end second transcode/next source-end
-				) :source-end
-				| "[" parse-source "]" (source-check: none)
-				| "(" parse-source ")" (source-check: none)
-				| ";" [thru newline | to end]
-				| "]" :source-end (source-check: [end skip])
-				| ")" :source-end (source-check: [end skip])
-				| skip
-			]
+			source-end: ["{" | {"}] (
+				set/any 'source-end second transcode/next source-end
+			) :source-end
+			| "[" parse-source "]"
+			| "(" parse-source ")"
+			| ";" [thru newline | to end]
+			| "]" :source-end break
+			| ")" :source-end break
+			| skip
 		]
 	]
 
 	parse-test-file: func [
 		test-file [file! url!]
 		emit-test [any-function!]
-		/local flags path position flag source current-dir failure
-		test-file-name
+		/local flags path position flag source current-dir stop vector
+		test-file-name next-position
 	] [
 		current-dir: what-dir
 		print ["file:" test-file]
@@ -95,36 +90,34 @@ make object! compose [
 		flags: copy []
 		unless binary? test-file [test-file: to binary! test-file]
 		unless parse/all test-file [
-			(failure: none)
-			any whitespace
 			any [
-				failure
-				[
-					position: ";" [to newline | to end]
-					| "[" parse-source "]" source-end: (
-						emit-test flags to string! copy/part position source-end
-						flags: copy []
-					) | ["{" | {"}] (
-						failure: [end skip]
-					) :position | "#" (
-						set/any [flag position] transcode/next position
-						append flags flag
-					) :position | skip (
-						if error? try [
-							set/any [path position] transcode/next position
-							case [
-								any [file? path url? path] [
-									parse-test-file path :process-vector
-									print ["file:" test-file-name]
-									log ["^/file: " test-file-name "^/^/"]	
-								]
-								path? path []
-								true [failure: [end skip]]
-							]
-						] [failure: [end skip]]
-					) :position
-				]
-				any whitespace
+				some whitespace
+				| ";" [thru newline | to end]
+				| copy vector ["[" parse-source "]"] (
+					emit-test flags to string! vector
+					flags: copy []
+				)
+				| position: ["{" | {"}] :position break
+				| "#" (
+					set/any [flag position] transcode/next position
+					append flags flag
+				) :position
+				| skip (
+					case [
+						error? try [
+							set/any [path next-position] transcode/next position
+						] [stop: [:position]]
+						any [file? path url? path] [
+							parse-test-file path :process-vector
+							print ["file:" test-file-name]
+							log ["^/file: " test-file-name "^/^/"]
+							stop: [end skip]
+						]
+						path? path [stop: [end skip]]
+						'else [stop: [:position]]
+					]
+				) stop break
+				| skip :next-position
 			]
 		] [
 			dialect-failures: dialect-failures + 1
