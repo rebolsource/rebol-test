@@ -1,8 +1,8 @@
 Rebol [
 	Title: "Core tests run"
-	File: %core-tests-run.r
+	File: %run.r
 	Author: "Ladislav Mecir"
-	Date: 11-Jan-2013/20:44:20+1:00
+	Date: 15-Jan-2013/16:21:19+1:00
 	Purpose: "Core tests"
 ]
 
@@ -16,8 +16,8 @@ do-core-tests: has [
 ] [
 	; Check if we run R3 or R2.
 	set [flags crash-flags] pick [
-		[[#64bit #r3only #r2crash #r3] [#r3crash #test3crash]]
-		[[#32bit #r3crash #r2only #test3crash] [#r2crash #test2crash]]
+		[[#64bit #r3only #r3 #r2crash #test2crash] [#r3crash #test3crash]]
+		[[#32bit #r2only #r3crash #test3crash] [#r2crash #test2crash]]
 	] found? in system 'catalog
 
 	print "Testing ..."
