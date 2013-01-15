@@ -1348,6 +1348,9 @@ datatypes/function.r
 	f: func [/r x] [x]
 	2 == f/r/r 1 2
 ]
+#r3only
+; bug#27
+[error? try [(type?) 1]]
 ; bug#1659
 ; inline function test
 [
