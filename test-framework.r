@@ -2,7 +2,7 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 13-Jan-2013/10:40:59+1:00
+	Date: 15-Jan-2013/10:17:13+1:00
 	Purpose: "Test framework"
 ]
 
@@ -68,7 +68,7 @@ make object! compose [
 	parse-test-file: func [
 		test-file [file! url!]
 		emit-test [any-function!]
-		/local flags path position flag source current-dir stop vector
+		/local flags position flag source current-dir stop vector value
 		test-file-name next-position
 	] [
 		current-dir: what-dir
@@ -97,27 +97,30 @@ make object! compose [
 					emit-test flags to string! vector
 					flags: copy []
 				)
-				| position: ["{" | {"}] :position break
-				| "#" (
-					set/any [flag position] transcode/next position
-					append flags flag
-				) :position
-				| skip (
+				| end break
+				| position: (
 					case [
-						error? try [
-							set/any [path next-position] transcode/next position
+						any [
+							error? try [
+								set/any [value next-position] transcode/next position
+							]
+							none? next-position
 						] [stop: [:position]]
-						any [file? path url? path] [
-							parse-test-file path :process-vector
+						issue? get/any 'value [
+							append flags value
+							stop: [end skip]
+						]
+						any [file? get/any 'value url? get/any 'value] [
+							parse-test-file value :process-vector
 							print ["file:" test-file-name]
 							log ["^/file: " test-file-name "^/^/"]
 							stop: [end skip]
 						]
-						path? path [stop: [end skip]]
+						path? get/any 'value [stop: [end skip]]
 						'else [stop: [:position]]
 					]
 				) stop break
-				| skip :next-position
+				| :next-position
 			]
 		] [
 			dialect-failures: dialect-failures + 1
