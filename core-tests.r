@@ -1419,6 +1419,8 @@ datatypes/image.r
 [image? #[image! 0x0 #{}]]
 datatypes/integer.r
 [integer? 0]
+; bug#33
+[integer? -0]
 [not integer? 1.1]
 [integer! = type? 0]
 [integer? 1]
@@ -1877,6 +1879,10 @@ datatypes/op.r
 [3 == do reduce [get '+ 1 2]]
 #r3only
 [error? try [do reduce [get '+ 1 2]]]
+#r3crash
+#r3only
+; bug#1934
+[3 = do reduce [1 :+ 2]]
 datatypes/pair.r
 [pair? 1x2]
 [not pair? 1]
@@ -4905,6 +4911,9 @@ functions/comparison/strict-equalq.r
 		strict-equal? p p
 	]
 ]
+functions/comparison/strict-not-equalq.r
+; bug#32
+[strict-not-equal? 0 1]
 functions/comparison/maximum-of.r
 ; bug#8
 [3 = first maximum-of [1 2 3]]
@@ -7425,7 +7434,11 @@ functions/control/any.r
 	blk: [any blk]
 	error? try blk
 ]
+functions/control/apply.r
+; bug#44
+[value? try [apply type?/word []]]
 functions/control/attempt.r
+; bug#41
 [none? attempt [1 / 0]]
 [1 = attempt [1]]
 [unset? attempt []]
@@ -9024,6 +9037,7 @@ functions/control/while.r
 	while [num < 10] [num: num + 1]
 	num = 10
 ]
+; bug#37
 ; Test body-block return values
 [
 	num: 0 
@@ -9988,6 +10002,13 @@ functions/series/union.r
 ; bug#799
 #r3only
 [equal? make typeset! [decimal! integer!] union make typeset! [decimal!] make typeset! [integer!]]
+functions/string/decloak.r
+; bug#48
+[
+	a: compress "a"
+	b: encloak a "a"
+	equal? a decloak b "a"
+]
 functions/string/decompress.r
 ; bug#3
 [value? try [decompress #{AAAAAAAAAAAAAAAAAAAA}]]
@@ -10346,6 +10367,11 @@ datatypes/percent.r
 functions/convert/to.r
 ; bug#12
 [image? to image! make gob! []]
+; bug#38
+['logic! = to word! logic!]
+#r3only
+['percent! = to word! percent!]
+['money! = to word! money!]
 functions/context/bind.r
 ; BIND works 'as expected' in object spec
 ; bug#1549
@@ -10395,6 +10421,9 @@ functions/context/set.r
 [equal? error? try [set /a 1] error? try [set [/a] 1]]
 ; bug#1745
 [equal? error? try [set #a 1] error? try [set [#a] 1]]
+functions/file/clean-path.r
+; bug#35
+[any-function? :clean-path]
 functions/file/exists.r
 ; bug#1613
 [exists? http://www.rebol.com/index.html]
