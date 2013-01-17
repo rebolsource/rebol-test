@@ -7436,7 +7436,7 @@ functions/control/any.r
 ]
 functions/control/apply.r
 ; bug#44
-[value? try [apply type?/word []]]
+[error? try [apply 'type?/word []]]
 functions/control/attempt.r
 ; bug#41
 [none? attempt [1 / 0]]
