@@ -621,6 +621,18 @@ datatypes/decimal.r
 [zero? 0.29999999999999999 - load mold/all 0.29999999999999999]
 [zero? 0.30000000000000004 - load mold/all 0.30000000000000004]
 [zero? 9.9999999999999926e152 - load mold/all 9.9999999999999926e152]
+; mold/all decimal
+; bug#1633
+;[equal? mold/all 0.1 "0.10000000000000001"]
+; bug#897
+;[equal? mold/all 0.3 "0.29999999999999999"]
+; bug#729
+[
+	x: 0.30000000000000004
+	zero? x - load mold/all x
+]
+; bug#1753
+[c: last mold/all 1e16 (#"0" <= c) and (#"9" >= c)]
 ; alternative form
 [1.1 == 1,1]
 [1.1 = make decimal! 1.1]
@@ -10110,18 +10122,6 @@ functions/convert/mold.r
 		n: n * 2
 	]
 ]
-; mold/all decimal
-; bug#1633
-[equal? mold/all 0.1 "0.10000000000000001"]
-; bug#897
-[equal? mold/all 0.3 "0.29999999999999999"]
-; bug#729
-[
-	x: 0.30000000000000004
-	same? x load mold/all x
-]
-; bug#1753
-[c: last mold/all 1e16 (#"0" <= c) and (#"9" >= c)]
 ; bug#719
 ["()" = mold quote ()]
 datatypes/library.r
