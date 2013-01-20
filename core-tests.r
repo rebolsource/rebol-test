@@ -9945,6 +9945,9 @@ functions/series/remove.r
 	remove/part a-bitset to integer! #"a"
 	none? find a-bitset #"a"
 ]
+functions/series/select.r
+; bug#1936: select returns incorrect value with block argument
+[4 == select [1 2 3 4 5 6] [1 2 3]]
 functions/series/skip.r
 [
 	blk: []
