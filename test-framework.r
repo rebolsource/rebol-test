@@ -2,7 +2,7 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 15-Jan-2013/15:26:51+1:00
+	Date: 21-Jan-2013/0:34:30+1:00
 	Purpose: "Test framework"
 ]
 
@@ -281,7 +281,7 @@ make object! compose [
 
 		; calculate checksums
 		case [
-			#"/" = first system/options/boot [
+			all [file? system/options/boot #"/" = first system/options/boot] [
 				interpreter-checksum: checksum/method read-binary
 					system/options/boot 'sha1
 			]
