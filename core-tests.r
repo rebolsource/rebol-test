@@ -585,52 +585,123 @@ datatypes/decimal.r
 [decimal? 1.0]
 [decimal? -1.0]
 [decimal? 1.5]
+; LOAD decimal and to binary! tests
 ; 64-bit IEEE 754 maximum
 #r3only
 [equal? #{7FEFFFFFFFFFFFFF} to binary! 1.7976931348623157e308]
-[zero? 1.7976931348623157e308 - load mold/all 1.7976931348623157e308]
-; 64-bit IEEE 754 minimum
-#r3only
-[equal? #{FFEFFFFFFFFFFFFF} to binary! -1.7976931348623157e308]
-[zero? -1.7976931348623157E308 - load mold/all -1.7976931348623157e308]
 ; Minimal positive normalized
 #r3only
 [equal? #{0010000000000000} to binary! 2.2250738585072014E-308]
-[zero? 2.2250738585072014E-308 - load mold/all 2.2250738585072014E-308]
 ; Maximal positive denormalized
 #r3only
 [equal? #{000FFFFFFFFFFFFF} to binary! 2.2250738585072009E-308]
-[zero? 2.2250738585072009E-308 - load mold/all 2.2250738585072009E-308]
 ; Minimal positive denormalized
 #r3only
 [equal? #{0000000000000001} to binary! 4.9406564584124654E-324]
-[zero? 4.9406564584124654E-324 - load mold/all 4.9406564584124654E-324]
-; Maximal negative normalized
+; zero
 #r3only
-[equal? #{8010000000000000} to binary! -2.2250738585072014E-308]
-[zero? -2.2250738585072014E-308 - load mold/all -2.2250738585072014E-308]
-; Minimal negative denormalized
+[equal? #{0000000000000000} to binary! 0.0]
+; negative zero
 #r3only
-[equal? #{800FFFFFFFFFFFFF} to binary! -2.2250738585072009E-308]
-[zero? -2.2250738585072009E-308 - load mold/all -2.2250738585072009E-308]
+[equal? #{8000000000000000} to binary! -0.0]
 ; Maximal negative denormalized
 #r3only
 [equal? #{8000000000000001} to binary! -4.9406564584124654E-324]
+; Minimal negative denormalized
+#r3only
+[equal? #{800FFFFFFFFFFFFF} to binary! -2.2250738585072009E-308]
+; Maximal negative normalized
+#r3only
+[equal? #{8010000000000000} to binary! -2.2250738585072014E-308]
+; 64-bit IEEE 754 minimum
+#r3only
+[equal? #{FFEFFFFFFFFFFFFF} to binary! -1.7976931348623157e308]
+; bug#729
+; MOLD decimal accuracy tests
+[
+	system/options/decimal-digits: 17
+	system/options/decimal-digits = 17
+]
+; 64-bit IEEE 754 maximum
+[zero? 1.7976931348623157e308 - load mold 1.7976931348623157e308]
+[same? 1.7976931348623157e308 load mold 1.7976931348623157e308]
+; Minimal positive normalized
+[zero? 2.2250738585072014E-308 - load mold 2.2250738585072014E-308]
+[same? 2.2250738585072014E-308 load mold 2.2250738585072014E-308]
+; Maximal positive denormalized
+[zero? 2.2250738585072009E-308 - load mold 2.2250738585072009E-308]
+[same? 2.2250738585072009E-308 load mold 2.2250738585072009E-308]
+; Minimal positive denormalized
+[zero? 4.9406564584124654E-324 - load mold 4.9406564584124654E-324]
+[same? 4.9406564584124654E-324 load mold 4.9406564584124654E-324]
+; Positive zero
+[zero? 0.0 - load mold 0.0]
+[same? 0.0 load mold 0.0]
+; Negative zero
+[zero? -0.0 - load mold -0.0]
+[same? -0.0 load mold -0.0]
+; Maximal negative denormalized
+[zero? -4.9406564584124654E-324 - load mold -4.9406564584124654E-324]
+[same? -4.9406564584124654E-324 load mold -4.9406564584124654E-324]
+; Minimal negative denormalized
+[zero? -2.2250738585072009E-308 - load mold -2.2250738585072009E-308]
+[same? -2.2250738585072009E-308 load mold -2.2250738585072009E-308]
+; Maximal negative normalized
+[zero? -2.2250738585072014E-308 - load mold -2.2250738585072014E-308]
+[same? -2.2250738585072014E-308 load mold -2.2250738585072014E-308]
+; 64-bit IEEE 754 minimum
+[zero? -1.7976931348623157E308 - load mold -1.7976931348623157e308]
+[same? -1.7976931348623157E308 load mold -1.7976931348623157e308]
+[zero? 0.10000000000000001 - load mold 0.10000000000000001]
+[same? 0.10000000000000001 load mold 0.10000000000000001]
+[zero? 0.29999999999999999 - load mold 0.29999999999999999]
+[same? 0.29999999999999999 load mold 0.29999999999999999]
+[zero? 0.30000000000000004 - load mold 0.30000000000000004]
+[same? 0.30000000000000004 load mold 0.30000000000000004]
+[zero? 9.9999999999999926e152 - load mold 9.9999999999999926e152]
+[same? 9.9999999999999926e152 load mold 9.9999999999999926e152]
+; bug#897
+; MOLD/ALL decimal accuracy tests
+; 64-bit IEEE 754 maximum
+[zero? 1.7976931348623157e308 - load mold/all 1.7976931348623157e308]
+[same? 1.7976931348623157e308 load mold/all 1.7976931348623157e308]
+; Minimal positive normalized
+[zero? 2.2250738585072014E-308 - load mold/all 2.2250738585072014E-308]
+[same? 2.2250738585072014E-308 load mold/all 2.2250738585072014E-308]
+; Maximal positive denormalized
+[zero? 2.2250738585072009E-308 - load mold/all 2.2250738585072009E-308]
+[same? 2.2250738585072009E-308 load mold/all 2.2250738585072009E-308]
+; Minimal positive denormalized
+[zero? 4.9406564584124654E-324 - load mold/all 4.9406564584124654E-324]
+[same? 4.9406564584124654E-324 load mold/all 4.9406564584124654E-324]
+; Positive zero
+[zero? 0.0 - load mold/all 0.0]
+[same? 0.0 load mold/all 0.0]
+; Negative zero
+[zero? -0.0 - load mold/all -0.0]
+[same? -0.0 load mold/all -0.0]
+; Maximal negative denormalized
 [zero? -4.9406564584124654E-324 - load mold/all -4.9406564584124654E-324]
+[same? -4.9406564584124654E-324 load mold/all -4.9406564584124654E-324]
+; Minimal negative denormalized
+[zero? -2.2250738585072009E-308 - load mold/all -2.2250738585072009E-308]
+[same? -2.2250738585072009E-308 load mold/all -2.2250738585072009E-308]
+; Maximal negative normalized
+[zero? -2.2250738585072014E-308 - load mold/all -2.2250738585072014E-308]
+[same? -2.2250738585072014E-308 load mold/all -2.2250738585072014E-308]
+; 64-bit IEEE 754 minimum
+[zero? -1.7976931348623157E308 - load mold/all -1.7976931348623157e308]
+[same? -1.7976931348623157E308 load mold/all -1.7976931348623157e308]
 [zero? 0.10000000000000001 - load mold/all 0.10000000000000001]
+[same? 0.10000000000000001 load mold/all 0.10000000000000001]
 [zero? 0.29999999999999999 - load mold/all 0.29999999999999999]
+[same? 0.29999999999999999 load mold/all 0.29999999999999999]
 [zero? 0.30000000000000004 - load mold/all 0.30000000000000004]
+[same? 0.30000000000000004 load mold/all 0.30000000000000004]
 [zero? 9.9999999999999926e152 - load mold/all 9.9999999999999926e152]
-; mold/all decimal
+[same? 9.9999999999999926e152 load mold/all 9.9999999999999926e152]
 ; bug#1633
 ;[equal? mold/all 0.1 "0.10000000000000001"]
-; bug#897
-;[equal? mold/all 0.3 "0.29999999999999999"]
-; bug#729
-[
-	x: 0.30000000000000004
-	zero? x - load mold/all x
-]
 ; bug#1753
 [c: last mold/all 1e16 (#"0" <= c) and (#"9" >= c)]
 ; alternative form
