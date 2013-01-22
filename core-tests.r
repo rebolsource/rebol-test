@@ -9407,6 +9407,12 @@ functions/series/find.r
 	blk: [1]
 	same? blk find blk 1
 ]
+functions/series/indexq.r
+[1 == index? []]
+[2 == index? next [a]]
+; bug#1611: Allow INDEX? to take none as an argument, return none
+#r3only
+[none? index? none]
 functions/series/insert.r
 [
 	a: make block! 0
