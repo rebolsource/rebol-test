@@ -2363,6 +2363,7 @@ datatypes/string.r
 ]
 datatypes/symbol.r
 #r2only
+#r2crash
 [symbol! = type? make symbol! "xx"]
 datatypes/tag.r
 [tag? <tag>]
