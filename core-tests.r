@@ -919,6 +919,7 @@ datatypes/error.r
 [try/except [make error! [type: 'throw id: 'halt]] [true]]
 #r3only
 [try/except [make error! [type: 'throw id: 'quit]] [true]]
+; error types that should be predefined
 #r3only
 [error? make error! [type: 'note id: 'no-load]]
 #r3only
@@ -1161,6 +1162,51 @@ datatypes/error.r
 [error? make error! [type: 'internal id: 'feature-na]]
 #r3only
 [error? make error! [type: 'internal id: 'not-done]]
+; triggered errors should not be assignable
+[a: 1 error? try [a: 1 / 0] :a =? 1]
+[a: 1 error? try [set 'a 1 / 0] :a =? 1]
+[a: 1 error? try [set/any 'a 1 / 0] :a =? 1]
+; unwind pseudo-errors should not be assignable bug#1515
+[a: 1 loop 1 [a: break] :a =? 1]
+[a: 1 loop 1 [set 'a break] :a =? 1]
+[a: 1 loop 1 [set/any 'a break] :a =? 1]
+#r3only
+[a: 1 loop 1 [a: continue] :a =? 1]
+#r3only
+[a: 1 loop 1 [set 'a continue] :a =? 1]
+#r3only
+[a: 1 loop 1 [set/any 'a continue] :a =? 1]
+[a: 1 catch [a: throw 2] :a =? 1]
+[a: 1 catch [set 'a throw 2] :a =? 1]
+[a: 1 catch [set/any 'a throw 2] :a =? 1]
+[a: 1 catch/name [a: throw/name 2 'b] 'b :a =? 1]
+[a: 1 catch/name [set 'a throw/name 2 'b] 'b :a =? 1]
+[a: 1 catch/name [set/any 'a throw/name 2 'b] 'b :a =? 1]
+[a: 1 do does [a: return 2] :a =? 1]
+[a: 1 do does [set 'a return 2] :a =? 1]
+[a: 1 do does [set/any 'a return 2] :a =? 1]
+[a: 1 do does [a: exit] :a =? 1]
+[a: 1 do does [set 'a exit] :a =? 1]
+[a: 1 do does [set/any 'a exit] :a =? 1]
+; unwind pseudo-errors should not be passable to functions, even to the error? function bug#1509
+[a: 1 loop 1 [a: error? break] :a =? 1]
+#r3only
+[a: 1 loop 1 [a: error? continue] :a =? 1]
+[a: 1 catch [a: error? throw 2] :a =? 1]
+[a: 1 catch/name [a: error? throw/name 2 'b] 'b :a =? 1]
+[a: 1 do does [a: error? return 2] :a =? 1]
+[a: 1 do does [a: error? exit] :a =? 1]
+; unwind pseudo-errors should not be caught by try
+[a: 1 loop 1 [a: error? try [break]] :a =? 1]
+#r3only
+[a: 1 loop 1 [a: error? try [continue]] :a =? 1]
+[a: 1 catch [a: error? try [throw 2]] :a =? 1]
+[a: 1 catch/name [a: error? try [throw/name 2 'b]] 'b :a =? 1]
+[a: 1 do does [a: error? try [return 2]] :a =? 1]
+[a: 1 do does [a: error? try [exit]] :a =? 1]
+; unwind pseudo-errors should not be caught by try even when they won't be handled
+; todo
+#r2only  ; should be adapted to be a load test, not an error test
 [
 	 x: 1
 	 error? try [x: load/header ""]
