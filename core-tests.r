@@ -595,7 +595,7 @@ datatypes/decimal.r
 [equal? #{0010000000000000} to binary! 2.2250738585072014E-308]
 ; Maximal positive denormalized
 #r3only
-[equal? #{000FFFFFFFFFFFFF} to binary! 2.2250738585072009E-308]
+[equal? #{000FFFFFFFFFFFFF} to binary! 2.225073858507201E-308]
 ; Minimal positive denormalized
 #r3only
 [equal? #{0000000000000001} to binary! 4.9406564584124654E-324]
@@ -610,7 +610,7 @@ datatypes/decimal.r
 [equal? #{8000000000000001} to binary! -4.9406564584124654E-324]
 ; Minimal negative denormalized
 #r3only
-[equal? #{800FFFFFFFFFFFFF} to binary! -2.2250738585072009E-308]
+[equal? #{800FFFFFFFFFFFFF} to binary! -2.225073858507201E-308]
 ; Maximal negative normalized
 #r3only
 [equal? #{8010000000000000} to binary! -2.2250738585072014E-308]
@@ -630,8 +630,8 @@ datatypes/decimal.r
 [zero? 2.2250738585072014E-308 - load mold 2.2250738585072014E-308]
 [same? 2.2250738585072014E-308 load mold 2.2250738585072014E-308]
 ; Maximal positive denormalized
-[zero? 2.2250738585072009E-308 - load mold 2.2250738585072009E-308]
-[same? 2.2250738585072009E-308 load mold 2.2250738585072009E-308]
+[zero? 2.2250738585072009E-308 - load mold 2.225073858507201E-308]
+[same? 2.2250738585072009E-308 load mold 2.225073858507201E-308]
 ; Minimal positive denormalized
 [zero? 4.9406564584124654E-324 - load mold 4.9406564584124654E-324]
 [same? 4.9406564584124654E-324 load mold 4.9406564584124654E-324]
@@ -645,8 +645,8 @@ datatypes/decimal.r
 [zero? -4.9406564584124654E-324 - load mold -4.9406564584124654E-324]
 [same? -4.9406564584124654E-324 load mold -4.9406564584124654E-324]
 ; Minimal negative denormalized
-[zero? -2.2250738585072009E-308 - load mold -2.2250738585072009E-308]
-[same? -2.2250738585072009E-308 load mold -2.2250738585072009E-308]
+[zero? -2.2250738585072009E-308 - load mold -2.225073858507201E-308]
+[same? -2.2250738585072009E-308 load mold -2.225073858507201E-308]
 ; Maximal negative normalized
 [zero? -2.2250738585072014E-308 - load mold -2.2250738585072014E-308]
 [same? -2.2250738585072014E-308 load mold -2.2250738585072014E-308]
