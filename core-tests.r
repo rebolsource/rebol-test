@@ -581,8 +581,6 @@ datatypes/date.r
 ]
 datatypes/decimal.r
 [decimal? 0.0]
-[equal? "0.0" mold 0.0]
-[equal? "0.0" mold -0.0]
 [not decimal? 0]
 [decimal! = type? 0.0]
 [decimal? 1.0]
