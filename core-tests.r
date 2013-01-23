@@ -919,6 +919,7 @@ datatypes/error.r
 [try/except [make error! [type: 'throw id: 'halt]] [true]]
 #r3only
 [try/except [make error! [type: 'throw id: 'quit]] [true]]
+; error types that should be predefined
 #r3only
 [error? make error! [type: 'note id: 'no-load]]
 #r3only
@@ -1161,6 +1162,66 @@ datatypes/error.r
 [error? make error! [type: 'internal id: 'feature-na]]
 #r3only
 [error? make error! [type: 'internal id: 'not-done]]
+; triggered errors should not be assignable
+[a: 1 error? try [a: 1 / 0] :a =? 1]
+[a: 1 error? try [set 'a 1 / 0] :a =? 1]
+[a: 1 error? try [set/any 'a 1 / 0] :a =? 1]
+; unwind pseudo-errors should not be assignable bug#1515
+[a: 1 loop 1 [a: break] :a =? 1]
+[a: 1 loop 1 [set 'a break] :a =? 1]
+[a: 1 loop 1 [set/any 'a break] :a =? 1]
+[a: 1 loop 1 [a: break/return 2] :a =? 1]
+[a: 1 loop 1 [set 'a break/return 2] :a =? 1]
+[a: 1 loop 1 [set/any 'a break/return 2] :a =? 1]
+#r3only
+[a: 1 loop 1 [a: continue] :a =? 1]
+#r3only
+[a: 1 loop 1 [set 'a continue] :a =? 1]
+#r3only
+[a: 1 loop 1 [set/any 'a continue] :a =? 1]
+[a: 1 catch [a: throw 2] :a =? 1]
+[a: 1 catch [set 'a throw 2] :a =? 1]
+[a: 1 catch [set/any 'a throw 2] :a =? 1]
+[a: 1 catch/name [a: throw/name 2 'b] 'b :a =? 1]
+[a: 1 catch/name [set 'a throw/name 2 'b] 'b :a =? 1]
+[a: 1 catch/name [set/any 'a throw/name 2 'b] 'b :a =? 1]
+[a: 1 do does [a: return 2] :a =? 1]
+[a: 1 do does [set 'a return 2] :a =? 1]
+[a: 1 do does [set/any 'a return 2] :a =? 1]
+[a: 1 do does [a: exit] :a =? 1]
+[a: 1 do does [set 'a exit] :a =? 1]
+[a: 1 do does [set/any 'a exit] :a =? 1]
+; unwind pseudo-errors should not be passable to functions, even to the error? function bug#1509
+[a: 1 loop 1 [a: error? break] :a =? 1]
+[a: 1 loop 1 [a: error? break/return 2] :a =? 1]
+#r3only
+[a: 1 loop 1 [a: error? continue] :a =? 1]
+[a: 1 catch [a: error? throw 2] :a =? 1]
+[a: 1 catch/name [a: error? throw/name 2 'b] 'b :a =? 1]
+[a: 1 do does [a: error? return 2] :a =? 1]
+[a: 1 do does [a: error? exit] :a =? 1]
+; unwind pseudo-errors should not be caught by try
+[a: 1 loop 1 [a: error? try [break]] :a =? 1]
+#r3only
+[a: 1 loop 1 [a: error? try [continue]] :a =? 1]
+[a: 1 catch [a: error? try [throw 2]] :a =? 1]
+[a: 1 catch/name [a: error? try [throw/name 2 'b]] 'b :a =? 1]
+[a: 1 do does [a: error? try [return 2]] :a =? 1]
+[a: 1 do does [a: error? try [exit]] :a =? 1]
+; TODO - unwind pseudo-errors should not be caught by try even when unhandled
+; We can't actually generate unhandled unwinds with the current test harness
+; since it already handles all unwinds. And we can't catch unwinds without
+; handling them, so they'll never be unhandled. Here for future reference.
+; There is a debate about changing this behavior for R3, see bug#1506.
+;[not error? try [break]]
+;[not error? try [break/return 2]]
+;#r3only
+;[not error? try [continue]]
+;[not error? try [throw none]]
+;[not error? try [throw/name none 'none]]
+;[not error? try [return 1]]
+;[not error? try [exit]]
+#r2only  ; should be adapted to be a load test, not an error test
 [
 	 x: 1
 	 error? try [x: load/header ""]
@@ -8247,9 +8308,6 @@ functions/control/exit.r
 	f1: does [exit]
 	unset? f1
 ]
-#r3only
-; test "exit not in function"
-[error? try [exit]]
 functions/control/for.r
 [
 	success: true
@@ -9031,9 +9089,6 @@ functions/control/return.r
 	f1: does [return try [1 / 0]]
 	error? f1
 ]
-#r3only
-; test "return not in function"; as well as the TRY capability to catch it
-[error? try [return 1]]
 functions/control/switch.r
 [
 	11 = switch 1 [
@@ -9089,18 +9144,6 @@ functions/control/try.r
 	error? try [f1]
 	success
 ]
-#r3only
-; testing the TRY capability to catch "throw without catch"
-[error? try [throw none]]
-#r3only
-; testing the TRY capability to catch "named throw without catch"
-[error? try [throw/name none 'none]]
-#r3only
-; testing the TRY capability to catch "return not in function"
-[error? try [return none]]
-#r3only
-; testing the TRY capability to catch "exit not in function"
-[error? try [exit]]
 #r3only
 ; testing TRY/EXCEPT
 ; bug#822
