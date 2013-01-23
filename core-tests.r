@@ -27,14 +27,12 @@ datatypes/binary.r
 [#{00} == to binary! "^(00)"]
 ; minimum
 [binary? #{}]
-#r2only
 ; alternative literal representation
 [#{} == #[binary! #{}]]
 datatypes/bitset.r
 [bitset? make bitset! "a"]
 [not bitset? 1]
 [bitset! = type? make bitset! "a"]
-#r2only
 ; minimum, literal representation
 [bitset? #[bitset! #{}]]
 datatypes/block.r
@@ -43,7 +41,6 @@ datatypes/block.r
 [block! = type? [1]]
 ; minimum
 [block? []]
-#r2only
 ; alternative literal representation
 [[] == #[block! []]]
 [[] == make block! 0]
@@ -200,14 +197,11 @@ datatypes/char.r
 ; maximum
 [char? #"^(ff)"]
 datatypes/closure.r
-#r3only
 [closure? closure [] ["OK"]]
-#r3only
 [not closure? 1]
 #r3only
 [closure! = type? closure [] ["OK"]]
 ; minimum
-#r3only
 [closure? closure [] []]
 ; literal form
 #r3only
@@ -481,7 +475,6 @@ datatypes/closure.r
 		2 = c
 	]
 ]
-#r3only
 ; bug#1528
 [closure? closure [self] []]
 datatypes/datatype.r
@@ -492,6 +485,10 @@ datatypes/datatype.r
 [datatype? bitset!]
 [datatype? block!]
 [datatype? char!]
+#r3
+[datatype? closure!]  ; closure! =? function! in R2/Forward, R2 2.7.7+
+#r3only
+[datatype? command!]
 [datatype? datatype!]
 [datatype? date!]
 [datatype? decimal!]
@@ -500,7 +497,13 @@ datatypes/datatype.r
 [datatype? event!]
 [datatype? file!]
 [datatype? function!]
+#r3
+[datatype? get-path!]  ; get-path! =? path! in R2/Forward, R2 2.7.7+
 [datatype? get-word!]
+#r3only
+[datatype? gob!]
+#r3only
+[datatype? handle!]
 #r2only
 [datatype? hash!]
 [datatype? image!]
@@ -512,8 +515,8 @@ datatypes/datatype.r
 [datatype? lit-path!]
 [datatype? lit-word!]
 [datatype? logic!]
-#r3only
-[datatype? map!]
+#r3
+[datatype? map!]  ; map! =? hash! in R2/Forward, R2 2.7.7+
 #r3only
 [datatype? module!]
 [datatype? money!]
@@ -539,8 +542,8 @@ datatypes/datatype.r
 [datatype? tag!]
 [datatype? time!]
 [datatype? tuple!]
-#r3only
-[datatype? typeset!]
+#r3
+[datatype? typeset!]  ; typeset! =? block! in R2/Forward, R2 2.7.7+
 [datatype? unset!]
 [datatype? url!]
 #r3only
@@ -720,12 +723,9 @@ datatypes/email.r
 [email? me@here.com]
 [not email? 1]
 [email! = type? me@here.com]
-#r2only
 ; "minimum"
 [email? #[email! ""]]
-#r2only
 [strict-equal? #[email! ""] make email! 0]
-#r2only
 [strict-equal? #[email! ""] to email! ""]
 datatypes/error.r
 [error? try [1 / 0]]
@@ -1176,7 +1176,6 @@ datatypes/file.r
 [file! = type? %myscript.r]
 ; minimum
 [file? %""]
-#r2only
 [%"" == #[file! ""]]
 [%"" == make file! 0]
 [%"" == to file! ""]
@@ -1607,13 +1606,26 @@ datatypes/lit-word.r
 	a-value: first ['a]
 	strict-equal? to word! :a-value do reduce [:a-value]
 ]
-; bug#1342
+; bug#1477
 [word? '/]
+[word? '//]
+[word? '///]
+; bug#1342
 [word? '<]
 [word? '>]
 [word? '<=]
 [word? '>=]
 [word? '<>]
+datatypes/get-word.r
+; bug#1477
+[get-word? first [:/]]
+[get-word? first [://]]
+[get-word? first [:///]]
+datatypes/set-word.r
+; bug#1477
+[set-word? first [/:]]
+[set-word? first [//:]]
+[set-word? first [///:]]
 datatypes/logic.r
 [logic? true]
 [logic? false]
@@ -1634,17 +1646,17 @@ datatypes/logic.r
 [true = to logic! "f"]
 ["true" = mold true]
 ["false" = mold false]
-datatypes/map.r
-#r3only
+datatypes/map.r  ; map! =? hash! in R2/Forward, R2 2.7.7+
+#r3
 [empty? make map! []]
-#r3only
+#r3
 [empty? make map! 4]
 #r3only
 ; The length of a map is the number of key/value pairs it holds.
-[2 == length? make map! [a 1 b 2]]
-#r3only
+[2 == length? make map! [a 1 b 2]]  ; 4 in R2, R2/Forward
+#r3
 [m: make map! [a 1 b 2] 1 == m/a]
-#r3only
+#r3
 [m: make map! [a 1 b 2] 2 == m/b]
 #r3only
 [m: make map! [a 1 b 2] none? m/c]
@@ -1653,9 +1665,9 @@ datatypes/map.r
 #r3only
 ; Maps contain key/value pairs and must be created from blocks of even length.
 [error? try [make map! [1]]]
-#r3only
+#r3
 [empty? clear make map! [a 1 b 2]]
-#r3only
+#r3
 [empty? clear make map! [a 1 b 2]]
 #r3only
 #r3crash
@@ -1679,6 +1691,21 @@ datatypes/module.r
 	]
 	var: 2
 	1 == a-module/var
+]
+#r3only
+; import test
+[
+	a-module: make module! [
+		[
+			exports: [var]
+		]
+
+		[
+			var: 2
+		]
+	]
+	import a-module
+	2 == var
 ]
 #r3only
 ; import test
@@ -1919,6 +1946,8 @@ datatypes/none.r
 [none = #[none]]
 ; bug#845
 [none = #[none!]]
+#r3only
+[none = #]
 [none = make none! none]
 [none = to none! none]
 [none = to none! 1]
@@ -1929,7 +1958,6 @@ datatypes/object.r
 [object! = type? make object! [x: 1]]
 ; minimum
 [object? make object! []]
-#r2only
 ; literal form
 [object? #[object! []]]
 ; local words
@@ -1987,12 +2015,10 @@ datatypes/pair.r
 [not pair? 1]
 [pair! = type? 1x2]
 [1x1 = make pair! 1]
-#r2only
 [1x2 = make pair! [1 2]]
 [1x1 = to pair! 1]
 ; bug#17
 [error? try [to pair! [0.4]]]
-#r2only
 [1x2 = to pair! [1 2]]
 ["1x1" = mold 1x1]
 ; minimum
@@ -2004,7 +2030,6 @@ datatypes/paren.r
 [not paren? 1]
 ; minimum
 [paren! = type? first [()]]
-#r2only
 ; alternative literal form
 [strict-equal? first [()] first [#[paren! []]]]
 [strict-equal? first [()] make paren! 0]
@@ -2256,7 +2281,6 @@ datatypes/string.r
 [string! = type? "ahoj"]
 ; minimum
 [string? ""]
-#r2only
 ; alternative literal form
 ["" == #[string! ""]]
 ["" == make string! 0]
@@ -2399,7 +2423,6 @@ datatypes/string.r
 ["^(del)" = "^(7f)"]
 ["^^" = "^(5E)"]
 ["^"" = "^(22)"]
-#r2only
 ["ahoj" = #[string! "ahoj"]]
 ["1" = to string! 1]
 [{""} = mold ""]
@@ -2411,17 +2434,15 @@ datatypes/string.r
 ]
 datatypes/symbol.r
 #r2only
+#r2crash
 [symbol! = type? make symbol! "xx"]
 datatypes/tag.r
 [tag? <tag>]
 [not tag? 1]
 [tag! = type? <tag>]
-#r2only
 ; minimum
 [tag? #[tag! ""]]
-#r2only
 [strict-equal? #[tag! ""] make tag! 0]
-#r2only
 [strict-equal? #[tag! ""] to tag! ""]
 ["<tag>" == mold <tag>]
 datatypes/typeset.r
@@ -2429,28 +2450,64 @@ datatypes/typeset.r
 [datatype? any-block!]
 #r3only
 [typeset? any-block!]
+#r3
+[typeset? to-typeset any-block!]
 #r2only
 [datatype? any-function!]
 #r3only
 [typeset? any-function!]
+#r3
+[typeset? to-typeset any-function!]
+#r3
+[typeset? any-path!]
+#r3
+[typeset? to-typeset any-path!]
+#r3
+[typeset? any-object!]
+#r3
+[typeset? to-typeset any-object!]
 #r2only
 [datatype? any-string!]
 #r3only
 [typeset? any-string!]
+#r3
+[typeset? to-typeset any-string!]
 #r2only
 [datatype? any-word!]
 #r3only
 [typeset? any-word!]
+#r3
+[typeset? to-typeset any-word!]
+#r3
+[typeset? immediate!]
+#r3
+[typeset? to-typeset immediate!]
+#r3
+[typeset? internal!]
+#r3
+[typeset? to-typeset internal!]
 #r2only
 [datatype? number!]
 #r3only
 [typeset? number!]
+#r3
+[typeset? to-typeset number!]
+#r3
+[typeset? scalar!]
+#r3
+[typeset? to-typeset scalar!]
 #r2only
 [datatype? series!]
 #r3only
 [typeset? series!]
+#r3
+[typeset? to-typeset series!]
 #r3only
 [typeset? make typeset! [integer! none!]]
+#r3
+[typeset? make typeset! reduce [integer! none!]]
+#r3
+[typeset? to-typeset [integer! none!]]
 #r3only
 [typeset! = type? series!]
 datatypes/time.r
@@ -2514,12 +2571,9 @@ datatypes/url.r
 [url? http://www.fm.tul.cz/~ladislav/rebol]
 [not url? 1]
 [url! = type? http://www.fm.tul.cz/~ladislav/rebol]
-#r2only
 ; minimum; alternative literal form
 [url? #[url! ""]]
-#r2only
 [strict-equal? #[url! ""] make url! 0]
-#r2only
 [strict-equal? #[url! ""] to url! ""]
 ["http://" = mold http://]
 ["http://a%2520b" = mold http://a%2520b]
@@ -2730,12 +2784,10 @@ functions/comparison/equalq.r
 ; Uses FUNC instead of make function! so the test is compatible.
 [not equal? func [][] func [][]]
 ; reflexivity test for closure!
-; Uses CLOSURE to make the test compatible. On todo list for R2/Forward.
-#r3
+; Uses CLOSURE to make the test compatible.
 [equal? a-value: closure [][] :a-value]
 ; No structural equivalence for closure!
-; Uses CLOSURE to make the test compatible. On todo list for R2/Forward.
-#r3
+; Uses CLOSURE to make the test compatible.
 [not equal? closure [][] closure [][]]
 [equal? a-value: #{00} a-value]
 ; binary!
@@ -4081,13 +4133,11 @@ functions/comparison/sameq.r
 ; no structural equality for function!
 [not same? func [] [] func [] []]
 ; reflexivity test for closure!
-#r3
 [
 	a-value: closure [] []
 	same? :a-value :a-value
 ]
 ; no structural equality for closure!
-#r3
 [not same? closure [] [] closure [] []]
 ; reflexivity test for native!
 [same? :all :all]
@@ -4100,15 +4150,6 @@ functions/comparison/sameq.r
 ]
 ; no structural equality for function!
 [not same? func [] [] func [] []]
-; reflexivity test for closure!
-#r3
-[
-	a-value: closure [] []
-	same? :a-value :a-value
-]
-; no structural equality for closure!
-#r3
-[not same? closure [] [] closure [] []]
 ; binary!
 [not same? #{00} #{00}]
 ; binary versus bitset
@@ -4569,13 +4610,11 @@ functions/comparison/strict-equalq.r
 ; no structural equality for function!
 [not strict-equal? func [] [] func [] []]
 ; reflexivity test for closure!
-#r3
 [
 	a-value: closure [] []
 	strict-equal? :a-value :a-value
 ]
 ; no structural equality for closure!
-#r3
 [not strict-equal? closure [] [] closure [] []]
 ; binary!
 [strict-equal? #{00} #{00}]
@@ -9461,7 +9500,7 @@ functions/series/emptyq.r
 	clear head blk
 	empty? blk
 ]
-#r3
+#r3only
 [empty? none]
 functions/series/exclude.r
 [empty? exclude [1 2] [2 1]]
@@ -9478,6 +9517,12 @@ functions/series/find.r
 	blk: [1]
 	same? blk find blk 1
 ]
+functions/series/indexq.r
+[1 == index? []]
+[2 == index? next [a]]
+; bug#1611: Allow INDEX? to take none as an argument, return none
+#r3only
+[none? index? none]
 functions/series/insert.r
 [
 	a: make block! 0
@@ -9813,7 +9858,7 @@ functions/series/last.r
 functions/series/lengthq.r
 ; bug#1626: "Allow LENGTH? to take none as an argument, return none"
 ; bug#1688: "LENGTH? NONE returns TRUE" (should return NONE)
-#r3
+#r3only
 [none? length? none]
 functions/series/next.r
 [
@@ -10016,6 +10061,9 @@ functions/series/remove.r
 	remove/part a-bitset to integer! #"a"
 	none? find a-bitset #"a"
 ]
+functions/series/select.r
+; bug#1936: select returns incorrect value with block argument
+[4 == select [1 2 3 4 5 6] [1 2 3]]
 functions/series/skip.r
 [
 	blk: []
@@ -10145,9 +10193,9 @@ functions/convert/load.r
 ; load/next
 #r2only
 [block? load/next "1"]
-; bug#1711
+; bug#1703  bug#1711
 #r3only
-[try/except [block? load/next "1"] [true]]
+[error? try [load/next "1"]]
 ; bug#1122
 [
 	any [
@@ -10176,6 +10224,7 @@ functions/convert/mold.r
 ]
 ; closure mold
 ; bug#23
+#r3only
 [
 	c: closure [a] [print a]
 	equal? "make closure! [[a][print a]]" mold :c
@@ -10434,7 +10483,7 @@ datatypes/percent.r
 #r3crash
 [error? try [repeat n 200 [try [close open open join tcp://localhost: n]]] true]
 ; bug#1651: "FILE-TYPE? should return NONE for unknown types"
-#r3
+#r3only
 [none? file-type? %foo.0123456789bar0123456789]
 ; bug#1678: "Can we add CRC-32 as a checksum method?"
 #r3only
