@@ -8939,12 +8939,15 @@ functions/control/reduce.r
 ["1 + 1" = reduce "1 + 1"]
 #r3only
 [error? first reduce [try [1 / 0]]]
-; bug#1760
-; RETURN stops the evaluation
-[
-	f1: does [reduce [return 1 2] 2]
-	1 = f1
-]
+; unwind functions should stop evaluation, bug#1760
+[unset? loop 1 [reduce [break]]]
+[1 = loop 1 [reduce [break/return 1]]]
+#r3only
+[unset? loop 1 [reduce [continue]]]
+[1 = catch [reduce [throw 1]]]
+[1 = catch/name [reduce [throw/name 1 'a]] 'a]
+[1 = do does [reduce [return 1 2] 2]]
+[unset? do does [reduce [exit 1] 2]]
 ; recursive behaviour
 [1 = first reduce [first reduce [1]]]
 ; infinite recursion
@@ -9229,11 +9232,23 @@ functions/control/while.r
 	while [false] [success: false]
 	success
 ]
-; Test break and break/return
+; Test break, break/return and continue
 [unset? while [true] [break]]
-[unset? while [break] []]
+[unset? while [break] []]  ; bug#1519
 [1 = while [true] [break/return 1]]
-[1 = while [break/return 1] [2]]
+[1 = while [break/return 1 false] [2]]  ; bug#1519
+#r3only
+[
+	x: true  y: true
+	while [x] [if x [x: false continue y: false]]
+	y
+]
+#r3only
+[
+	x: true  y: true
+	while [if x [x: false continue y: false] x] []  ; bug#1519
+	y
+]
 [
 	num: 0
 	while [true] [num: 1 break num: 2]
@@ -9244,11 +9259,17 @@ functions/control/while.r
 	f1: does [while [true] [return 1]]
 	1 = f1
 ]
-; bug#1519
-; Test that RETURN stops the loop
-[do does [while [return true] [return false]]]
+[do does [while [return true] [return false]]]  ; bug#1519
+; EXIT should stop the loop
+[unset? do does [x: true while [x] [exit x: false]]]
+[unset? do does [x: true while [exit x] [x: false]]]  ; bug#1519
+; THROW should stop the loop
+[1 = catch [x: true while [x] [throw 1 x: false]]]
+[1 = catch [x: true while [throw 1 x] [x: false]]]  ; bug#1519
+[1 = catch/name [x: true while [x] [throw/name 1 'a x: false]] 'a]
+[1 = catch/name [x: true while [throw/name 1 'a x] [x: false]] 'a]  ; bug#1519
 #r3only
-; Test that errors do not stop the loop and errors can be returned
+; Test that disarmed errors do not stop the loop and errors can be returned
 [
 	num: 0
 	e: while [num < 10] [num: num + 1 try [1 / 0]]
