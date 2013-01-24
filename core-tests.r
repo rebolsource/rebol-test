@@ -2052,7 +2052,6 @@ datatypes/op.r
 [3 == do reduce [get '+ 1 2]]
 #r3only
 [error? try [do reduce [get '+ 1 2]]]
-#r3crash
 #r3only
 ; bug#1934
 [3 = do reduce [1 :+ 2]]
