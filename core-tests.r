@@ -1208,19 +1208,6 @@ datatypes/error.r
 [a: 1 catch/name [a: error? try [throw/name 2 'b]] 'b :a =? 1]
 [a: 1 do does [a: error? try [return 2]] :a =? 1]
 [a: 1 do does [a: error? try [exit]] :a =? 1]
-; TODO - unwind pseudo-errors should not be caught by try even when unhandled
-; We can't actually generate unhandled unwinds with the current test harness
-; since it already handles all unwinds. And we can't catch unwinds without
-; handling them, so they'll never be unhandled. Here for future reference.
-; There is a debate about changing this behavior for R3, see bug#1506.
-;[not error? try [break]]
-;[not error? try [break/return 2]]
-;#r3only
-;[not error? try [continue]]
-;[not error? try [throw none]]
-;[not error? try [throw/name none 'none]]
-;[not error? try [return 1]]
-;[not error? try [exit]]
 #r2only  ; should be adapted to be a load test, not an error test
 [
 	 x: 1
@@ -4202,13 +4189,6 @@ functions/comparison/sameq.r
 [same? :all :all]
 ; reflexivity test for op!
 [same? :+ :+]
-; reflexivity test for function!
-[
-	a-value: func [] []
-	same? :a-value :a-value
-]
-; no structural equality for function!
-[not same? func [] [] func [] []]
 ; binary!
 [not same? #{00} #{00}]
 ; binary versus bitset
