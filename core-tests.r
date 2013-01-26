@@ -9345,17 +9345,9 @@ functions/control/while.r
 [1 = catch [cycle?: true while [cycle?] [throw 1 cycle?: false]]]
 [  ; bug#1519
 	cycle?: true
-	1 = catch [while [if cycle? [throw 1] true] [cycle?: false]]
-]
-[  ; bug#1519
-	cycle?: true
 	1 = catch [while [if cycle? [throw 1] false] [cycle?: false]]
 ]
 [1 = catch/name [cycle?: true while [cycle?] [throw/name 1 'a cycle?: false]] 'a]
-[  ; bug#1519
-	cycle?: true
-	1 = catch/name [while [if cycle? [throw/name 1 'a] true] [cycle?: false]] 'a
-]
 [  ; bug#1519
 	cycle?: true
 	1 = catch/name [while [if cycle? [throw/name 1 'a] false] [cycle?: false]] 'a
