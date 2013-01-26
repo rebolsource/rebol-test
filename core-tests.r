@@ -1166,48 +1166,6 @@ datatypes/error.r
 [a: 1 error? try [a: 1 / 0] :a =? 1]
 [a: 1 error? try [set 'a 1 / 0] :a =? 1]
 [a: 1 error? try [set/any 'a 1 / 0] :a =? 1]
-; unwind pseudo-errors should not be assignable bug#1515
-[a: 1 loop 1 [a: break] :a =? 1]
-[a: 1 loop 1 [set 'a break] :a =? 1]
-[a: 1 loop 1 [set/any 'a break] :a =? 1]
-[a: 1 loop 1 [a: break/return 2] :a =? 1]
-[a: 1 loop 1 [set 'a break/return 2] :a =? 1]
-[a: 1 loop 1 [set/any 'a break/return 2] :a =? 1]
-#r3only
-[a: 1 loop 1 [a: continue] :a =? 1]
-#r3only
-[a: 1 loop 1 [set 'a continue] :a =? 1]
-#r3only
-[a: 1 loop 1 [set/any 'a continue] :a =? 1]
-[a: 1 catch [a: throw 2] :a =? 1]
-[a: 1 catch [set 'a throw 2] :a =? 1]
-[a: 1 catch [set/any 'a throw 2] :a =? 1]
-[a: 1 catch/name [a: throw/name 2 'b] 'b :a =? 1]
-[a: 1 catch/name [set 'a throw/name 2 'b] 'b :a =? 1]
-[a: 1 catch/name [set/any 'a throw/name 2 'b] 'b :a =? 1]
-[a: 1 do does [a: return 2] :a =? 1]
-[a: 1 do does [set 'a return 2] :a =? 1]
-[a: 1 do does [set/any 'a return 2] :a =? 1]
-[a: 1 do does [a: exit] :a =? 1]
-[a: 1 do does [set 'a exit] :a =? 1]
-[a: 1 do does [set/any 'a exit] :a =? 1]
-; unwind pseudo-errors should not be passable to functions, even to the error? function bug#1509
-[a: 1 loop 1 [a: error? break] :a =? 1]
-[a: 1 loop 1 [a: error? break/return 2] :a =? 1]
-#r3only
-[a: 1 loop 1 [a: error? continue] :a =? 1]
-[a: 1 catch [a: error? throw 2] :a =? 1]
-[a: 1 catch/name [a: error? throw/name 2 'b] 'b :a =? 1]
-[a: 1 do does [a: error? return 2] :a =? 1]
-[a: 1 do does [a: error? exit] :a =? 1]
-; unwind pseudo-errors should not be caught by try
-[a: 1 loop 1 [a: error? try [break]] :a =? 1]
-#r3only
-[a: 1 loop 1 [a: error? try [continue]] :a =? 1]
-[a: 1 catch [a: error? try [throw 2]] :a =? 1]
-[a: 1 catch/name [a: error? try [throw/name 2 'b]] 'b :a =? 1]
-[a: 1 do does [a: error? try [return 2]] :a =? 1]
-[a: 1 do does [a: error? try [exit]] :a =? 1]
 #r2only  ; should be adapted to be a load test, not an error test
 [
 	 x: 1
@@ -3584,11 +3542,11 @@ functions/comparison/equivq.r
 #r3
 [not equiv? func [][] func [][]]
 ; reflexivity test for closure!
-; Uses CLOSURE to make the test compatible. On todo list for R2/Forward.
+; Uses CLOSURE to make the test compatible.
 #r3
 [equiv? a-value: closure [][] :a-value]
 ; No structural equivalence for closure!
-; Uses CLOSURE to make the test compatible. On todo list for R2/Forward.
+; Uses CLOSURE to make the test compatible.
 #r3
 [not equiv? closure [][] closure [][]]
 ; binary!
@@ -7626,6 +7584,7 @@ functions/control/attempt.r
 ; THROW stops attempt evaluation
 [1 == catch [attempt [throw 1 2] 2]]
 ; BREAK stops attempt evaluation
+[unset? loop 1 [attempt [break 2] 2]]
 [1 == loop 1 [attempt [break/return 1 2] 2]]
 ; recursion
 [1 = attempt [attempt [1]]]
@@ -7636,13 +7595,30 @@ functions/control/attempt.r
 	none? attempt blk
 ]
 functions/control/break.r
-[unset? while [true] [break]]
-; break/return
-[none? while [true] [break/return none]]
-[false = while [true] [break/return false]]
-[true = while [true] [break/return true]]
-[unset? while [true] [break/return ()]]
-[error? while [true] [break/return try [1 / 0]]]
+; see loop functions for basic breaking functionality
+; just testing return values, but written as if break could fail altogether
+; in case that becomes an issue. break failure tests are with the functions
+; that they are failing to break from.
+; break should return #[unset!]
+[unset? loop 1 [break 2]]
+; break/return should return argument
+[none? loop 1 [break/return none 2]]
+[false =? loop 1 [break/return false 2]]
+[true =? loop 1 [break/return true 2]]
+[unset? loop 1 [break/return () 2]]
+[error? loop 1 [break/return try [1 / 0] 2]]
+; the "result" of break should not be assignable, bug#1515
+[a: 1 loop 1 [a: break] :a =? 1]
+[a: 1 loop 1 [set 'a break] :a =? 1]
+[a: 1 loop 1 [set/any 'a break] :a =? 1]
+[a: 1 loop 1 [a: break/return 2] :a =? 1]
+[a: 1 loop 1 [set 'a break/return 2] :a =? 1]
+[a: 1 loop 1 [set/any 'a break/return 2] :a =? 1]
+; the "result" of break should not be passable to functions, bug#1509
+[a: 1 loop 1 [a: error? break] :a =? 1]
+[a: 1 loop 1 [a: error? break/return 2] :a =? 1]
+; the "result" of break should not be caught by try
+[a: 1 loop 1 [a: error? try [break]] :a =? 1]
 functions/control/case.r
 [
 	success: false
@@ -7697,6 +7673,7 @@ functions/control/case.r
 	error? try blk
 ]
 functions/control/catch.r
+; see also functions/control/throw.r
 [
 	catch [
 		throw success: true
@@ -7713,8 +7690,6 @@ functions/control/catch.r
 [unset? catch [throw ()]]
 [error? catch [throw try [1 / 0]]]
 [1 = catch [throw 1]]
-; bug#1509
-[1 = catch [type? throw 1]]
 ; catch/name results
 [unset? catch/name [] 'catch]
 [unset? catch/name [()] 'catch]
@@ -7842,31 +7817,20 @@ functions/control/compose.r
 	b: copy [] insert/dup b 1 32768 compose b
 ]
 functions/control/continue.r
+; see loop functions for basic continuing functionality
+; the "result" of continue should not be assignable, bug#1515
 #r3only
-[
-	success: true
-	loop 1 [continue success: false]
-	success
-]
+[a: 1 loop 1 [a: continue] :a =? 1]
 #r3only
-[
-	success: true
-	repeat i 1 [continue success: false]
-	success
-]
+[a: 1 loop 1 [set 'a continue] :a =? 1]
 #r3only
-[
-	success: true
-	cycle?: true
-	while [cycle?] [cycle?: false continue success: false]
-	success
-]
+[a: 1 loop 1 [set/any 'a continue] :a =? 1]
+; the "result" of continue should not be passable to functions, bug#1509
 #r3only
-[
-	success: true
-	foreach i [1] [continue success: false]
-	success
-]
+[a: 1 loop 1 [a: error? continue] :a =? 1]
+; continue should not be caught by try
+#r3only
+[a: 1 loop 1 [a: error? try [continue]] :a =? 1]
 functions/control/disarm.r
 #r2only
 [object? disarm try [1 / 0]]
@@ -8287,6 +8251,14 @@ functions/control/exit.r
 	f1: does [exit]
 	unset? f1
 ]
+; the "result" of exit should not be assignable, bug#1515
+[a: 1 do does [a: exit] :a =? 1]
+[a: 1 do does [set 'a exit] :a =? 1]
+[a: 1 do does [set/any 'a exit] :a =? 1]
+; the "result" of exit should not be passable to functions, bug#1509
+[a: 1 do does [a: error? exit] :a =? 1]
+; exit should not be caught by try
+[a: 1 do does [a: error? try [exit]] :a =? 1]
 functions/control/for.r
 [
 	success: true
@@ -8309,6 +8281,20 @@ functions/control/for.r
 [unset? for i 1 10 1 [break]]
 ; break/return return value
 [2 = for i 1 10 1 [break/return 2]]
+; continue cycle
+#r3only
+[
+	success: true
+	for i 1 1 1 [continue success: false]
+	success
+]
+#r3only
+[
+	success: true
+	x: "a"
+	for i x tail x 1 [continue success: false]
+	success
+]
 ; string! test
 [
 	out: copy ""
@@ -8461,7 +8447,7 @@ functions/control/for.r
 		]
 	]
 ]
-; FOR does not bind 'self
+; FOR should not bind 'self
 ; bug#1529
 [same? 'self for i 1 1 1 ['self]]
 functions/control/forall.r
@@ -8504,6 +8490,14 @@ functions/control/forall.r
 [
 	blk: [1 2 3 4]
 	1 = forall blk [break/return 1]
+]
+; continue cycle
+#r3only
+[
+	success: true
+	x: "a"
+	forall x [continue success: false]
+	success
 ]
 ; zero repetition
 [
@@ -8588,6 +8582,13 @@ functions/control/foreach.r
 	blk: [1 2 3 4]
 	1 = foreach i blk [break/return 1]
 ]
+; continue cycle
+#r3only
+[
+	success: true
+	foreach i [1] [continue success: false]
+	success
+]
 ; zero repetition
 [
 	success: true
@@ -8628,14 +8629,23 @@ functions/control/forever.r
 	]
 	num = 10
 ]
-; Test break and break/return
+; Test break, break/return and continue
 [unset? forever [break]]
 [1 = forever [break/return 1]]
+#r3only
+[
+	success: true
+	cycle?: true
+	forever [if cycle? [cycle?: false continue success: false] break]
+	success
+]
 ; Test that return stops the loop
 [
 	f1: does [forever [return 1]]
 	1 = f1
 ]
+; Test that exit stops the loop
+[unset? do does [forever [exit]]]
 #r3only
 ; Test that errors do not stop the loop and errors can be returned
 [
@@ -8702,6 +8712,14 @@ functions/control/forskip.r
 [
 	blk: [1 2 3 4]
 	1 = forskip blk 2 [break/return 1]
+]
+; continue cycle
+#r3only
+[
+	success: true
+	x: "a"
+	forskip x 1 [continue success: false]
+	success
 ]
 ; zero repetition
 [
@@ -8847,14 +8865,17 @@ functions/control/loop.r
 	loop 10 [num: num + 1 break]
 	num = 1
 ]
-; bug#1509
-[loop 1 [error? break/return true false]]
-; bug#1515
-[loop 1 [type? a: break/return true false]]
 ; break return value
 [unset? loop 10 [break]]
 ; break/return return value
 [2 = loop 10 [break/return 2]]
+; continue cycle
+#r3only
+[
+	success: true
+	loop 1 [continue success: false]
+	success
+]
 ; zero repetition
 [
 	success: true
@@ -8862,7 +8883,7 @@ functions/control/loop.r
 	success
 ]
 [
-	success: true	
+	success: true
 	loop -1 [success: false]
 	success
 ]
@@ -8894,7 +8915,7 @@ functions/control/loop.r
 				use [break] [
 					break: 1
 					f 2
-					1 = get/any 'break						
+					1 = get/any 'break
 				] 
 			]
 		]
@@ -8918,12 +8939,15 @@ functions/control/reduce.r
 ["1 + 1" = reduce "1 + 1"]
 #r3only
 [error? first reduce [try [1 / 0]]]
-; bug#1760
-; RETURN stops the evaluation
-[
-	f1: does [reduce [return 1 2] 2]
-	1 = f1
-]
+; unwind functions should stop evaluation, bug#1760
+[unset? loop 1 [reduce [break]]]
+[1 = loop 1 [reduce [break/return 1]]]
+#r3only
+[unset? loop 1 [reduce [continue]]]
+[1 = catch [reduce [throw 1]]]
+[1 = catch/name [reduce [throw/name 1 'a]] 'a]
+[1 = do does [reduce [return 1 2] 2]]
+[unset? do does [reduce [exit 1] 2]]
 ; recursive behaviour
 [1 = first reduce [first reduce [1]]]
 ; infinite recursion
@@ -8962,6 +8986,25 @@ functions/control/repeat.r
 [unset? repeat i 10 [break]]
 ; break/return return value
 [2 = repeat i 10 [break/return 2]]
+; continue cycle
+#r3only
+[
+	success: true
+	repeat i 1 [continue success: false]
+	success
+]
+#r3only
+[
+	success: true
+	repeat i "a" [continue success: false]
+	success
+]
+#r3only
+[
+	success: true
+	repeat i [a] [continue success: false]
+	success
+]
 #r2only
 ; string! test
 [
@@ -9068,6 +9111,14 @@ functions/control/return.r
 	f1: does [return try [1 / 0]]
 	error? f1
 ]
+; the "result" of return should not be assignable, bug#1515
+[a: 1 do does [a: return 2] :a =? 1]
+[a: 1 do does [set 'a return 2] :a =? 1]
+[a: 1 do does [set/any 'a return 2] :a =? 1]
+; the "result" of return should not be passable to functions, bug#1509
+[a: 1 do does [a: error? return 2] :a =? 1]
+; return should not be caught by try
+[a: 1 do does [a: error? try [return 2]] :a =? 1]
 functions/control/switch.r
 [
 	11 = switch 1 [
@@ -9088,13 +9139,20 @@ functions/control/switch.r
 	error? switch 1 cases
 ]
 functions/control/throw.r
-[
-	catch [
-		throw success: true
-		sucess: false
-	]
-	success
-]
+; see functions/control/catch.r for basic functionality
+; the "result" of throw should not be assignable, bug#1515
+[a: 1 catch [a: throw 2] :a =? 1]
+[a: 1 catch [set 'a throw 2] :a =? 1]
+[a: 1 catch [set/any 'a throw 2] :a =? 1]
+[a: 1 catch/name [a: throw/name 2 'b] 'b :a =? 1]
+[a: 1 catch/name [set 'a throw/name 2 'b] 'b :a =? 1]
+[a: 1 catch/name [set/any 'a throw/name 2 'b] 'b :a =? 1]
+; the "result" of throw should not be passable to functions, bug#1509
+[a: 1 catch [a: error? throw 2] :a =? 1]
+[a: 1 catch/name [a: error? throw/name 2 'b] 'b :a =? 1]
+; throw should not be caught by try
+[a: 1 catch [a: error? try [throw 2]] :a =? 1]
+[a: 1 catch/name [a: error? try [throw/name 2 'b]] 'b :a =? 1]
 functions/control/try.r
 #r2only
 [
@@ -9163,7 +9221,15 @@ functions/control/until.r
 [1 = until [1]]
 ; Test break and break/return
 [unset? until [break true]]
-[1 = until [break/return 1]]
+[1 = until [break/return 1 true]]
+; Test continue
+#r3only
+[
+	success: true
+	cycle?: true
+	until [if cycle? [cycle?: false continue success: false] true]
+	success
+]
 ; Test that return stops the loop
 [
 	f1: does [until [return 1]]
@@ -9208,26 +9274,65 @@ functions/control/while.r
 	while [false] [success: false]
 	success
 ]
-; Test break and break/return
-[unset? while [true] [break]]
-[unset? while [break] []]
-[1 = while [true] [break/return 1]]
-[1 = while [break/return 1] [2]]
+; Test break, break/return and continue
+[cycle?: true unset? while [cycle?] [break cycle?: false]]
+[cycle?: true unset? while [if cycle? [break] cycle?] [cycle?: false]]  ; bug#1519
+[cycle?: true 1 = while [cycle?] [break/return 1 cycle?: false]]
+[cycle?: true 1 = while [if cycle? [break/return 1] cycle?] [cycle?: false]]  ; bug#1519
+#r3only
+[
+	success: true
+	cycle?: true
+	while [cycle?] [cycle?: false continue success: false]
+	success
+]
+#r3only
+[  ; bug#1519
+	success: true
+	cycle?: true
+	while [if cycle? [cycle?: false continue success: false] cycle?] []
+	success
+]
 [
 	num: 0
 	while [true] [num: 1 break num: 2]
 	num = 1
 ]
-; Test that RETURN stops the loop
+; RETURN should stop the loop
 [
-	f1: does [while [true] [return 1]]
+	cycle?: true
+	f1: does [while [cycle?] [cycle?: false return 1] 2]
 	1 = f1
 ]
-; bug#1519
-; Test that RETURN stops the loop
-[do does [while [return true] [return false]]]
+[  ; bug#1519
+	cycle?: true
+	f1: does [while [if cycle? [return 1] cycle?] [cycle?: false 2]]
+	1 = f1
+]
+; EXIT should stop the loop
+[
+	cycle?: true
+	f1: does [while [cycle?] [cycle?: false exit] 2]
+	unset? f1
+]
+[  ; bug#1519
+	cycle?: true
+	f1: does [while [if cycle? [exit] cycle?] [cycle?: false 2]]
+	unset? f1
+]
+; THROW should stop the loop
+[1 = catch [cycle?: true while [cycle?] [throw 1 cycle?: false]]]
+[  ; bug#1519
+	cycle?: true
+	1 = catch [while [if cycle? [throw 1] false] [cycle?: false]]
+]
+[1 = catch/name [cycle?: true while [cycle?] [throw/name 1 'a cycle?: false]] 'a]
+[  ; bug#1519
+	cycle?: true
+	1 = catch/name [while [if cycle? [throw/name 1 'a] false] [cycle?: false]] 'a
+]
 #r3only
-; Test that errors do not stop the loop and errors can be returned
+; Test that disarmed errors do not stop the loop and errors can be returned
 [
 	num: 0
 	e: while [num < 10] [num: num + 1 try [1 / 0]]
@@ -9284,6 +9389,11 @@ functions/context/use.r
 	error? try [use 'a [a: 2]]
 	a = 1
 ]
+; initialization
+#r2only
+[use [a] [unset? get/any 'a]]
+#r3only
+[use [a] [none? :a]]
 ; BREAK out of USE
 [
 	1 = loop 1 [
