@@ -1514,6 +1514,12 @@ datatypes/gob.r
 [gob? make gob! []]
 #r3only
 [gob! = type? make gob! []]
+; bug#62
+#r3only
+[
+	g: make gob! []
+	1x1 == g/offset: 1x1
+]
 datatypes/hash.r
 #r2only
 ; minimum
@@ -2253,6 +2259,13 @@ datatypes/set-path.r
 		a == 3x2
 		a == [x 3]
 	]
+]
+; bug#64
+[
+	blk: [1]
+	i: 1
+	blk/:i: 2
+	blk = [2]
 ]
 datatypes/set-word.r
 [set-word? first [a:]]
@@ -3488,7 +3501,7 @@ functions/comparison/equalq.r
 [not equal? (make error! "hello") (make error! "there")]
 #r3only
 ; error! difference in op! code
-; bug#60: op! generates error! with offset code field
+; bug#60: operators generate errors with offset NEAR field
 [not equal? (try [1 / 0]) (try [2 / 0])]
 #r3only
 ; error! basic comparison
@@ -8292,6 +8305,7 @@ functions/control/for.r
 ; break/return return value
 [2 = for i 1 10 1 [break/return 2]]
 ; continue cycle
+; bug#58
 #r3only
 [
 	success: true
@@ -10649,6 +10663,7 @@ functions/convert/to.r
 ['percent! = to word! percent!]
 ['money! = to word! money!]
 ; bug#50
+#r3only
 [none? bind? to word! "zzz"]
 functions/context/bind.r
 ; BIND works 'as expected' in object spec
