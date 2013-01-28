@@ -10648,6 +10648,8 @@ functions/convert/to.r
 #r3only
 ['percent! = to word! percent!]
 ['money! = to word! money!]
+; bug#50
+[none? bind? to word! "zzz"]
 functions/context/bind.r
 ; BIND works 'as expected' in object spec
 ; bug#1549
