@@ -35,6 +35,16 @@ datatypes/bitset.r
 [bitset! = type? make bitset! "a"]
 ; minimum, literal representation
 [bitset? #[bitset! #{}]]
+; access symmetry
+[
+	b: #{0b}
+	not error? try [b/1: b/1]
+]
+; bug#42
+[
+	b: #{0b}
+	b/1 == 11
+]
 datatypes/block.r
 [block? [1]]
 [not block? 1]
