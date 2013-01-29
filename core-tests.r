@@ -2220,6 +2220,11 @@ datatypes/path.r
 	error? try [do path]
 	true
 ]
+; bug#71
+[
+	a: "abcd"
+	error? try [a/x]
+]
 datatypes/port.r
 [port? make port! http://]
 [not port? 1]
@@ -2587,6 +2592,7 @@ datatypes/unset.r
 [unset? #[unset!]]
 #r3only
 [unset? make unset! none]
+; bug#68
 #r3only
 [unset? to unset! none]
 #r3only
@@ -9667,9 +9673,17 @@ functions/series/find.r
 	blk: [1]
 	same? blk find blk 1
 ]
+; bug#66
+[none? find/skip [1 2 3 4 5 6] 2 3]
 functions/series/indexq.r
 [1 == index? []]
 [2 == index? next [a]]
+; past-tail index
+[
+	a: tail copy [1]
+	remove head a
+	2 == index? a
+]
 ; bug#1611: Allow INDEX? to take none as an argument, return none
 #r3only
 [none? index? none]
@@ -10368,6 +10382,7 @@ functions/convert/mold.r
 	string? mold a
 ]
 ; cyclic object
+; bug#69
 [
 	a: make object! [a: self]
 	string? mold a
