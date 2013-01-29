@@ -8788,10 +8788,6 @@ functions/control/forskip.r
 	e/near = [f]
 ]
 functions/control/halt.r
-; bug#1742
-#test2crash
-#test3crash
-[halt]
 functions/control/if.r
 [
 	success: false
