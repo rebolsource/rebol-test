@@ -7646,6 +7646,9 @@ functions/control/break.r
 ; the "result" of break should not be passable to functions, bug#1509
 [a: 1 loop 1 [a: error? break] :a =? 1]
 [a: 1 loop 1 [a: error? break/return 2] :a =? 1]
+#r3crash
+; bug#1945
+[spec-of break]
 ; the "result" of break should not be caught by try
 [a: 1 loop 1 [a: error? try [break]] :a =? 1]
 functions/control/case.r
