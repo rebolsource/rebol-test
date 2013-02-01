@@ -1481,6 +1481,24 @@ datatypes/function.r
 ]
 ; bug#1528
 [function? func [self] []]
+datatypes/get-path.r
+; bug#1947
+; empty get-path test
+#r3only
+[
+	any [
+	    error? try [make get-path! []]
+	    equal? make get-path! [] load mold/all make get-path! []
+	]
+]
+; one-element get-path test
+#r3only
+[
+	any [
+	    error? try [make get-path! [a]]
+	    equal? make get-path! [a] load mold/all make get-path! [a]
+	]
+]
 datatypes/get-word.r
 [get-word? first [:a]]
 [not get-word? 1]
@@ -1533,7 +1551,6 @@ datatypes/image.r
 [image? make image! 100x100]
 [not image? 1]
 [image! = type? make image! 0x0]
-#r2only
 ; minimum
 [image? #[image! 0x0 #{}]]
 datatypes/integer.r
@@ -1608,11 +1625,21 @@ datatypes/lit-path.r
 [lit-path! = type? first ['a/b]]
 #r2only
 ; minimum
-[lit-path? first [#[lit-path! []]]]
-#r2only
-[strict-equal? first [#[lit-path! []]] make lit-path! 0]
-#r2only
-[strict-equal? first [#[lit-path! []]] to lit-path! []]
+; bug#1947
+; empty lit-path test
+[
+	any [
+	    error? try [make lit-path! []]
+	    equal? make lit-path! [] load mold/all make lit-path! []
+	]
+]
+; one-element lit-path test
+[
+	any [
+	    error? try [make lit-path! [a]]
+	    equal? make lit-path! [a] load mold/all make lit-path! [a]
+	]
+]
 ; lit-paths are active
 [
 	a-value: first ['a/b]
@@ -2081,9 +2108,21 @@ datatypes/path.r
 [not path? 1]
 [path! = type? 'a/b]
 ; the minimum
-[path? make path! 0]
-[strict-equal? make path! 0 to path! []]
-[path? to path! []]
+; bug#1947
+; empty path test
+[
+	any [
+	    error? try [make path! []]
+	    equal? make path! [] load mold/all make path! []
+	]
+]
+; one-element path test
+[
+	any [
+	    error? try [make path! [a]]
+	    equal? make path! [a] load mold/all make path! [a]
+	]
+]
 ["a/b" = mold 'a/b]
 [
 	a-word: 1
@@ -2240,9 +2279,21 @@ datatypes/set-path.r
 [set-path! = type? first [a/b:]]
 #r2only
 ; the minimum
-[set-path? #[set-path! []]]
-#r2only
-[strict-equal? #[set-path! []] make set-path! 0]
+; bug#1947
+; empty set-path test
+[
+	any [
+	    error? try [make set-path! []]
+	    equal? make set-path! [] load mold/all make set-path! []
+	]
+]
+; one-element set-path test
+[
+	any [
+	    error? try [make set-path! [a]]
+	    equal? make set-path! [a] load mold/all make set-path! [a]
+	]
+]
 ["a/b:" = mold first [a/b:]]
 ; set-paths are active
 [
