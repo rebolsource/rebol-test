@@ -629,6 +629,7 @@ datatypes/decimal.r
 [equal? #{FFEFFFFFFFFFFFFF} to binary! -1.7976931348623157e308]
 ; bug#729
 ; MOLD decimal accuracy tests
+#r3only
 [
 	system/options/decimal-digits: 17
 	system/options/decimal-digits = 17
