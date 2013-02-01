@@ -1177,7 +1177,7 @@ datatypes/error.r
 [a: 1 error? try [a: 1 / 0] :a =? 1]
 [a: 1 error? try [set 'a 1 / 0] :a =? 1]
 [a: 1 error? try [set/any 'a 1 / 0] :a =? 1]
-#r2only  ; should be adapted to be a load test, not an error test
+#r2only
 [
 	 x: 1
 	 error? try [x: load/header ""]
