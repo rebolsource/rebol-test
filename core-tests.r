@@ -7646,9 +7646,12 @@ functions/control/break.r
 ; the "result" of break should not be passable to functions, bug#1509
 [a: 1 loop 1 [a: error? break] :a =? 1]
 [a: 1 loop 1 [a: error? break/return 2] :a =? 1]
+; bug#1535
+[loop 1 [words-of break] true]
+[loop 1 [values-of break] true]
 #r3crash
 ; bug#1945
-[spec-of break]
+[loop 1 [spec-of break] true]
 ; the "result" of break should not be caught by try
 [a: 1 loop 1 [a: error? try [break]] :a =? 1]
 functions/control/case.r
@@ -7860,6 +7863,15 @@ functions/control/continue.r
 ; the "result" of continue should not be passable to functions, bug#1509
 #r3only
 [a: 1 loop 1 [a: error? continue] :a =? 1]
+; bug#1535
+#r3only
+[loop 1 [words-of continue] true]
+#r3only
+[loop 1 [values-of continue] true]
+#r3crash
+#r3only
+; bug#1945
+[loop 1 [spec-of continue] true]
 ; continue should not be caught by try
 #r3only
 [a: 1 loop 1 [a: error? try [continue]] :a =? 1]
@@ -8289,6 +8301,12 @@ functions/control/exit.r
 [a: 1 do does [set/any 'a exit] :a =? 1]
 ; the "result" of exit should not be passable to functions, bug#1509
 [a: 1 do does [a: error? exit] :a =? 1]
+; bug#1535
+[loop 1 [words-of exit] true]
+[loop 1 [values-of exit] true]
+#r3crash
+; bug#1945
+[loop 1 [spec-of exit] true]
 ; exit should not be caught by try
 [a: 1 do does [a: error? try [exit]] :a =? 1]
 functions/control/for.r
@@ -9146,6 +9164,12 @@ functions/control/return.r
 [a: 1 do does [set/any 'a return 2] :a =? 1]
 ; the "result" of return should not be passable to functions, bug#1509
 [a: 1 do does [a: error? return 2] :a =? 1]
+; bug#1535
+[loop 1 [words-of return none] true]
+[loop 1 [values-of return none] true]
+#r3crash
+; bug#1945
+[loop 1 [spec-of return none] true]
 ; return should not be caught by try
 [a: 1 do does [a: error? try [return 2]] :a =? 1]
 functions/control/switch.r
@@ -9178,6 +9202,12 @@ functions/control/throw.r
 [a: 1 catch/name [set/any 'a throw/name 2 'b] 'b :a =? 1]
 ; the "result" of throw should not be passable to functions, bug#1509
 [a: 1 catch [a: error? throw 2] :a =? 1]
+; bug#1535
+[loop 1 [words-of throw none] true]
+[loop 1 [values-of throw none] true]
+#r3crash
+; bug#1945
+[loop 1 [spec-of throw none] true]
 [a: 1 catch/name [a: error? throw/name 2 'b] 'b :a =? 1]
 ; throw should not be caught by try
 [a: 1 catch [a: error? try [throw 2]] :a =? 1]
