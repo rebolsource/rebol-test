@@ -1623,7 +1623,6 @@ datatypes/lit-path.r
 [lit-path? first ['a/b]]
 [not lit-path? 1]
 [lit-path! = type? first ['a/b]]
-#r2only
 ; minimum
 ; bug#1947
 ; empty lit-path test
@@ -2277,7 +2276,6 @@ datatypes/set-path.r
 [set-path? first [a/b:]]
 [not set-path? 1]
 [set-path! = type? first [a/b:]]
-#r2only
 ; the minimum
 ; bug#1947
 ; empty set-path test
