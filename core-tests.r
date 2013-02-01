@@ -2617,9 +2617,9 @@ datatypes/time.r
 ]
 ; strange value
 [error? try [load "--596523:-14:-07.772224"]]
-; maximal time
-[time? 596523:14:07.999999999]
 ; minimal time
+[time? -596523:14:07.999999999]
+; maximal time
 [time? 596523:14:07.999999999]
 ; minimal positive time
 [positive? 0:0:0.000000001]
