@@ -95,7 +95,7 @@ make object! compose [
 								stop: [end skip]
 							]
 							any [file? get/any 'value url? get/any 'value] [
-								parse-test-file value :process-vector
+								parse-test-file value :emit-test
 								print ["file:" mold test-file-name]
 								log ["^/file: " mold test-file-name "^/^/"]
 								stop: [end skip]

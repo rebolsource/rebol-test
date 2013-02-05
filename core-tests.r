@@ -10392,6 +10392,9 @@ functions/series/sort.r
 ]
 ; bug#1152: SORT not stable (order not preserved)
 [equal? [1 9 1 5 1 7] sort/skip/compare [1 9 1 5 1 7] 2 1]
+functions/series/trim.r
+; bug#1948
+["foo^/" = trim "  foo ^/"]
 functions/series/union.r
 ; bug#799
 #r3only
