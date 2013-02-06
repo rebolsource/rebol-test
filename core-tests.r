@@ -1583,9 +1583,7 @@ datatypes/integer.r
 #32bit
 [error? try [to integer! 2147483648.0]]
 ; bug#921
-#64bit
 [error? try [to integer! 9.2233720368547765e18]]
-#64bit
 [error? try [to integer! -9.2233720368547779e18]]
 [0 = to integer! "0"]
 [0 = to integer! false]
@@ -10082,13 +10080,11 @@ functions/series/insert.r
 	insert/dup a 0 -1
 	a == []
 ]
-#r2only
 [
 	a: make block! 0
 	insert/dup a 0 -2147483648
 	a == []
 ]
-#r3only
 [
 	a: make block! 0
 	insert/dup a 0 -2147483648
@@ -10819,8 +10815,8 @@ functions/file/make-dir.r
 #r2only
 [
 	any [
-		not error? e: disarm try [make-dir %/folder-to-save-test-files]
-		e/type = 'access
+		not error? e: try [make-dir %/folder-to-save-test-files]
+		(e: disarm e e/type = 'access)
 	]
 ]
 #r3only
