@@ -9038,6 +9038,7 @@ functions/control/reduce.r
 [error? first reduce [try [1 / 0]]]
 ; unwind functions should stop evaluation, bug#1760
 [unset? loop 1 [reduce [break]]]
+[unset? loop 1 [reduce/no-set [a: break]]]
 [1 = loop 1 [reduce [break/return 1]]]
 #r3only
 [unset? loop 1 [reduce [continue]]]
