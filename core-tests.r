@@ -188,6 +188,7 @@ datatypes/char.r
 [#"}" = #"^(7D)"]
 [#"~" = #"^(7E)"]
 [#"^~" = #"^(7F)"]
+; alternatives
 [#"^(null)" = #"^(00)"]
 [#"^(line)" = #"^(0A)"]
 [#"^/" = #"^(0A)"]
@@ -197,8 +198,6 @@ datatypes/char.r
 [#"^(esc)" = #"^(1B)"]
 [#"^(back)" = #"^(08)"]
 [#"^(del)" = #"^(7f)"]
-[#"^^" = #"^(5E)"]
-[#"^"" = #"^(22)"]
 [#"^(00)" = make char! 0]
 [#"^(00)" = to char! 0]
 [{#"a"} = mold #"a"]
@@ -1076,10 +1075,6 @@ datatypes/error.r
 #r3only
 [error? make error! [type: 'math id: 'overflow]]
 #r3only
-[error? make error! [type: 'math id: 'zero-divide]]
-#r3only
-[error? make error! [type: 'math id: 'overflow]]
-#r3only
 [error? make error! [type: 'math id: 'positive]]
 #r3only
 [error? make error! [type: 'access id: 'cannot-open]]
@@ -1712,8 +1707,6 @@ datatypes/map.r  ; map! =? hash! in R2/Forward, R2 2.7.7+
 [error? try [make map! [1]]]
 #r3
 [empty? clear make map! [a 1 b 2]]
-#r3
-[empty? clear make map! [a 1 b 2]]
 #r3only
 #r3crash
 ; bug#1930: Lookup crashes on empty hashed map.
@@ -1822,7 +1815,6 @@ datatypes/money.r
 #r3only
 ; minimum for R3
 [equal? -$99999999999999999999999999e127 -$99999999999999999999999999e127]
-[$0 = negate $0]
 #r3only
 [not $0 = $1e-128]
 #r3only
@@ -1831,21 +1823,16 @@ datatypes/money.r
 [not $1 <> $1]
 [$1 <= $2]
 [not $2 <= $1]
-; zero? tests
-[zero? $0]
-[zero? negate $0]
 #r3only
 [not zero? $1e-128]
 #r3only
 [not zero? -$1e-128]
 ; positive? tests
-[not positive? $0]
 [not positive? negate $0]
 #r3only
 [positive? $1e-128]
 #r3only
 [not positive? -$1e-128]
-[not negative? $0]
 [not negative? negate $0]
 #r3only
 [not negative? $1e-128]
@@ -1857,8 +1844,6 @@ datatypes/money.r
 [same? $1 $1]
 #r3only
 [not same? $1 $1.0]
-[-$1 = negate $1]
-[$1 = negate -$1]
 #r3only
 ["$1.0000000000000000000000000" = mold $2.0000000000000000000000000 - $1]
 #r3only
@@ -2500,17 +2485,9 @@ datatypes/string.r
 ["^(esc)" = "^(1B)"]
 ["^(back)" = "^(08)"]
 ["^(del)" = "^(7f)"]
-["^^" = "^(5E)"]
-["^"" = "^(22)"]
 ["ahoj" = #[string! "ahoj"]]
 ["1" = to string! 1]
 [{""} = mold ""]
-; bug#6
-[
-	a: copy []
-	insert/only a a
-	string? mold a
-]
 datatypes/symbol.r
 #r2only
 #r2crash
@@ -3085,7 +3062,7 @@ functions/comparison/equalq.r
 [not equal? integer! make typeset! [integer!]]
 #r3only
 ; datatype! vs. typeset!
-[	not equal? integer! to typeset! [integer!]]
+[not equal? integer! to typeset! [integer!]]
 #r3
 ; datatype! vs. typeset!
 ; Supported by R2/Forward.
@@ -3276,7 +3253,7 @@ functions/comparison/equalq.r
 [equal? equal? 2-Jul-2009 2-Jul-2009/22:20 equal? 2-Jul-2009/22:20 2-Jul-2009]
 ; date! missing time and zone = 00:00:00+00:00
 [equal? 2-Jul-2009 2-Jul-2009/00:00:00+00:00]
-[	equal? equal? 2-Jul-2009 2-Jul-2009/00:00 equal? 2-Jul-2009/00:00 2-Jul-2009]
+[equal? equal? 2-Jul-2009 2-Jul-2009/00:00 equal? 2-Jul-2009/00:00 2-Jul-2009]
 ; Timezone math in date!
 [equal? 2-Jul-2009/22:20 2-Jul-2009/20:20-2:00]
 [equal? 00:00 00:00]
@@ -3526,12 +3503,6 @@ functions/comparison/equalq.r
 #r3only
 ; unset! symmetry with =
 [equal? none = () () = none]
-; unset! symmetry with =
-; Fails on R2 because there is no structural comparison of objects.
-#r2only
-[not equal? disarm try [none = ()] disarm try [() = none]]
-#r3only
-[equal? none = () () = none]
 #r3only
 ; error! reflexivity
 ; Evaluates (try [1 / 0]) to get error! value.
@@ -3703,8 +3674,6 @@ functions/comparison/equivq.r
 	a-value: #a
 	equal? equiv? a-value to string! a-value equiv? to string! a-value a-value
 ]
-#r3
-[not equiv? #{} none]
 ; symmetry
 #r3
 [equal? equiv? #{} none equiv? none #{}]
@@ -3802,7 +3771,7 @@ functions/comparison/equivq.r
 ]
 ; block! vs. lit-path!
 #r3
-[not equal? [a b] first ['a/b]]
+[not equiv? [a b] first ['a/b]]
 ; block! vs. lit-path! symmetry
 #r3
 [
@@ -4200,6 +4169,7 @@ functions/comparison/equivq.r
 	]
 ]
 functions/comparison/sameq.r
+; reflexivity test for action!
 [same? :abs :abs]
 ; reflexivity test for native!
 [same? :all :all]
@@ -4219,10 +4189,6 @@ functions/comparison/sameq.r
 ]
 ; no structural equality for closure!
 [not same? closure [] [] closure [] []]
-; reflexivity test for native!
-[same? :all :all]
-; reflexivity test for op!
-[same? :+ :+]
 ; binary!
 [not same? #{00} #{00}]
 ; binary versus bitset
@@ -4248,7 +4214,7 @@ functions/comparison/sameq.r
 	a-value: %""
 	equal? same? a-value to string! a-value same? to string! a-value a-value
 ]
-[	not same? #{00} #[image! 1x1 #{00}]]
+[not same? #{00} #[image! 1x1 #{00}]]
 ; symmetry
 [equal? same? #{00} #[image! 1x1 #{00}] same? #[image! 1x1 #{00}] #{00}]
 [not same? #{00} to integer! #{00}]
@@ -4714,12 +4680,12 @@ functions/comparison/strict-equalq.r
 	a-value: %""
 	equal? strict-equal? a-value to string! a-value strict-equal? to string! a-value a-value
 ]
-[	not strict-equal? #{00} #[image! 1x1 #{00}]]
+[not strict-equal? #{00} #[image! 1x1 #{00}]]
 ; symmetry
-[	equal? strict-equal? #{00} #[image! 1x1 #{00}] strict-equal? #[image! 1x1 #{00}] #{00}]
-[	not strict-equal? #{00} to integer! #{00}]
+[equal? strict-equal? #{00} #[image! 1x1 #{00}] strict-equal? #[image! 1x1 #{00}] #{00}]
+[not strict-equal? #{00} to integer! #{00}]
 ; symmetry
-[	equal? strict-equal? #{00} to integer! #{00} strict-equal? to integer! #{00} #{00}]
+[equal? strict-equal? #{00} to integer! #{00} strict-equal? to integer! #{00} #{00}]
 [
 	a-value: #a
 	not strict-equal? a-value to string! a-value
@@ -4731,7 +4697,7 @@ functions/comparison/strict-equalq.r
 ]
 [not strict-equal? #{} none]
 ; symmetry
-[	equal? strict-equal? #{} none strict-equal? none #{}]
+[equal? strict-equal? #{} none strict-equal? none #{}]
 [
 	a-value: ""
 	not strict-equal? a-value to binary! a-value
@@ -5757,27 +5723,25 @@ functions/math/mod.r
 [$0 == mod $999'999'999'999'999 $1]
 [0.0 == mod 9'999'999'999'999'999 1.0]
 [0.0 == mod 999'999'999'999'999 1.0]
-[0.0 == mod 562'949'953'421'313.0 1.0]
-[0.0 == mod -562'949'953'421'313.0 1.0]
-[0.0 == mod -562'949'953'421'314.0 1]
-[0.5 == mod -562'949'953'421'312.5 1]
-[0.5 == mod 562'949'953'421'312.5 1]
-[0.5 == mod -562'949'953'421'313.5 1]
-[0.5 == mod 562'949'953'421'313.5 1]
-[0.5 == mod -562'949'953'421'314.5 1]
-[0.5 == mod 562'949'953'421'314.5 1]
 [0.0 == mod 562'949'953'421'311.0 1]
+[0.0 == mod -562'949'953'421'311.0 1]
 [0.25 == mod 562'949'953'421'311.25 1]
 [0.5 == mod 562'949'953'421'311.5 1]
-[0.0 == mod -562'949'953'421'311.0 1]
 [0.5 == mod -562'949'953'421'311.5 1]
 [0.25 == mod -562'949'953'421'311.75 1]
 [0.0 == mod 562'949'953'421'312.0 1]
-[0.25 == mod 562'949'953'421'312.25 1]
-[0.5 == mod 562'949'953'421'312.5 1]
 [0.0 == mod -562'949'953'421'312.0 1]
+[0.25 == mod 562'949'953'421'312.25 1]
 [0.5 == mod -562'949'953'421'312.5 1]
+[0.5 == mod 562'949'953'421'312.5 1]
 [0.25 == mod -562'949'953'421'312.75 1]
+[0.0 == mod 562'949'953'421'313.0 1.0]
+[0.0 == mod -562'949'953'421'313.0 1.0]
+[0.5 == mod -562'949'953'421'313.5 1]
+[0.5 == mod 562'949'953'421'313.5 1]
+[0.0 == mod -562'949'953'421'314.0 1]
+[0.5 == mod -562'949'953'421'314.5 1]
+[0.5 == mod 562'949'953'421'314.5 1]
 [not negative? 1e-16 - abs mod 0.15 - 0.05 - 0.1 0.1]
 [not negative? 1e-16 - abs mod 0.1 + 0.1 + 0.1 0.3]
 [not negative? 1e-16 - abs mod 0.3 0.1 + 0.1 + 0.1]
@@ -6142,7 +6106,6 @@ functions/math/round.r
 [zero? 2 - round 1.5]
 [zero? 3 - round 2.5]
 [zero? -2 - round -1.5]
-[zero? -2 - round -1.5]
 [zero? -3 - round -2.5]
 ; REBOL rounds to 2.0 beyond this
 [zero? 1 - round 1.499999999999995]
@@ -6156,15 +6119,12 @@ functions/math/round.r
 [zero? round 0.49999999]
 [zero? 1 - round 0.5]
 [zero? 1 - round 1.49999999]
-[zero? 2 - round 1.5]
 [2 == round 2]
 [zero? 2 - round 2.49999999]
-[zero? 3 - round 2.5]
 [zero? round -0.00001]
 [zero? round -0.49999999]
 [zero? -1 - round -0.5]
 [zero? -1 - round -1.49999999]
-[zero? -2 - round -1.5]
 [-2 == round -2]
 #r3only
 [1E20 == round 1E20]
@@ -6924,6 +6884,7 @@ functions/math/zeroq.r
 [not zero? -$0.01]
 [not zero? $999999999999999.87]
 [not zero? -$999999999999999.87]
+[zero? negate $0]
 ; time
 [zero? 0:00]
 [not zero? 0:00:0.000000001]
@@ -6998,7 +6959,6 @@ functions/control/all.r
 [$1 == all [$1]]
 [same? :type? all [:type?]]
 [none? all [#[none]]]
-; library test?
 [
 	a-value: make object! []
 	same? :a-value all [:a-value]
@@ -7092,8 +7052,6 @@ functions/control/all.r
 	a-value: first ['a]
 	:a-value == all [true :a-value]
 ]
-[true = all [true true]]
-[none? all [true false]]
 [$1 == all [true $1]]
 [same? :type? all [true :type?]]
 [none? all [true #[none]]]
@@ -7191,6 +7149,7 @@ functions/control/all.r
 ]
 [true = all [true true]]
 [none? all [false true]]
+[none? all [true false]]
 [true = all [$1 true]]
 [true = all [:type? true]]
 [none? all [#[none] true]]
@@ -7546,7 +7505,6 @@ functions/control/any.r
 	:a-value == any [:a-value false]
 ]
 [true = any [true false]]
-[none? any [false false]]
 [$1 == any [$1 false]]
 [same? :type? any [:type? false]]
 [none? any [#[none] false]]
@@ -8099,8 +8057,6 @@ functions/control/do.r
 	a-value: make object! []
 	same? :a-value do :a-value
 ]
-[same? get '+ all [get '+]]
-[0x0 == all [0x0]]
 [
 	a-value: first [(2)]
 	2 == do :a-value
@@ -8121,7 +8077,6 @@ functions/control/do.r
 	a-value: make port! http://
 	port? do :a-value
 ]
-[/a == all [/a]]
 [
 	a-value: first [a/b:]
 	:a-value == do :a-value
@@ -10031,18 +9986,6 @@ functions/series/insert.r
 [
 	a: make block! 0
 	b: at [1 2 3 4 5 6 7 8 9] 5
-	insert/part a b -1
-	a == [4]
-]
-[
-	a: make block! 0
-	b: at [1 2 3 4 5 6 7 8 9] 5
-	insert/part a b -1
-	a == [4]
-]
-[
-	a: make block! 0
-	b: at [1 2 3 4 5 6 7 8 9] 5
 	insert/part a b -4
 	a == [1 2 3 4]
 ]
@@ -10452,6 +10395,7 @@ functions/convert/load.r
 ]
 functions/convert/mold.r
 ; bug#860
+; bug#6
 ; cyclic block
 [
 	a: copy []
@@ -10671,8 +10615,6 @@ datatypes/percent.r
 #r3only
 [1.0 = to decimal! 100%]
 #r3only
-[percent! = type? 0%]
-#r3only
 [0% = load mold 0.0%]
 #r3only
 [1% = load mold 1.0%]
@@ -10725,8 +10667,6 @@ datatypes/percent.r
 [1.1% = to percent! 1.1%]
 #r3only
 [1.1% = to percent! "1.1%"]
-#r3only
-[error? try [to percent! "t"]]
 ; bug#1422: "Rebol crashes when opening the 128th port"
 #r3crash
 [error? try [repeat n 200 [try [close open open join tcp://localhost: n]]] true]

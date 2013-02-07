@@ -2,7 +2,7 @@ Rebol [
 	Title: "Log diff"
 	File: %log-diff.r
 	Author: "Ladislav Mecir"
-	Date: 6-Feb-2013/17:14:56+1:00
+	Date: 7-Feb-2013/12:13:13+1:00
 	Purpose: "Test framework"
 ]
 
@@ -15,13 +15,15 @@ make-diff: func [
 	/local old-log-contents new-log-contents
 	old-test old-result new-test new-result
 	new-successes new-failures new-crashes
-	progressions regressions removed
+	progressions regressions removed summary
 ] [
-	collect-log old-log-contents: copy [] old-log
-	collect-log new-log-contents: copy [] new-log
+	if exists? diff-file [delete diff-file]
 
-	sort/skip old-log-contents 2
-	sort/skip new-log-contents 2
+	collect-logs old-log-contents: copy [] old-log
+	collect-logs new-log-contents: copy [] new-log
+
+	sort/case/skip old-log-contents 2
+	sort/case/skip new-log-contents 2
 
 	; counter initialization
 	new-successes:
@@ -45,7 +47,10 @@ make-diff: func [
 				new-test
 				any [
 					none? old-test
-					old-test > new-test
+					all [
+						strict-not-equal? old-test new-test
+						old-test == second sort/case reduce [old-test new-test]
+					]
 					all [
 						old-test = new-test
 						old-result = 'skipped
@@ -78,7 +83,10 @@ make-diff: func [
 				old-test
 				any [
 					none? new-test
-					new-test > old-test
+					all [
+						strict-not-equal? new-test old-test
+						new-test == second sort/case reduce [new-test old-test]
+					]
 					all [
 						new-test = old-test
 						new-result = 'skipped
@@ -93,7 +101,7 @@ make-diff: func [
 					" removed^/"
 				]
 			]
-			old-result = new-result []
+			old-result == new-result []
 			; having different results
 			(
 				write/append diff-file new-test
@@ -115,18 +123,30 @@ make-diff: func [
 				write/append diff-file rejoin [" progression, " new-result "^/"]
 			]
 		]
-		if all [old-test any [none? new-test old-test <= new-test]] [
+		if all [
+			old-test
+			any [
+				none? new-test
+				old-test == first sort/case reduce [old-test new-test]
+			]
+		] [
 			; we need to move the old-log-contents position
-			if old-test = pick old-log-contents 1 [
+			if old-test == pick old-log-contents 1 [
 				print old-test
 				do make error! {duplicate test in old-log}
 			]
 			set [old-test old-result] old-log-contents
 			old-log-contents: skip old-log-contents 2
 		]
-		if all [new-test any [none? new-test new-test <= old-test]] [
+		if all [
+			new-test
+			any [
+				none? old-test
+				new-test == first sort/case reduce [new-test old-test]
+			]
+		] [
 			; we need to move the new-log-contents position
-			if new-test = pick new-log-contents 1 [
+			if new-test == pick new-log-contents 1 [
 				print new-test
 				do make error! {duplicate test in new-log}
 			]
@@ -134,6 +154,20 @@ make-diff: func [
 			new-log-contents: skip new-log-contents 2
 		]
 	]
+
+	print "Done."
+
+	summary: rejoin [
+		"new-successes: " new-successes
+		"^/new-failures: " new-failures
+		"^/new-crashes: " new-crashes
+		"^/progressions: " progressions
+		"^/regressions: " regressions
+		"^/removed: " removed
+	]
+	print summary
+
+	write/append diff-file rejoin ["^/Summary:^/" summary "^/"]
 ]
 
-make-diff first to-rebol-file first system/script/args to-rebol-file second system/script/args %diff.r
+make-diff first load system/script/args second load system/script/args %diff.r
