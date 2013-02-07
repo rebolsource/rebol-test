@@ -9036,6 +9036,7 @@ functions/control/reduce.r
 [error? first reduce [try [1 / 0]]]
 ; unwind functions should stop evaluation, bug#1760
 [unset? loop 1 [reduce [break]]]
+[unset? loop 1 [reduce/no-set [a: break]]]
 [1 = loop 1 [reduce [break/return 1]]]
 #r3only
 [unset? loop 1 [reduce [continue]]]
@@ -10388,6 +10389,9 @@ functions/series/sort.r
 ]
 ; bug#1152: SORT not stable (order not preserved)
 [equal? [1 9 1 5 1 7] sort/skip/compare [1 9 1 5 1 7] 2 1]
+functions/series/trim.r
+; bug#1948
+["foo^/" = trim "  foo ^/"]
 functions/series/union.r
 ; bug#799
 #r3only
