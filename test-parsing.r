@@ -2,7 +2,7 @@ Rebol [
 	Title: "Test parsing"
 	File: %test-parsing.r
 	Author: "Ladislav Mecir"
-	Date: 30-Jan-2013/12:11:48+1:00
+	Date: 6-Feb-2013/17:14:56+1:00
 	Purpose: "Test framework"
 ]
 
@@ -49,7 +49,7 @@ make object! [
 
 	set 'collect-tests func [
 		collected-tests [block!] {collect the tests here (modified)}
-		test-file [file! url!]
+		test-file [file!]
 		/local flags position stop vector value next-position test-sources
 		current-dir
 	] [
@@ -61,10 +61,10 @@ make object! [
 				test-file: clean-path test-file
 				change-dir first split-path test-file
 			]
-			test-sources: read-binary test-file
+			test-sources: read test-file
 		] [
 			append collected-tests reduce [
-				test-file 'dialect {^/"failed, cannot access the file"^/}
+				test-file 'dialect {^/"failed, cannot read the file"^/}
 			]
 			exit
 		] [
@@ -78,7 +78,7 @@ make object! [
 				|	";" [thru newline | to end]
 				|	copy vector ["[" test-source-rule "]"] (
 						append/only collected-tests flags
-						append collected-tests to string! vector
+						append collected-tests vector
 						flags: copy []
 					)
 				|	end break
@@ -94,7 +94,7 @@ make object! [
 								append flags value
 								stop: [end skip]
 							]
-							any [file? get/any 'value url? get/any 'value] [
+							file? get/any 'value [
 								collect-tests collected-tests value
 								print ["file:" mold test-file]
 								append collected-tests test-file
@@ -114,6 +114,75 @@ make object! [
 			append collected-tests reduce [
 				'dialect
 				rejoin ["failed, line: " line-number? position]
+			]
+		]
+	]
+
+	set 'collect-logs func [
+		collected-logs [block!] {collect the logged results here (modified)}
+		log-file [file!]
+		/local log-contents last-vector stop value
+	] [
+		if error? try [log-contents: read log-file] [
+			make error! rejoin ["Unable to read " mold log-file]
+		]
+
+		parse/all log-contents [
+			(stop: [end skip])
+			any [
+				any whitespace
+				[
+					position: "%"
+					(set/any [value next-position] transcode/next position)
+					:next-position
+					[
+						some whitespace
+						{"} thru {"}
+						; dialect failure
+						(dialect-failures: dialect-failures + 1)
+						|	some whitespace
+							"line:"
+							some whitespace
+							next-position:
+							(set/any [value next-position] transcode/next next-position)
+							:next-position
+							{"} thru {"}
+							; dialect failure
+							(dialect-failures: dialect-failures + 1) 
+						|
+					]
+					|	copy last-vector ["[" test-source-rule "]"]
+						any whitespace
+						[
+							end (
+								; crash found
+								do make error! "log incomplete!"
+							)
+							|	{"} copy value to {"} skip
+								; test result found
+								(
+									parse/all value [
+										"succeeded"
+										(value: 'succeeded)
+										|	"failed"
+											(value: 'failed)
+										|	"crashed"
+											(value: 'crashed)
+										|	"skipped"
+											(value: 'skipped)
+										|	(do make error! "invalid test result")
+									]
+									append collected-logs reduce [
+										last-vector
+										value
+									]
+								)
+						]
+					|	"system/version:"
+						to end
+						(stop: none)
+				] position: stop break
+				|	:position
 			]
 		]
 	]
