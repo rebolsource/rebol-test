@@ -170,4 +170,4 @@ make-diff: func [
 	write/append diff-file rejoin ["^/Summary:^/" summary "^/"]
 ]
 
-make-diff first load system/script/args second load system/script/args %diff.r
+make-diff to-file first load system/script/args to-file second load system/script/args %diff.r
