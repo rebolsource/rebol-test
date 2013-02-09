@@ -10748,6 +10748,15 @@ functions/context/set.r
 [equal? error? try [set /a 1] error? try [set [/a] 1]]
 ; bug#1745
 [equal? error? try [set #a 1] error? try [set [#a] 1]]
+; bug#1763
+[error? try [set [a] reduce [()]]]
+[not error? try [set [a] reduce [1 ()]]]
+[error? try [set construct [a: none] reduce [()]]]
+[not error? try [set construct [a: none] reduce [1 ()]]]
+[set/any [a] reduce [()] unset? get/any 'a]
+[set/any b: construct [a: none] reduce [()] unset? get/any in b 'a]
+; set [:get-word] [word]
+[a: 1 b: none set [:b] [a] b =? 1]
 functions/file/clean-path.r
 ; bug#35
 [any-function? :clean-path]
