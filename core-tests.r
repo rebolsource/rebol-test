@@ -7606,6 +7606,8 @@ functions/control/any.r
 functions/control/apply.r
 ; bug#44
 [error? try [apply 'type?/word []]]
+; bug#1949: RETURN/redo can break APPLY security
+[same? :add attempt [apply does [return/redo :add] []]]
 functions/control/attempt.r
 ; bug#41
 [none? attempt [1 / 0]]
