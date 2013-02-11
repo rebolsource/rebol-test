@@ -10751,14 +10751,20 @@ functions/context/set.r
 ; bug#1745
 [equal? error? try [set #a 1] error? try [set [#a] 1]]
 ; bug#1763
-[error? try [set [a] reduce [()]]]
-[not error? try [set [a] reduce [1 ()]]]
-[error? try [set construct [a: none] reduce [()]]]
-[not error? try [set construct [a: none] reduce [1 ()]]]
-[set/any [a] reduce [()] unset? get/any 'a]
-[set/any b: construct [a: none] reduce [()] unset? get/any in b 'a]
+[a: 1 all [error? try [set [a] reduce [()]] a = 1]]
+[a: 1 set [a] reduce [2 ()] a = 2]
+[a: 1 attempt [set [a b] reduce [2 ()]] a = 1]
+[x: construct [a: 1] all [error? try [set x reduce [()]] x/a = 1]]
+[x: construct [a: 1] set x reduce [2 ()] x/a = 2]
+[x: construct [a: 1 b: 2] all [error? try [set x reduce [3 ()]] x/a = 1]]
+[a: 1 set/any [a] reduce [()] unset? get/any 'a]
+[a: 1 b: 2 set/any [a b] reduce [3 ()] all [a = 3 unset? get/any 'b]]
+[x: construct [a: 1] set/any x reduce [()] unset? get/any in x 'a]
+[x: construct [a: 1 b: 2] set/any x reduce [3 ()] all [a = 3 unset? get/any in x 'b]]
 ; set [:get-word] [word]
 [a: 1 b: none set [:b] [a] b =? 1]
+[unset 'a b: none all [error? try [set [:b] [a]] none? b]]
+[unset 'a b: none set/any [:b] [a] unset? get/any 'b]
 functions/file/clean-path.r
 ; bug#35
 [any-function? :clean-path]
