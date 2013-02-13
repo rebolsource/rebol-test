@@ -1477,6 +1477,7 @@ datatypes/function.r
 ; bug#1528
 [function? func [self] []]
 datatypes/get-path.r
+; minimum
 ; bug#1947
 ; empty get-path test
 #r3only
@@ -1492,6 +1493,18 @@ datatypes/get-path.r
 	any [
 	    error? try [make get-path! [a]]
 	    equal? make get-path! [a] load mold/all make get-path! [a]
+	]
+]
+; this may be controversial, but such paths exist
+#r3only
+[get-path? load "#[get-path! []]"]
+#r3only
+[get-path? load "#[get-path! [a]]"]
+#r3only
+[
+	all [
+		get-path? a: load "#[get-path! [a b c] 2]"
+		2 == index? a
 	]
 ]
 datatypes/get-word.r
@@ -1630,6 +1643,15 @@ datatypes/lit-path.r
 	any [
 	    error? try [make lit-path! [a]]
 	    equal? make lit-path! [a] load mold/all make lit-path! [a]
+	]
+]
+; this may be controversial, but such paths exist
+[lit-path? load "#[lit-path! []]"]
+[lit-path? load "#[lit-path! [a]]"]
+[
+	all [
+		lit-path? a: load "#[lit-path! [a b c] 2]"
+		2 == index? a
 	]
 ]
 ; lit-paths are active
@@ -2105,6 +2127,15 @@ datatypes/path.r
 	    equal? make path! [a] load mold/all make path! [a]
 	]
 ]
+; this may be controversial, but such paths exist
+[path? load "#[path! []]"]
+[path? load "#[path! [a]]"]
+[
+	all [
+		path? a: load "#[path! [a b c] 2]"
+		2 == index? a
+	]
+]
 ["a/b" = mold 'a/b]
 [
 	a-word: 1
@@ -2273,6 +2304,15 @@ datatypes/set-path.r
 	any [
 	    error? try [make set-path! [a]]
 	    equal? make set-path! [a] load mold/all make set-path! [a]
+	]
+]
+; this may be controversial, but such paths exist
+[set-path? load "#[set-path! []]"]
+[set-path? load "#[set-path! [a]]"]
+[
+	all [
+		set-path? a: load "#[set-path! [a b c] 2]"
+		2 == index? a
 	]
 ]
 ["a/b:" = mold first [a/b:]]
@@ -7687,7 +7727,7 @@ functions/control/apply.r
 [use [x] [x: 1 strict-equal? 1 apply func [:x] [:x] [x]]]
 [use [x] [x: 1 strict-equal? 'x apply func [:x] [:x] ['x]]]
 [use [x] [x: 1 strict-equal? 'x apply/only func [:x] [:x] [x]]]
-[use [x] [x: 1 strict-equal? 'x apply/only func [:x] [return :x][x]]]
+[use [x] [x: 1 strict-equal? 'x apply/only func [:x] [return :x] [x]]]
 [
 	use [x] [
 		unset 'x

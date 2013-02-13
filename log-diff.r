@@ -16,6 +16,7 @@ make-diff: func [
 	old-test old-result new-test new-result
 	new-successes new-failures new-crashes
 	progressions regressions removed summary
+	move-old-log move-new-log
 ] [
 	if exists? diff-file [delete diff-file]
 
@@ -32,6 +33,7 @@ make-diff: func [
 	progressions:
 	regressions:
 	removed:
+	unchanged:
 	0
 
 	; cycle initialization
@@ -45,6 +47,7 @@ make-diff: func [
 		case [
 			all [
 				new-test
+				new-result <> 'skipped
 				any [
 					none? old-test
 					all [
@@ -52,9 +55,8 @@ make-diff: func [
 						old-test == second sort/case reduce [old-test new-test]
 					]
 					all [
-						old-test = new-test
+						old-test == new-test
 						old-result = 'skipped
-						new-result <> 'skipped
 					]
 				]
 			] [
@@ -81,6 +83,7 @@ make-diff: func [
 			]
 			all [
 				old-test
+				old-result <> 'skipped
 				any [
 					none? new-test
 					all [
@@ -88,9 +91,8 @@ make-diff: func [
 						new-test == second sort/case reduce [new-test old-test]
 					]
 					all [
-						new-test = old-test
+						new-test == old-test
 						new-result = 'skipped
-						old-result <> 'skipped
 					]
 				]
 			] [
@@ -101,8 +103,11 @@ make-diff: func [
 					" removed^/"
 				]
 			]
-			old-result == new-result []
-			; having different results
+			any [
+				old-result = new-result
+				strict-not-equal? old-test new-test
+			] [unchanged: unchanged + 1]
+			; having one test with different results
 			(
 				write/append diff-file new-test
 				any [
@@ -123,14 +128,21 @@ make-diff: func [
 				write/append diff-file rejoin [" progression, " new-result "^/"]
 			]
 		]
-		if all [
+		move-old-log: all [
 			old-test
 			any [
 				none? new-test
 				old-test == first sort/case reduce [old-test new-test]
 			]
-		] [
-			; we need to move the old-log-contents position
+		] 
+		move-new-log: all [
+			new-test
+			any [
+				none? old-test
+				new-test == first sort/case reduce [new-test old-test]
+			]
+		]
+		if move-old-log [
 			if old-test == pick old-log-contents 1 [
 				print old-test
 				do make error! {duplicate test in old-log}
@@ -138,14 +150,7 @@ make-diff: func [
 			set [old-test old-result] old-log-contents
 			old-log-contents: skip old-log-contents 2
 		]
-		if all [
-			new-test
-			any [
-				none? old-test
-				new-test == first sort/case reduce [new-test old-test]
-			]
-		] [
-			; we need to move the new-log-contents position
+		if move-new-log [
 			if new-test == pick new-log-contents 1 [
 				print new-test
 				do make error! {duplicate test in new-log}
@@ -164,6 +169,9 @@ make-diff: func [
 		"^/progressions: " progressions
 		"^/regressions: " regressions
 		"^/removed: " removed
+		"^/unchanged: " unchanged
+		"^/total: " new-successes + new-failures + new-crashes + progressions
+		+ regressions + removed + unchanged
 	]
 	print summary
 
