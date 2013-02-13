@@ -110,7 +110,6 @@ make object! [
 				|	:next-position
 			]
 		] [
-			print ["position:" copy/part mold position 30]
 			append collected-tests reduce [
 				'dialect
 				rejoin ["failed, line: " line-number? position]

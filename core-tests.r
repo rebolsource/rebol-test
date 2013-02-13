@@ -214,7 +214,7 @@ datatypes/closure.r
 [closure? closure [] []]
 ; literal form
 #r3only
-[closure? first [#[closure! [[][]]]]]
+[closure? first [#[closure! [[] []]]]]
 ; return-less return value tests
 [
 	f: closure [] []
@@ -402,7 +402,7 @@ datatypes/closure.r
 ]
 ; bug#21
 [
-	c: closure [a][return a]
+	c: closure [a] [return a]
 	1 == c 1
 ]
 ; two-function return test
@@ -1200,9 +1200,9 @@ datatypes/function.r
 [function? does []]
 ; literal form
 #r2only
-[function? first [#[function! [][]]]]
+[function? first [#[function! [] []]]]
 #r3only
-[function? first [#[function! [[][]]]]]
+[function? first [#[function! [[] []]]]]
 ; return-less return value tests
 [
 	f: does []
@@ -2836,16 +2836,16 @@ functions/comparison/equalq.r
 [not equal? :+ :-]
 ; reflexivity test for function!
 ; Uses func instead of make function! so the test is compatible.
-[equal? a-value: func [][] :a-value]
+[equal? a-value: func [] [] :a-value]
 ; No structural equivalence for function!
 ; Uses FUNC instead of make function! so the test is compatible.
-[not equal? func [][] func [][]]
+[not equal? func [] [] func [] []]
 ; reflexivity test for closure!
 ; Uses CLOSURE to make the test compatible.
-[equal? a-value: closure [][] :a-value]
+[equal? a-value: closure [] [] :a-value]
 ; No structural equivalence for closure!
 ; Uses CLOSURE to make the test compatible.
-[not equal? closure [][] closure [][]]
+[not equal? closure [] [] closure [] []]
 [equal? a-value: #{00} a-value]
 ; binary!
 ; Same contents
@@ -3585,18 +3585,18 @@ functions/comparison/equivq.r
 ; reflexivity test for function!
 ; Uses func instead of make function! so the test is compatible.
 #r3
-[equiv? a-value: func [][] :a-value]
+[equiv? a-value: func [] [] :a-value]
 ; no structural equivalence for function!
 #r3
-[not equiv? func [][] func [][]]
+[not equiv? func [] [] func [] []]
 ; reflexivity test for closure!
 ; Uses CLOSURE to make the test compatible.
 #r3
-[equiv? a-value: closure [][] :a-value]
+[equiv? a-value: closure [] [] :a-value]
 ; No structural equivalence for closure!
 ; Uses CLOSURE to make the test compatible.
 #r3
-[not equiv? closure [][] closure [][]]
+[not equiv? closure [] [] closure [] []]
 ; binary!
 ; Same contents
 #r3
@@ -7606,6 +7606,94 @@ functions/control/any.r
 functions/control/apply.r
 ; bug#44
 [error? try [apply 'type?/word []]]
+; DO is special
+[2 == do does [return apply :do [:add 1 1] 4 4]]
+[1 == apply :subtract [2 1]]
+#r3only
+[1 == apply :- [2 1]]
+#r2only
+[-2 == apply :- [2]]
+[none == apply func [a] [a] []]
+[none == apply/only func [a] [a] []]
+[1 == apply func [a] [a] [1 2]]
+[1 == apply/only func [a] [a] [1 2]]
+[true == apply func [/a] [a] [true]]
+[none == apply func [/a] [a] [false]]
+[none == apply func [/a] [a] []]
+[true == apply/only func [/a] [a] [true]]
+; the word 'false
+[true == apply/only func [/a] [a] [false]]
+[false == apply/only func [/a] [a] [#[false]]]
+[none == apply/only func [/a] [a] []]
+[use [a] [a: true true == apply func [/a] [a] [a]]]
+[use [a] [a: false none == apply func [/a] [a] [a]]]
+[use [a] [a: false true == apply func [/a] [a] ['a]]]
+[use [a] [a: false true == apply func [/a] [a] [/a]]]
+[use [a] [a: false true == apply/only func [/a] [a] [a]]]
+[paren! == apply/only :type? [()]]
+['paren! == apply/only :type? [() true]]
+[[1] == head apply :insert [copy [] [1] none none none]]
+[[1] == head apply :insert [copy [] [1] none none false]]
+[[[1]] == head apply :insert [copy [] [1] none none true]]
+[native! == apply :type? [:print]]
+[get-word! == apply/only :type? [:print]]
+[1 == do does [apply :return [1] 2]]
+; bug#1760
+[1 == do does [apply does [] [return 1] 2]]
+; bug#1760
+[1 == do does [apply func [a] [a] [return 1] 2]]
+; bug#1760
+[1 == do does [apply does [] [return 1]]]
+[1 == do does [apply func [a] [a] [return 1]]]
+[1 == do does [apply :also [return 1 2]]]
+; bug#1760
+[1 == do does [apply :also [2 return 1]]]
+[unset? apply func [x [any-type!]] [get/any 'x] [()]]
+[unset? apply func ['x [any-type!]] [get/any 'x] [()]]
+[unset? apply func [:x [any-type!]] [get/any 'x] [()]]
+[unset? apply func [x [any-type!]] [return get/any 'x] [()]]
+[unset? apply func ['x [any-type!]] [return get/any 'x] [()]]
+[unset? apply func [:x [any-type!]] [return get/any 'x] [()]]
+[error? apply :make [error! ""]]
+#r3only
+[error? apply func [:x [any-type!]] [return get/any 'x] [make error! ""]]
+[
+	error? apply/only func [x [any-type!]] [
+		return get/any 'x
+	] head insert copy [] make error! ""
+]
+[
+	error? apply/only func ['x [any-type!]] [
+		return get/any 'x
+	] head insert copy [] make error! ""
+]
+[
+	error? apply/only func [:x [any-type!]] [
+		return get/any 'x
+	] head insert copy [] make error! ""
+]
+[use [x] [x: 1 strict-equal? 1 apply func ['x] [:x] [:x]]]
+[use [x] [x: 1 strict-equal? first [:x] apply/only func ['x] [:x] [:x]]]
+[
+	use [x] [
+		unset 'x
+		strict-equal? first [:x] apply/only func ['x [any-type!]] [
+			return get/any 'x
+		] [:x]
+	]
+]
+[use [x] [x: 1 strict-equal? 1 apply func [:x] [:x] [x]]]
+[use [x] [x: 1 strict-equal? 'x apply func [:x] [:x] ['x]]]
+[use [x] [x: 1 strict-equal? 'x apply/only func [:x] [:x] [x]]]
+[use [x] [x: 1 strict-equal? 'x apply/only func [:x] [return :x][x]]]
+[
+	use [x] [
+		unset 'x
+		strict-equal? 'x apply/only func [:x [any-type!]] [
+			return get/any 'x
+		] [x]
+	]
+]
 functions/control/attempt.r
 ; bug#41
 [none? attempt [1 / 0]]
@@ -8975,7 +9063,7 @@ functions/control/loop.r
 functions/control/map-each.r
 ; "return bug"
 [
-	integer? do does [map-each v [][] 1]
+	integer? do does [map-each v [] [] 1]
 ]
 functions/control/reduce.r
 [[1 2] = reduce [1 1 + 1]]
@@ -9247,9 +9335,9 @@ functions/control/try.r
 #r3only
 ; testing TRY/EXCEPT
 ; bug#822
-[error? try/except [make error! ""][0]]
+[error? try/except [make error! ""] [0]]
 #r3only
-[try/except [do make error! ""][true]]
+[try/except [do make error! ""] [true]]
 functions/control/unless.r
 [
 	success: false
@@ -10419,7 +10507,7 @@ functions/convert/mold.r
 #r3only
 [
 	c: closure [a] [print a]
-	equal? "make closure! [[a][print a]]" mold :c
+	equal? "make closure! [[a] [print a]]" mold :c
 ]
 ; deep nested block mold
 ; bug#876
@@ -10430,7 +10518,7 @@ functions/convert/mold.r
 		if error? try [
 			loop n [a: append/only copy [] a]
 			mold a
-		][break/return true]
+		] [break/return true]
 		n: n * 2
 	]
 ]
