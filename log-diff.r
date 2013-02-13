@@ -2,7 +2,7 @@ Rebol [
 	Title: "Log diff"
 	File: %log-diff.r
 	Author: "Ladislav Mecir"
-	Date: 7-Feb-2013/12:13:13+1:00
+	Date: 13-Feb-2013/18:22:13+1:00
 	Purpose: "Test framework"
 ]
 
@@ -158,7 +158,7 @@ make-diff: func [
 	print "Done."
 
 	summary: rejoin [
-		"new-successes: " new-successes
+		"^/new-successes: " new-successes
 		"^/new-failures: " new-failures
 		"^/new-crashes: " new-crashes
 		"^/progressions: " progressions
@@ -170,4 +170,4 @@ make-diff: func [
 	write/append diff-file rejoin ["^/Summary:^/" summary "^/"]
 ]
 
-make-diff first load system/script/args second load system/script/args %diff.r
+make-diff to-file first load system/script/args to-file second load system/script/args %diff.r
