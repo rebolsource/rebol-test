@@ -2,21 +2,44 @@ Rebol [
 	Title: "Catch-any"
 	File: %catch-any.r
 	Author: "Ladislav Mecir"
-	Date: 14-Feb-2013/21:09:57+1:00
+	Date: 14-Feb-2013/23:21:36+1:00
 	Purpose: "Catch any REBOL exception"
 ]
 
 make object! [
 	do-block: func [
-		; helper for catching RETURN, EXIT and RETURN/REDO in R3
+		; helper for catching BREAK, CONTINUE, THROW or QUIT
 		block [block!]
 		exception [word!]
 		/local result
 	] [
-		set exception 'return
-		set/any 'result do block
-		set exception none
-		return get/any 'result
+		; try wraps CATCH/QUIT to circumvent bug#851
+		try [
+			catch/quit [
+				catch [
+					loop 1 [
+						try [
+							set exception 'return
+							set/any 'result do block
+							set exception none
+							return :result
+						]
+						; an error was triggered
+						set exception 'error
+						exit
+					]
+					; BREAK or CONTINUE
+					set exception 'break
+					exit
+				]
+				; THROW
+				set exception 'throw
+				exit
+			]
+			; QUIT
+			set exception 'quit
+			exit
+		]
 	]
 
 	set 'catch-any func [
@@ -25,32 +48,24 @@ make object! [
 		exception [word!] {used to return the exception type}
 		/local result
 	] either rebol/version >= 2.100.0 [[
-		catch/quit [
-			set/any 'result catch [
-				set/any 'result loop 1 [
-					result: try [
-						; catch RETURN, EXIT and RETURN/REDO
-						; using the DO-BLOCK helper call
-						; and enclosing the call into paren
-						; to make sure no "excess arguments" are taken
-						(set/any 'result do-block block exception)
-						return get/any 'result
+		; catch RETURN, EXIT and RETURN/REDO
+		; using the DO-BLOCK helper call
+		; the helper call is enclosed in a block
+		; not containing any additional values
+		; to not give REDO any "excess arguments"
+		; also, it is necessary to catch all above exceptions again
+		; in case they are triggered by REDO
+		; TRY wraps CATCH/QUIT to circumvent bug#851
+		try [
+			catch/quit [
+				try [
+					catch [
+						loop 1 [set/any 'result do-block block exception]
 					]
-					; an error was triggered
-					set exception 'error
-					return result
 				]
-				; BREAK or CONTINUE
-				set exception 'break
-				return get/any 'result
 			]
-			; THROW
-			set exception 'throw
-			return get/any 'result
 		]
-		; QUIT
-		set exception 'quit
-		#[unset!]
+		either get exception [#[unset!]] [:result]
 	]] [[
 		error? set/any 'result catch [
 			error? set/any 'result loop 1 [
