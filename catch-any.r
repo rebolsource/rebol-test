@@ -31,7 +31,9 @@ make object! [
 					result: try [
 						; catch RETURN, EXIT and RETURN/REDO
 						; using the DO-BLOCK helper call
-						do [set/any 'result do-block block exception]
+						; and enclosing the call into paren
+						; to make sure no "excess arguments" are taken
+						(set/any 'result do-block block exception)
 						return get/any 'result
 					]
 					; an error was triggered
