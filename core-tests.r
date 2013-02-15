@@ -8435,11 +8435,11 @@ functions/control/exit.r
 ; the "result" of exit should not be passable to functions, bug#1509
 [a: 1 do does [a: error? exit] :a =? 1]
 ; bug#1535
-[loop 1 [words-of exit] true]
-[loop 1 [values-of exit] true]
+[do does [words-of exit] true]
+[do does [values-of exit] true]
 #r3crash
 ; bug#1945
-[loop 1 [spec-of exit] true]
+[do does [spec-of exit] true]
 ; exit should not be caught by try
 [a: 1 do does [a: error? try [exit]] :a =? 1]
 functions/control/for.r
@@ -9299,11 +9299,11 @@ functions/control/return.r
 ; the "result" of return should not be passable to functions, bug#1509
 [a: 1 do does [a: error? return 2] :a =? 1]
 ; bug#1535
-[loop 1 [words-of return none] true]
-[loop 1 [values-of return none] true]
+[do does [words-of return none] true]
+[do does [values-of return none] true]
 #r3crash
 ; bug#1945
-[loop 1 [spec-of return none] true]
+[do does [spec-of return none] true]
 ; return should not be caught by try
 [a: 1 do does [a: error? try [return 2]] :a =? 1]
 functions/control/switch.r
@@ -9337,11 +9337,11 @@ functions/control/throw.r
 ; the "result" of throw should not be passable to functions, bug#1509
 [a: 1 catch [a: error? throw 2] :a =? 1]
 ; bug#1535
-[loop 1 [words-of throw none] true]
-[loop 1 [values-of throw none] true]
+[catch [words-of throw none] true]
+[catch [values-of throw none] true]
 #r3crash
 ; bug#1945
-[loop 1 [spec-of throw none] true]
+[catch [spec-of throw none] true]
 [a: 1 catch/name [a: error? throw/name 2 'b] 'b :a =? 1]
 ; throw should not be caught by try
 [a: 1 catch [a: error? try [throw 2]] :a =? 1]
