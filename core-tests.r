@@ -9630,6 +9630,14 @@ functions/context/valueq.r
 [false == value? 'nonsense]
 [true == value? 'value?]
 functions/series/append.r
+; bug#75
+#r3only
+[
+	o: make object! [a: 1]
+	p: make o []
+	append p [b 2]
+	not in o 'b
+]
 ; bug#1776
 #r3crash
 #r2crash
