@@ -29,12 +29,6 @@ datatypes/binary.r
 [binary? #{}]
 ; alternative literal representation
 [#{} == #[binary! #{}]]
-datatypes/bitset.r
-[bitset? make bitset! "a"]
-[not bitset? 1]
-[bitset! = type? make bitset! "a"]
-; minimum, literal representation
-[bitset? #[bitset! #{}]]
 ; access symmetry
 [
 	b: #{0b}
@@ -45,6 +39,12 @@ datatypes/bitset.r
 	b: #{0b}
 	b/1 == 11
 ]
+datatypes/bitset.r
+[bitset? make bitset! "a"]
+[not bitset? 1]
+[bitset! = type? make bitset! "a"]
+; minimum, literal representation
+[bitset? #[bitset! #{}]]
 datatypes/block.r
 [block? [1]]
 [not block? 1]
@@ -1172,12 +1172,6 @@ datatypes/error.r
 [a: 1 error? try [a: 1 / 0] :a =? 1]
 [a: 1 error? try [set 'a 1 / 0] :a =? 1]
 [a: 1 error? try [set/any 'a 1 / 0] :a =? 1]
-; R2 bug
-[
-	 x: 1
-	 error? try [x: load/header ""]
-	 not error? x
-]
 datatypes/event.r
 [not event? 1]
 datatypes/file.r
@@ -1535,6 +1529,10 @@ datatypes/get-word.r
 	unset 'a
 	unset? :a
 ]
+; bug#1477
+[get-word? first [:/]]
+[get-word? first [://]]
+[get-word? first [:///]]
 datatypes/gob.r
 #r3only
 ; minimum
@@ -1618,6 +1616,22 @@ datatypes/issue.r
 #r2only
 [# == to issue! ""]
 [issue? #a]
+datatypes/library.r
+[
+	success: library? a-library: load/library case [
+		; this needs to be system-specific
+		system/version/4 = 2 [%libc.dylib]					; OSX
+		system/version/4 = 3 [%kernel32.dll]					; Windows
+		all [system/version/4 = 4 system/version/5 = 2] [%/lib/libc.so.6]	; Linux libc6
+		system/version/4 = 4 [%libc.so]						; Linux
+		system/version/4 = 7 [%libc.so]						; FreeBSD
+		system/version/4 = 8 [%libc.so]						; NetBSD
+		system/version/4 = 9 [%libc.so]						; OpenBSD
+		system/version/4 = 10 [%libc.so]					; Solaris
+	]
+	free a-library
+	success
+]
 datatypes/list.r
 #r2only
 [list? make list! []]
@@ -1678,16 +1692,6 @@ datatypes/lit-word.r
 [word? '<=]
 [word? '>=]
 [word? '<>]
-datatypes/get-word.r
-; bug#1477
-[get-word? first [:/]]
-[get-word? first [://]]
-[get-word? first [:///]]
-datatypes/set-word.r
-; bug#1477
-[set-word? first [/:]]
-[set-word? first [//:]]
-[set-word? first [///:]]
 datatypes/logic.r
 [logic? true]
 [logic? false]
@@ -2278,6 +2282,94 @@ datatypes/path.r
 	a: "abcd"
 	error? try [a/x]
 ]
+datatypes/percent.r
+#r3only
+[percent? 0%]
+#r3only
+[not percent? 1]
+#r3only
+[percent! = type? 0%]
+#r3only
+[percent? 0.0%]
+#r3only
+[percent? 1%]
+#r3only
+[percent? -1.0%]
+#r3only
+[percent? 2.2%]
+#r3only
+[0% = make percent! 0]
+#r3only
+[0% = make percent! "0"]
+#r3only
+[0% = to percent! 0]
+#r3only
+[0% = to percent! "0"]
+#r3only
+[100% = to percent! 1]
+#r3only
+[10% = to percent! 0.1]
+#r3only
+[error? try [to percent! "t"]]
+#r3only
+[0 = to decimal! 0%]
+#r3only
+[0.1 = to decimal! 10%]
+#r3only
+[1.0 = to decimal! 100%]
+#r3only
+[0% = load mold 0.0%]
+#r3only
+[1% = load mold 1.0%]
+#r3only
+[1.1% = load mold 1.1%]
+#r3only
+[-1% = load mold -1.0%]
+#r3only
+; 64-bit IEEE 754 maximum
+; bug#1475
+[same? 1.7976931348623157e310% load mold/all 1.7976931348623157e310%]
+#r3only
+; bug#1475
+; 64-bit IEEE 754 minimum
+[same? -1.7976931348623157E310% load mold/all -1.7976931348623157e310%]
+#r3only
+; Minimal positive normalized
+[same? 2.2250738585072014E-310% load mold/all 2.2250738585072014E-310%]
+#r3only
+; Maximal positive denormalized
+[same? 2.2250738585072009E-310% load mold/all 2.2250738585072009E-310%]
+#r3only
+; Minimal positive denormalized
+[same? 4.9406564584124654E-322% load mold/all 4.9406564584124654E-322%]
+#r3only
+; Maximal negative normalized
+[same? -2.2250738585072014E-306% load mold/all -2.2250738585072014E-306%]
+#r3only
+; Minimal negative denormalized
+[same? -2.2250738585072009E-306% load mold/all -2.2250738585072009E-306%]
+#r3only
+; Maximal negative denormalized
+[same? -4.9406564584124654E-322% load mold/all -4.9406564584124654E-322%]
+#r3only
+[same? 10.000000000000001% load mold/all 10.000000000000001%]
+#r3only
+[same? 29.999999999999999% load mold/all 29.999999999999999%]
+#r3only
+[same? 30.000000000000004% load mold/all 30.000000000000004%]
+#r3only
+[same? 9.9999999999999926e154% load mold/all 9.9999999999999926e154%]
+#r3only
+; alternative form
+[1.1% == 1,1%]
+#r3only
+[110% = make percent! 110%]
+#r3only
+[110% = make percent! "110%"]
+#r3only
+[1.1% = to percent! 1.1%]
+#r3only
+[1.1% = to percent! "1.1%"]
 datatypes/port.r
 [port? make port! http://]
 [not port? 1]
@@ -2286,6 +2378,77 @@ datatypes/refinement.r
 [refinement? /a]
 [not refinement? 1]
 [refinement! = type? /a]
+datatypes/routine.r
+[
+	success: routine? case [
+		; this needs to be system-specific
+		system/version/4 = 2 [							; OSX
+			a-library: load/library %libc.dylib
+			make routine! [
+				tv [struct! []]
+				tz [struct! []]
+				return: [integer!]
+			] a-library "settimeofday"
+		]
+		system/version/4 = 3 [							; Windows
+			a-library: load/library %kernel32.dll
+			make routine! [
+				systemtime [struct! []]
+				return: [int]
+			] a-library "SetSystemTime"
+		]
+		all [system/version/4 = 4 system/version/5 = 2] [			; Linux libc6
+			a-library: %/lib/libc.so.6
+			make routine! [
+				tv [struct! []]
+				tz [struct! []]
+				return: [integer!]
+			] a-library "settimeofday"
+		]
+		system/version/4 = 4 [							; Linux
+			a-library: load/library %libc.so
+			make routine! [
+				tv [struct! []]
+				tz [struct! []]
+				return: [integer!]
+			] a-library "settimeofday"
+		]
+		system/version/4 = 7 [							; FreeBSD
+			a-library: load/library %libc.so
+			make routine! [
+				tv [struct! []]
+				tz [struct! []]
+				return: [integer!]
+			] a-library "settimeofday"
+		]
+		system/version/4 = 8 [							; NetBSD
+			a-library: load/library %libc.so
+			make routine! [
+				tv [struct! []]
+				tz [struct! []]
+				return: [integer!]
+			] a-library "settimeofday"
+		]
+		system/version/4 = 9 [							; OpenBSD
+			a-library: load/library %libc.so
+			make routine! [
+				tv [struct! []]
+				tz [struct! []]
+				return: [integer!]
+			] a-library "settimeofday"
+		]
+		system/version/4 = 10 [							; Solaris
+			a-library: load/library %libc.so
+			make routine! [
+				tv [struct! []]
+				tz [struct! []]
+				return: [integer!]
+			] a-library "settimeofday"
+		]
+	]
+	free a-library
+	success
+]
 datatypes/set-path.r
 [set-path? first [a/b:]]
 [not set-path? 1]
@@ -2370,6 +2533,10 @@ datatypes/set-word.r
 	a: action!
 	equal? :a action!
 ]
+; bug#1477
+[set-word? first [/:]]
+[set-word? first [//:]]
+[set-word? first [///:]]
 #r3only
 ; bug#1817
 [
@@ -2528,6 +2695,62 @@ datatypes/string.r
 ["ahoj" = #[string! "ahoj"]]
 ["1" = to string! 1]
 [{""} = mold ""]
+datatypes/struct.r
+[struct? make struct! [i [integer!]] none]
+[not struct? 1]
+[struct! = type? make struct! [] none]
+; minimum
+[struct? make struct! [] none]
+; literal form
+[struct? #[struct! [] []]]
+[
+	s: make string! 15
+	addr: func [s] [copy third make struct! [s [string!]] reduce [s]]
+	(addr s) = (addr insert/dup s #"0" 15)
+]
+[false = not make struct! [] none]
+[
+	a-value: make struct! [] none
+	f: does [:a-value]
+	same? third :a-value third f
+]
+[
+	a-value: make struct! [i [integer!]] [1]
+	1 == a-value/i
+]
+[
+	a-value: make struct! [] none
+	same? third :a-value third all [:a-value]
+]
+[
+	a-value: make struct! [] none
+	same? third :a-value third all [true :a-value]
+]
+[
+	a-value: make struct! [] none
+	true = all [:a-value true]
+]
+[
+	a-value: make struct! [] none
+	same? third :a-value third do reduce [:a-value]
+]
+[
+	a-value: make struct! [] none
+	same? third :a-value third do :a-value
+]
+[if make struct! [] none [true]]
+[
+	a-value: make struct! [] none
+	same? third :a-value third any [:a-value]
+]
+[
+	a-value: make struct! [] none
+	same? third :a-value third any [false :a-value]
+]
+[
+	a-value: make struct! [] none
+	same? third :a-value third any [:a-value false]
+]
 datatypes/symbol.r
 #r2only
 #r2crash
@@ -2541,6 +2764,49 @@ datatypes/tag.r
 [strict-equal? #[tag! ""] make tag! 0]
 [strict-equal? #[tag! ""] to tag! ""]
 ["<tag>" == mold <tag>]
+datatypes/time.r
+[time? 0:00]
+[not time? 1]
+[time! = type? 0:00]
+[0:0:10 = make time! 10]
+[0:0:10 = to time! 10]
+[error? try [to time! "a"]]
+["0:00" = mold 0:00]
+; small value
+[
+	found? any [
+		error? try [t: -596522:0:0 - 1:00]
+		t = load mold t
+	]
+]
+; big value
+[
+	found? any [
+		error? try [t: 596522:0:0 + 1:00]
+		t = load mold t
+	]
+]
+; strange value
+[error? try [load "--596523:-14:-07.772224"]]
+; minimal time
+[time? -596523:14:07.999999999]
+; maximal negative time
+[negative? -0:0:0.000000001]
+; minimal positive time
+[positive? 0:0:0.000000001]
+; maximal time
+[time? 596523:14:07.999999999]
+datatypes/tuple.r
+[tuple? 1.2.3]
+[not tuple? 1]
+[tuple! = type? 1.2.3]
+[1.2.3 = to tuple! [1 2 3]]
+["1.2.3" = mold 1.2.3]
+; minimum
+[tuple? make tuple! []]
+; maximum
+[tuple? 255.255.255.255.255.255.255.255.255.255]
+[error? try [load "255.255.255.255.255.255.255.255.255.255.255"]]
 datatypes/typeset.r
 #r2only
 [datatype? any-block!]
@@ -2606,49 +2872,6 @@ datatypes/typeset.r
 [typeset? to-typeset [integer! none!]]
 #r3only
 [typeset! = type? series!]
-datatypes/time.r
-[time? 0:00]
-[not time? 1]
-[time! = type? 0:00]
-[0:0:10 = make time! 10]
-[0:0:10 = to time! 10]
-[error? try [to time! "a"]]
-["0:00" = mold 0:00]
-; small value
-[
-	found? any [
-		error? try [t: -596522:0:0 - 1:00]
-		t = load mold t
-	]
-]
-; big value
-[
-	found? any [
-		error? try [t: 596522:0:0 + 1:00]
-		t = load mold t
-	]
-]
-; strange value
-[error? try [load "--596523:-14:-07.772224"]]
-; minimal time
-[time? -596523:14:07.999999999]
-; maximal time
-[time? 596523:14:07.999999999]
-; minimal positive time
-[positive? 0:0:0.000000001]
-; maximal negative time
-[negative? -0:0:0.000000001]
-datatypes/tuple.r
-[tuple? 1.2.3]
-[not tuple? 1]
-[tuple! = type? 1.2.3]
-[1.2.3 = to tuple! [1 2 3]]
-["1.2.3" = mold 1.2.3]
-; minimum
-[tuple? make tuple! []]
-; maximum
-[tuple? 255.255.255.255.255.255.255.255.255.255]
-[error? try [load "255.255.255.255.255.255.255.255.255.255.255"]]
 datatypes/unset.r
 [unset? ()]
 [unset! == type? ()]
@@ -8948,6 +9171,7 @@ functions/control/forskip.r
 	e/near = [f]
 ]
 functions/control/halt.r
+[any-function? :halt]
 functions/control/if.r
 [
 	success: false
@@ -10246,6 +10470,7 @@ functions/series/ordinals.r
 [9 = ninth [1 2 3 4 5 6 7 8 9 10 11]]
 [10 = tenth [1 2 3 4 5 6 7 8 9 10 11]]
 functions/series/parse.r
+; THRU rule
 ; bug#682: parse thru tag!
 [
 	t: none
@@ -10262,15 +10487,17 @@ functions/series/parse.r
 [parse "abcd" [thru "cd" end]]
 ; bug#1959
 [parse "<abcd>" [thru <abcd> end]]
-; bug#1280
-[
-	parse "" [(i: 0) 3 [["a" |] (i: i + 1)]]
-	i == 3
-]
+; self-invoking rule
 ; bug#1672
 [
 	a: [a]
 	error? try [parse [] a]
+]
+; repetition
+; bug#1280
+[
+	parse "" [(i: 0) 3 [["a" |] (i: i + 1)]]
+	i == 3
 ]
 ; bug#1268
 #r3only
@@ -10291,6 +10518,7 @@ functions/series/parse.r
 	parse "a" [while [(i: i + 1 j: if i = 2 [[fail]]) j]]
 	i == 2
 ]
+; THEN rule
 #r3only
 ; bug#1267
 [
@@ -10300,6 +10528,7 @@ functions/series/parse.r
 	a4: [any [b then e: (d: [:e]) fail | [c | (d: [fail]) fail]] d]
 	equal? parse "aaaaabc" a2 parse "aaaaabc" a4
 ]
+; NOT rule
 #r3only
 ; bug#1246
 [parse "1" [not not "1" "1"]]
@@ -10316,6 +10545,7 @@ functions/series/parse.r
 [parse "" [not skip]]
 #r3only
 [parse "" [not fail]]
+; empty string rule
 ; bug#1880
 [parse "12" ["" to end]]
 functions/series/pick.r
@@ -10481,6 +10711,17 @@ functions/series/union.r
 ; bug#799
 #r3only
 [equal? make typeset! [decimal! integer!] union make typeset! [decimal!] make typeset! [integer!]]
+functions/string/checksum.r
+; bug#1678: "Can we add CRC-32 as a checksum method?"
+#r3only
+[(checksum/method to-binary "foo" 'CRC32) = -1938594527]
+; bug#1678
+#r3only
+[(checksum/method to-binary "" 'CRC32) = 0]
+functions/string/compress.r
+; bug#1679
+#r3only
+[#{1F8B0800EF46BE4C00034BCBCF07002165738C03000000} = compress/gzip "foo"]
 functions/string/decloak.r
 ; bug#48
 [
@@ -10489,6 +10730,12 @@ functions/string/decloak.r
 	equal? a decloak b "a"
 ]
 functions/string/decompress.r
+; bug#1679: "Native GZIP compress/decompress suport"
+#r3only
+["foo" = decompress/gzip compress/gzip "foo"]
+; bug#1679
+#r3only
+["foo" = decompress/gzip #{1F8B0800EF46BE4C00034BCBCF07002165738C03000000}]
 ; bug#3
 [value? try [decompress #{AAAAAAAAAAAAAAAAAAAA}]]
 functions/convert/as-binary.r
@@ -10535,6 +10782,12 @@ functions/convert/load.r
 		greater? load "9999999999999999999" load "9223372036854775807"
 	]
 ]
+; R2 bug
+[
+	 x: 1
+	 error? try [x: load/header ""]
+	 not error? x
+]
 functions/convert/mold.r
 ; bug#860
 ; bug#6
@@ -10578,258 +10831,6 @@ functions/convert/mold.r
 ]
 ; bug#719
 ["()" = mold quote ()]
-datatypes/library.r
-[
-	success: library? a-library: load/library case [
-		; this needs to be system-specific
-		system/version/4 = 2 [%libc.dylib]					; OSX
-		system/version/4 = 3 [%kernel32.dll]					; Windows
-		all [system/version/4 = 4 system/version/5 = 2] [%/lib/libc.so.6]	; Linux libc6
-		system/version/4 = 4 [%libc.so]						; Linux
-		system/version/4 = 7 [%libc.so]						; FreeBSD
-		system/version/4 = 8 [%libc.so]						; NetBSD
-		system/version/4 = 9 [%libc.so]						; OpenBSD
-		system/version/4 = 10 [%libc.so]					; Solaris
-	]
-	free a-library
-	success
-]
-datatypes/routine.r
-[
-	success: routine? case [
-		; this needs to be system-specific
-		system/version/4 = 2 [							; OSX
-			a-library: load/library %libc.dylib
-			make routine! [
-				tv [struct! []]
-				tz [struct! []]
-				return: [integer!]
-			] a-library "settimeofday"
-		]
-		system/version/4 = 3 [							; Windows
-			a-library: load/library %kernel32.dll
-			make routine! [
-				systemtime [struct! []]
-				return: [int]
-			] a-library "SetSystemTime"
-		]
-		all [system/version/4 = 4 system/version/5 = 2] [			; Linux libc6
-			a-library: %/lib/libc.so.6
-			make routine! [
-				tv [struct! []]
-				tz [struct! []]
-				return: [integer!]
-			] a-library "settimeofday"
-		]
-		system/version/4 = 4 [							; Linux
-			a-library: load/library %libc.so
-			make routine! [
-				tv [struct! []]
-				tz [struct! []]
-				return: [integer!]
-			] a-library "settimeofday"
-		]
-		system/version/4 = 7 [							; FreeBSD
-			a-library: load/library %libc.so
-			make routine! [
-				tv [struct! []]
-				tz [struct! []]
-				return: [integer!]
-			] a-library "settimeofday"
-		]
-		system/version/4 = 8 [							; NetBSD
-			a-library: load/library %libc.so
-			make routine! [
-				tv [struct! []]
-				tz [struct! []]
-				return: [integer!]
-			] a-library "settimeofday"
-		]
-		system/version/4 = 9 [							; OpenBSD
-			a-library: load/library %libc.so
-			make routine! [
-				tv [struct! []]
-				tz [struct! []]
-				return: [integer!]
-			] a-library "settimeofday"
-		]
-		system/version/4 = 10 [							; Solaris
-			a-library: load/library %libc.so
-			make routine! [
-				tv [struct! []]
-				tz [struct! []]
-				return: [integer!]
-			] a-library "settimeofday"
-		]
-	]
-	free a-library
-	success
-]
-datatypes/struct.r
-[struct? make struct! [i [integer!]] none]
-[not struct? 1]
-[struct! = type? make struct! [] none]
-; minimum
-[struct? make struct! [] none]
-; literal form
-[struct? #[struct! [] []]]
-[
-	s: make string! 15
-	addr: func [s] [copy third make struct! [s [string!]] reduce [s]]
-	(addr s) = (addr insert/dup s #"0" 15)
-]
-[false = not make struct! [] none]
-[
-	a-value: make struct! [] none
-	f: does [:a-value]
-	same? third :a-value third f
-]
-[
-	a-value: make struct! [i [integer!]] [1]
-	1 == a-value/i
-]
-[
-	a-value: make struct! [] none
-	same? third :a-value third all [:a-value]
-]
-[
-	a-value: make struct! [] none
-	same? third :a-value third all [true :a-value]
-]
-[
-	a-value: make struct! [] none
-	true = all [:a-value true]
-]
-[
-	a-value: make struct! [] none
-	same? third :a-value third do reduce [:a-value]
-]
-[
-	a-value: make struct! [] none
-	same? third :a-value third do :a-value
-]
-[if make struct! [] none [true]]
-[
-	a-value: make struct! [] none
-	same? third :a-value third any [:a-value]
-]
-[
-	a-value: make struct! [] none
-	same? third :a-value third any [false :a-value]
-]
-[
-	a-value: make struct! [] none
-	same? third :a-value third any [:a-value false]
-]
-datatypes/percent.r
-#r3only
-[percent? 0%]
-#r3only
-[not percent? 1]
-#r3only
-[percent! = type? 0%]
-#r3only
-[percent? 0.0%]
-#r3only
-[percent? 1%]
-#r3only
-[percent? -1.0%]
-#r3only
-[percent? 2.2%]
-#r3only
-[0% = make percent! 0]
-#r3only
-[0% = make percent! "0"]
-#r3only
-[0% = to percent! 0]
-#r3only
-[0% = to percent! "0"]
-#r3only
-[100% = to percent! 1]
-#r3only
-[10% = to percent! 0.1]
-#r3only
-[error? try [to percent! "t"]]
-#r3only
-[0 = to decimal! 0%]
-#r3only
-[0.1 = to decimal! 10%]
-#r3only
-[1.0 = to decimal! 100%]
-#r3only
-[0% = load mold 0.0%]
-#r3only
-[1% = load mold 1.0%]
-#r3only
-[1.1% = load mold 1.1%]
-#r3only
-[-1% = load mold -1.0%]
-#r3only
-; 64-bit IEEE 754 maximum
-; bug#1475
-[same? 1.7976931348623157e310% load mold/all 1.7976931348623157e310%]
-#r3only
-; bug#1475
-; 64-bit IEEE 754 minimum
-[same? -1.7976931348623157E310% load mold/all -1.7976931348623157e310%]
-#r3only
-; Minimal positive normalized
-[same? 2.2250738585072014E-310% load mold/all 2.2250738585072014E-310%]
-#r3only
-; Maximal positive denormalized
-[same? 2.2250738585072009E-310% load mold/all 2.2250738585072009E-310%]
-#r3only
-; Minimal positive denormalized
-[same? 4.9406564584124654E-322% load mold/all 4.9406564584124654E-322%]
-#r3only
-; Maximal negative normalized
-[same? -2.2250738585072014E-306% load mold/all -2.2250738585072014E-306%]
-#r3only
-; Minimal negative denormalized
-[same? -2.2250738585072009E-306% load mold/all -2.2250738585072009E-306%]
-#r3only
-; Maximal negative denormalized
-[same? -4.9406564584124654E-322% load mold/all -4.9406564584124654E-322%]
-#r3only
-[same? 10.000000000000001% load mold/all 10.000000000000001%]
-#r3only
-[same? 29.999999999999999% load mold/all 29.999999999999999%]
-#r3only
-[same? 30.000000000000004% load mold/all 30.000000000000004%]
-#r3only
-[same? 9.9999999999999926e154% load mold/all 9.9999999999999926e154%]
-#r3only
-; alternative form
-[1.1% == 1,1%]
-#r3only
-[110% = make percent! 110%]
-#r3only
-[110% = make percent! "110%"]
-#r3only
-[1.1% = to percent! 1.1%]
-#r3only
-[1.1% = to percent! "1.1%"]
-; bug#1422: "Rebol crashes when opening the 128th port"
-#r3crash
-[error? try [repeat n 200 [try [close open open join tcp://localhost: n]]] true]
-; bug#1651: "FILE-TYPE? should return NONE for unknown types"
-#r3only
-[none? file-type? %foo.0123456789bar0123456789]
-; bug#1678: "Can we add CRC-32 as a checksum method?"
-#r3only
-[(checksum/method to-binary "foo" 'CRC32) = -1938594527]
-; bug#1678
-#r3only
-[(checksum/method to-binary "" 'CRC32) = 0]
-; bug#1679: "Native GZIP compress/decompress suport"
-#r3only
-["foo" = decompress/gzip compress/gzip "foo"]
-; bug#1679
-#r3only
-[#{1F8B0800EF46BE4C00034BCBCF07002165738C03000000} = compress/gzip "foo"]
-; bug#1679
-#r3only
-["foo" = decompress/gzip #{1F8B0800EF46BE4C00034BCBCF07002165738C03000000}]
 functions/convert/to.r
 ; bug#12
 [image? to image! make gob! []]
@@ -10838,10 +10839,10 @@ functions/convert/to.r
 #r3only
 ['percent! = to word! percent!]
 ['money! = to word! money!]
+functions/context/bind.r
 ; bug#50
 #r3only
 [none? bind? to word! "zzz"]
-functions/context/bind.r
 ; BIND works 'as expected' in object spec
 ; bug#1549
 [
@@ -10908,7 +10909,7 @@ functions/context/set.r
 functions/file/clean-path.r
 ; bug#35
 [any-function? :clean-path]
-functions/file/exists.r
+functions/file/existsq.r
 ; bug#1613
 [exists? http://www.rebol.com/index.html]
 functions/file/make-dir.r
@@ -10942,6 +10943,14 @@ functions/file/make-dir.r
 ]
 ; bug#1822: DIFFERENCE on date!s problem
 [12:00 = difference 13/1/2011/12:00 13/1/2011]
+functions/file/open.r
+; bug#1422: "Rebol crashes when opening the 128th port"
+#r3crash
+[error? try [repeat n 200 [try [close open open join tcp://localhost: n]]] true]
+functions/file/file-typeq.r
+; bug#1651: "FILE-TYPE? should return NONE for unknown types"
+#r3only
+[none? file-type? %foo.0123456789bar0123456789]
 functions/reflectors/body-of.r
 ; bug#49
 [
