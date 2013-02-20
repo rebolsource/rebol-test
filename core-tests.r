@@ -2942,10 +2942,10 @@ functions/comparison/equalq.r
 ; image! alpha different
 [not equal? #[image! 1x1 #{000000} #{01}] #[image! 1x1 #{000000}]]
 #r3only
-; Literal offset not spported in R2.
+; Literal offset not supported in R2.
 [equal? #[image! 1x1 #{000000} 2] #[image! 1x1 #{000000} 2]]
 #r3only
-; Literal offset not spported in R2.
+; Literal offset not supported in R2.
 [not equal? #[image! 1x1 #{000000} 2] #[image! 1x1 #{000000}]]
 [
 	a-value: #[image! 1x1 #{000000}]
