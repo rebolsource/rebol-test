@@ -2008,6 +2008,12 @@ datatypes/none.r
 [none = to none! none]
 [none = to none! 1]
 ["none" = mold none]
+; bug#1666
+; bug#1650
+[
+	f: does [#]
+	# == f
+]
 datatypes/object.r
 [object? make object! [x: 1]]
 [not object? 1]
@@ -2281,6 +2287,11 @@ datatypes/path.r
 [
 	a: "abcd"
 	error? try [a/x]
+]
+; bug#1820: Word USER can't be selected with path syntax
+[
+	b: [user 1 _user 2]
+	1 = b/user
 ]
 datatypes/percent.r
 #r3only
@@ -5829,6 +5840,8 @@ functions/math/difference.r
 [[] = difference [1 2] [1 2]]
 ; bitset
 [(charset "a") = difference charset "a" charset ""]
+; bug#1822: DIFFERENCE on date!s problem
+[12:00 = difference 13/1/2011/12:00 13/1/2011]
 functions/math/divide.r
 [1 == divide -2147483648 -2147483648]
 [2 == divide -2147483648 -1073741824]
@@ -10620,6 +10633,9 @@ functions/series/remove.r
 	remove/part a-bitset to integer! #"a"
 	none? find a-bitset #"a"
 ]
+functions/series/reverse.r
+; bug#1810: REVERSE/part does not work for tuple!
+[3.2.1.4.5 = reverse/part 1.2.3.4.5 3]
 functions/series/select.r
 ; bug#1936: select returns incorrect value with block argument
 [4 == select [1 2 3 4 5 6] [1 2 3]]
@@ -10928,21 +10944,6 @@ functions/file/make-dir.r
 		e/type = 'access
 	]
 ]
-; bug#1666
-; bug#1650
-[
-	f: does [#]
-	# == f
-]
-; bug#1810: REVERSE/part does not work for tuple!
-[3.2.1.4.5 = reverse/part 1.2.3.4.5 3]
-; bug#1820: Word USER can't be selected with path syntax
-[
-	b: [user 1 _user 2]
-	1 = b/user
-]
-; bug#1822: DIFFERENCE on date!s problem
-[12:00 = difference 13/1/2011/12:00 13/1/2011]
 functions/file/open.r
 ; bug#1422: "Rebol crashes when opening the 128th port"
 #r3crash
