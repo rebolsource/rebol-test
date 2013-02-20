@@ -10250,6 +10250,10 @@ functions/series/parse.r
 	parse "a." [any [thru "a" (i: i + 1 j: if i > 1 [[end skip]]) j]]
 	i == 1
 ]
+; bug#1959: THRU advances position to END correctly.
+[parse "abcd" [thru "cd" end]]
+; bug#1959
+[parse "<abcd>" [thru <abcd> end]]
 ; bug#1280
 [
 	parse "" [(i: 0) 3 [["a" |] (i: i + 1)]]
