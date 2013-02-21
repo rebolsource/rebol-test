@@ -2,7 +2,6 @@ Rebol [
 	Title: "Log diff"
 	File: %log-diff.r
 	Author: "Ladislav Mecir"
-	Date: 13-Feb-2013/18:22:13+1:00
 	Purpose: "Test framework"
 ]
 
