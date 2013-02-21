@@ -10847,6 +10847,10 @@ functions/convert/mold.r
 ]
 ; bug#719
 ["()" = mold quote ()]
+; bug#77
+["#[block! [1 2] 2]" == mold/all next [1 2]]
+; bug#77
+[none? find mold/flat make object! [a: 1] "    "]
 functions/convert/to.r
 ; bug#12
 [image? to image! make gob! []]
