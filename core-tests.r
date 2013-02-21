@@ -10474,10 +10474,13 @@ functions/series/parse.r
 	parse "a." [any [thru "a" (i: i + 1 j: if i > 1 [[end skip]]) j]]
 	i == 1
 ]
-; bug#1959: THRU advances position to END correctly.
-[parse "abcd" [thru "cd" end]]
+; bug#1959: THRU fails to to match at end
+[parse "abcd" [thru "d"]]
+[parse "abcd" [to "d" skip]]
 ; bug#1959
-[parse "<abcd>" [thru <abcd> end]]
+[parse "<abcd>" [thru <abcd>]]
+[parse [a b c d] [thru 'd]]
+[parse [a b c d] [to 'd skip]]
 ; self-invoking rule
 ; bug#1672
 [
