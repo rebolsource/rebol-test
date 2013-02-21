@@ -2,7 +2,6 @@ Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
 	Author: "Ladislav Mecir"
-	Date: 6-Feb-2013/17:14:56+1:00
 	Purpose: "Test framework"
 ]
 
@@ -121,8 +120,10 @@ make object! compose [
 				interpreter-checksum: checksum/method read-binary
 					to-rebol-file system/script/args 'sha1
 			]
-			none [
-				interpreter-checksum: to binary! "none"
+			'else [
+				; use system/build
+				interpreter-checksum: checksum/method to binary!
+					mold system/build 'sha1
 			] 
 		]
 		test-checksum: checksum/method read-binary file 'sha1
