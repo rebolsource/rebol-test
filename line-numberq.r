@@ -2,7 +2,6 @@ Rebol [
 	Title: "Line number"
 	File: %line-numberq.r
 	Author: "Ladislav Mecir"
-	Date: 1-Nov-2010/14:21:20+1:00
 	Purpose: "Compute the line number"
 ]
 

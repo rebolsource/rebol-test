@@ -2,7 +2,6 @@ Rebol [
 	Title: "Core tests run with crash recovery"
 	File: %run-recover.r
 	Author: "Ladislav Mecir"
-	Date: 5-Feb-2013/16:54:57+1:00
 	Purpose: "Core tests"
 ]
 

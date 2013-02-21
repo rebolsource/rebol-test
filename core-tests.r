@@ -1734,7 +1734,6 @@ datatypes/map.r  ; map! =? hash! in R2/Forward, R2 2.7.7+
 #r3
 [empty? clear make map! [a 1 b 2]]
 #r3only
-#r3crash
 ; bug#1930: Lookup crashes on empty hashed map.
 [m: make map! 8 clear m none? m/a]
 datatypes/module.r
@@ -2265,7 +2264,6 @@ datatypes/path.r
 	b: [b 1]
 	1 = b/b
 ]
-#r2crash
 ; path evaluation order
 [
 	a: 1x2
@@ -2502,7 +2500,6 @@ datatypes/set-path.r
     o/a/x: 71830
 	o/a/x = 71830
 ]
-#r2crash
 ; set-path evaluation order
 [
 	a: 1x2
@@ -2764,7 +2761,6 @@ datatypes/struct.r
 ]
 datatypes/symbol.r
 #r2only
-#r2crash
 [symbol! = type? make symbol! "xx"]
 datatypes/tag.r
 [tag? <tag>]
@@ -3276,8 +3272,6 @@ functions/comparison/equalq.r
 	equal? a-value a-value
 ]
 ; bug#1049
-#r2crash
-#r3crash
 ; Comparison of cyclic blocks
 [
 	a-value: copy []
@@ -4015,7 +4009,6 @@ functions/comparison/equivq.r
 ; comparison of cyclic blocks
 ; bug#1049
 #r3
-#r3crash
 [
 	a-value: copy []
 	insert/only a-value a-value
@@ -5020,8 +5013,6 @@ functions/comparison/strict-equalq.r
 	insert/only a-value a-value
 	strict-equal? a-value a-value
 ]
-#r2crash
-#r3crash
 ; bug#1066
 ; comparison of cyclic blocks
 [
@@ -6073,7 +6064,6 @@ functions/math/multiply.r
 #32bit
 [error? try [multiply -2 2147483647]]
 #32bit
-#r2crash
 [error? try [multiply -1 -2147483648]]
 [1073741824 = multiply -1 -1073741824]
 [2 = multiply -1 -2]
@@ -6370,7 +6360,6 @@ functions/math/remainder.r
 ; integer! tests
 [0 = remainder -9223372036854775808 -1]
 ; integer! tests
-#r2crash
 [0 == remainder -2147483648 -1]
 ; time! tests
 [-1:00 == remainder -1:00 -3:00]
@@ -8021,7 +8010,6 @@ functions/control/break.r
 ; bug#1535
 [loop 1 [words-of break] true]
 [loop 1 [values-of break] true]
-#r3crash
 ; bug#1945
 [loop 1 [spec-of break] true]
 ; the "result" of break should not be caught by try
@@ -8162,7 +8150,6 @@ functions/control/catch.r
 	true
 ]
 #r3only
-#test3crash
 ; bug#851
 [error? try [catch/quit [] do make error! ""]]
 functions/control/compose.r
@@ -8219,7 +8206,6 @@ functions/control/compose.r
 	error? try blk
 ]
 ; #1906
-#r3crash
 [
 	b: copy [] insert/dup b 1 32768 compose b
 ]
@@ -8240,7 +8226,6 @@ functions/control/continue.r
 [loop 1 [words-of continue] true]
 #r3only
 [loop 1 [values-of continue] true]
-#r3crash
 #r3only
 ; bug#1945
 [loop 1 [spec-of continue] true]
@@ -8548,7 +8533,6 @@ functions/control/do.r
 	error? try blk
 ]
 ; infinite recursion for string
-#test3crash
 ; bug#1896
 [
 	str: "do str"
@@ -8673,7 +8657,6 @@ functions/control/exit.r
 ; bug#1535
 [do does [words-of exit] true]
 [do does [values-of exit] true]
-#r3crash
 ; bug#1945
 [do does [spec-of exit] true]
 ; exit should not be caught by try
@@ -9538,7 +9521,6 @@ functions/control/return.r
 ; bug#1535
 [do does [words-of return none] true]
 [do does [values-of return none] true]
-#r3crash
 ; bug#1945
 [do does [spec-of return none] true]
 ; return should not be caught by try
@@ -9576,7 +9558,6 @@ functions/control/throw.r
 ; bug#1535
 [catch [words-of throw none] true]
 [catch [values-of throw none] true]
-#r3crash
 ; bug#1945
 [catch [spec-of throw none] true]
 [a: 1 catch/name [a: error? throw/name 2 'b] 'b :a =? 1]
@@ -9876,11 +9857,8 @@ functions/series/append.r
 	not in o 'b
 ]
 ; bug#1776
-#r3crash
-#r2crash
 [a: copy [] until [error? try [a: append/only copy [] a]]]
 ; bug#1894
-#r3crash
 [
 	port: open/new %pokus.txt
 	append port newline
@@ -10950,7 +10928,6 @@ functions/file/make-dir.r
 ]
 functions/file/open.r
 ; bug#1422: "Rebol crashes when opening the 128th port"
-#r3crash
 [error? try [repeat n 200 [try [close open open join tcp://localhost: n]]] true]
 functions/file/file-typeq.r
 ; bug#1651: "FILE-TYPE? should return NONE for unknown types"

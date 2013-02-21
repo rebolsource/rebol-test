@@ -15,15 +15,3 @@
 
 #r3
 ; the test can work with R2 if using R2/Forward, or with R3
-
-#r2crash
-; the test crashes the R2 interpreter
-
-#r3crash
-; the test crashes the R3 interpreter
-
-#test2crash
-; the test crashes the test environment when run in the R2 interpreter
-
-#test3crash
-; the test crashes the test environment when run in the R3 interpreter

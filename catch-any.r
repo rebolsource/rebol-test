@@ -2,7 +2,6 @@ Rebol [
 	Title: "Catch-any"
 	File: %catch-any.r
 	Author: "Ladislav Mecir"
-	Date: 14-Feb-2013/23:21:36+1:00
 	Purpose: "Catch any REBOL exception"
 ]
 
@@ -13,7 +12,7 @@ make object! [
 		exception [word!]
 		/local result
 	] [
-		; try wraps CATCH/QUIT to circumvent bug#851
+		; TRY wraps CATCH/QUIT to circumvent bug#851
 		try [
 			catch/quit [
 				catch [

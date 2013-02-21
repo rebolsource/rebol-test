@@ -2,7 +2,6 @@ Rebol [
 	Title: "Test parsing"
 	File: %test-parsing.r
 	Author: "Ladislav Mecir"
-	Date: 6-Feb-2013/17:14:56+1:00
 	Purpose: "Test framework"
 ]
 
