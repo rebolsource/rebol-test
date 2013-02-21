@@ -10958,3 +10958,6 @@ functions/reflectors/body-of.r
 	f: func [] []
 	not same? body-of :f body-of :f
 ]
+system/system.r
+; bug#76
+[date? system/build]
