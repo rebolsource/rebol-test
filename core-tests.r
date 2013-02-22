@@ -10466,6 +10466,15 @@ functions/series/ordinals.r
 [9 = ninth [1 2 3 4 5 6 7 8 9 10 11]]
 [10 = tenth [1 2 3 4 5 6 7 8 9 10 11]]
 functions/series/parse.r
+; TO/THRU integer!
+[parse "abcd" [to 3 "cd"]]
+[parse "abcd" [to 5]]
+[parse "abcd" [to 128]]
+[parse "abcd" [thru 3 "d"]]
+[parse "abcd" [thru 4]]
+[parse "abcd" [thru 128]]
+[parse "abcd" ["ab" to 1 "abcd"]]
+[parse "abcd" ["ab" thru 1 "bcd"]]
 ; THRU rule
 ; bug#682: parse thru tag!
 [
