@@ -8944,6 +8944,11 @@ functions/control/forall.r
 	e: disarm try [f]
 	e/near = [f]
 ]
+; bug#81
+[
+	blk: [1]
+	1 == forall blk [blk/1]
+]
 functions/control/foreach.r
 [
 	out: copy ""
