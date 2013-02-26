@@ -111,7 +111,7 @@ make object! [
 		] [
 			append collected-tests reduce [
 				'dialect
-				rejoin ["failed, line: " line-number? position]
+				rejoin [{^/"failed, line: } line-number? position {"^/}]
 			]
 		]
 	]
@@ -133,22 +133,9 @@ make object! [
 					position: "%"
 					(set/any [value next-position] transcode/next position)
 					:next-position
-					[
+					|	; dialect failure?
 						some whitespace
 						{"} thru {"}
-						; dialect failure
-						(dialect-failures: dialect-failures + 1)
-						|	some whitespace
-							"line:"
-							some whitespace
-							next-position:
-							(set/any [value next-position] transcode/next next-position)
-							:next-position
-							{"} thru {"}
-							; dialect failure
-							(dialect-failures: dialect-failures + 1) 
-						|
-					]
 					|	copy last-vector ["[" test-source-rule "]"]
 						any whitespace
 						[
@@ -179,6 +166,7 @@ make object! [
 					|	"system/version:"
 						to end
 						(stop: none)
+					| (do make error! "log file parsing problem")
 				] position: stop break
 				|	:position
 			]

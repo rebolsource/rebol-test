@@ -161,22 +161,10 @@ make object! compose [
 							position: "%"
 							(set/any [value next-position] transcode/next position)
 							:next-position
-							[
+							|	; dialect failure?
 								some whitespace
 								{"} thru {"}
-								; dialect failure
 								(dialect-failures: dialect-failures + 1)
-								|	some whitespace
-									"line:"
-									some whitespace
-									next-position:
-									(set/any [value next-position] transcode/next next-position)
-									:next-position
-									{"} thru {"}
-									; dialect failure
-									(dialect-failures: dialect-failures + 1) 
-								|
-							]
 							|	copy last-vector ["[" test-source-rule "]"]
 								any whitespace
 								[
@@ -205,6 +193,7 @@ make object! compose [
 							|	"system/version:"
 								to end
 								(last-vector: stop: none)
+							|	(do make error! "log file parsing problem")
 						] position: stop break
 						|	:position
 					]

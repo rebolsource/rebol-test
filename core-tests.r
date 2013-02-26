@@ -10470,6 +10470,7 @@ functions/series/parse.r
 [parse "abcd" [to 3 "cd"]]
 [parse "abcd" [to 5]]
 [parse "abcd" [to 128]]
+; bug#1965
 [parse "abcd" [thru 3 "d"]]
 [parse "abcd" [thru 4]]
 [parse "abcd" [thru 128]]
@@ -10856,6 +10857,8 @@ functions/convert/to.r
 #r3only
 ['percent! = to word! percent!]
 ['money! = to word! money!]
+; bug#1967
+[not same? to binary! [1] to binary! [2]]
 functions/context/bind.r
 ; bug#50
 #r3only
@@ -10961,3 +10964,37 @@ functions/reflectors/body-of.r
 system/system.r
 ; bug#76
 [date? system/build]
+system/clipboard.r
+; empty clipboard
+[
+	write clipboard:// ""
+	c: read clipboard://
+	all [string? c empty? c]
+]
+; ASCII string
+[
+	write clipboard:// c: "This is a test."
+	d: read clipboard://
+	strict-equal? c d
+]
+; Unicode string
+[
+	write clipboard:// c: "Příliš žluťoučký kůň úpěl ďábelské ódy."
+	strict-equal? read clipboard:// c
+]
+; OPEN
+; bug#1968
+[
+	p: open clipboard://
+	append p c: "Clipboard port test"
+	strict-equal? c copy p
+]
+#r3only
+[
+	p: open clipboard://
+	write p c: "Clipboard port test"
+	strict-equal? c read p
+]
+; WRITE shall return a port in R3
+#r3only
+[equal? read write clipboard:// c: "test" c]
