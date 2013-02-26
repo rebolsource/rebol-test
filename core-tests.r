@@ -1545,6 +1545,17 @@ datatypes/gob.r
 	g: make gob! []
 	1x1 == g/offset: 1x1
 ]
+; bug#1969
+[
+	g1: make gob! []
+	g2: make gob! []
+	insert g1 g2
+	same? g1 g2/parent
+	do "g1: none"
+	do "recycle"
+	g3: make gob! []
+	insert g2/parent g3
+]
 datatypes/hash.r
 #r2only
 ; minimum
