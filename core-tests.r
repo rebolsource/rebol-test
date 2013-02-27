@@ -10757,10 +10757,10 @@ functions/string/decloak.r
 functions/string/decompress.r
 ; bug#1679: "Native GZIP compress/decompress suport"
 #r3only
-["foo" = decompress/gzip compress/gzip "foo"]
+["foo" == to string! decompress/gzip compress/gzip "foo"]
 ; bug#1679
 #r3only
-["foo" = decompress/gzip #{1F8B0800EF46BE4C00034BCBCF07002165738C03000000}]
+["foo" == to string! decompress/gzip #{1F8B0800EF46BE4C00034BCBCF07002165738C03000000}]
 ; bug#3
 [value? try [decompress #{AAAAAAAAAAAAAAAAAAAA}]]
 functions/convert/as-binary.r
