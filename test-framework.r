@@ -89,7 +89,6 @@ make object! compose [
 				set flags block! set value skip (
 					emit-test flags to string! value
 				)
-				|	path!
 				|	set value file! (log ["^/" mold value "^/^/"])
 				| 	'dialect set value string! (
 						log [value]

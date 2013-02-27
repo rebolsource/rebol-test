@@ -99,10 +99,6 @@ make object! [
 								append collected-tests test-file
 								stop: [end skip]
 							]
-							path? get/any 'value [
-								append/only collected-tests value
-								stop: [end skip]
-							]
 							'else [stop: [:position]]
 						]
 					) stop break
