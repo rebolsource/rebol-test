@@ -1556,6 +1556,7 @@
 	do "recycle"
 	g3: make gob! []
 	insert g2/parent g3
+	true
 ]
 ; datatypes/hash.r
 #r2only
