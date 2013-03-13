@@ -8770,15 +8770,6 @@
 		either num > 1 [break/return false] [true]
 	]
 ]
-#64bit
-; bug#1136
-[
-	num: 0
-	for i 9223372036854775807 9223372036854775807 1 [
-		num: num + 1
-		either num > 1 [break/return false] [true]
-	]
-]
 [
 	num: 0
 	for i -2147483648 -2147483648 -1 [
@@ -8786,13 +8777,31 @@
 		either num > 1 [break/return false] [true]
 	]
 ]
-#64bit
 ; bug#1136
+#64bit
+[
+	num: 0
+	for i 9223372036854775807 9223372036854775807 1 [
+		num: num + 1
+		either num > 1 [break/return false] [true]
+	]
+]
+#64bit
 [
 	num: 0
 	for i -9223372036854775808 -9223372036854775808 -1 [
 		num: num + 1
 		either num > 1 [break/return false] [true]
+	]
+]
+; bug#1994
+#64bit
+[
+	num: 0
+	for i 9223372036854775807 9223372036854775807 9223372036854775807 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
 	]
 ]
 #r2only
@@ -8831,7 +8840,7 @@
 	blk: [for i 1 1 1 blk]
 	error? try blk
 ]
-; local variable stability - this should be decided upon
+; local variable changeability - this is how it works in R3
 [
 	test: false
 	for i 1 3 1 [
@@ -8842,8 +8851,8 @@
 		]
 	]
 ]
-#r2only
 ; THROW error test
+#r2only
 [
 	b: head insert copy [] try [1 / 0]
 	pokus1: func [[catch] block [block!] /local elem] [
@@ -8857,8 +8866,8 @@
 	b: disarm try [pokus1 b]
 	b/near = [pokus1 b]
 ]
-#r3only
 ; local variable type safety
+#r3only
 [
 	test: false
 	error? try [
