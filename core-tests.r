@@ -1534,8 +1534,8 @@
 [get-word? first [://]]
 [get-word? first [:///]]
 ; datatypes/gob.r
-#r3only
 ; minimum
+#r3only
 [gob? make gob! []]
 #r3only
 [gob! = type? make gob! []]
@@ -1556,6 +1556,12 @@
 	do "recycle"
 	g3: make gob! []
 	insert g2/parent g3
+	true
+]
+; bug#1989
+#r3only
+[
+	loop 30000000 [make gob! []]
 	true
 ]
 ; datatypes/hash.r
