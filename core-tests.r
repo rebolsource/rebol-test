@@ -8836,8 +8836,42 @@
 		true
 	]
 ]
+[
+	num: 0
+	for i 2147483647 2147483647 2147483647 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+[
+	num: 0
+	for i 2147483647 2147483647 -2147483648 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+[
+	num: 0
+	for i -2147483648 -2147483648 2147483647 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+[
+	num: 0
+	for i -2147483648 -2147483648 -2147483648 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
 ; bug#1993
 [equal? type? for i 1 2 0 [break] type? for i 2 1 0 [break]]
+[equal? type? for i -1 -2 0 [break] type? for i 2 1 0 [break]]
+[equal? type? for i -1 -2 0 [break] type? for i -2 -1 0 [break]]
 #r2only
 ; char tests
 [
