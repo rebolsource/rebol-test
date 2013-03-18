@@ -8804,6 +8804,35 @@
 		true
 	]
 ]
+#64bit
+[
+	num: 0
+	for i 9223372036854775807 9223372036854775807 -9223372036854775808 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+#64bit
+[
+	num: 0
+	for i -9223372036854775808 -9223372036854775808 9223372036854775807 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+#64bit
+[
+	num: 0
+	for i -9223372036854775808 -9223372036854775808 -9223372036854775808 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+; bug#1993
+[equal? type? for i 1 2 0 [break] type? for i 2 1 0 [break]]
 #r2only
 ; char tests
 [
