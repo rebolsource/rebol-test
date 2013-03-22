@@ -8177,6 +8177,8 @@
 #r3only
 ; bug#851
 [error? try [catch/quit [] do make error! ""]]
+; bug#851
+[none? attempt [catch/quit [] do make error! ""]]
 ; functions/control/compose.r
 [
 	num: 1
