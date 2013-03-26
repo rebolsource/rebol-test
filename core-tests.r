@@ -1564,6 +1564,25 @@
 	loop 30000000 [make gob! []]
 	true
 ]
+#r3only
+[
+	scr: 800x600
+	main: make gob! [
+		size: scr
+		color: red
+	]	
+	loop 10 [
+		clear main
+		recycle
+		loop random 1000 [
+			append main make gob! reduce/no-set [
+				offset: random scr
+				color: random 255.255.255
+			]
+		]
+	]
+	true
+]
 ; datatypes/hash.r
 #r2only
 ; minimum
