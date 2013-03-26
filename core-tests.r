@@ -1568,7 +1568,6 @@
 [
 	main: make gob! []
 	foreach i [31 325 1] [
-		print i
 		clear main
 		recycle
 		loop i [
