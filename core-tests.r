@@ -1566,19 +1566,13 @@
 ]
 #r3only
 [
-	scr: 800x600
-	main: make gob! [
-		size: scr
-		color: red
-	]	
-	loop 10 [
+	main: make gob! []
+	foreach i [31 325 1] [
+		print i
 		clear main
 		recycle
-		loop random 1000 [
-			append main make gob! reduce/no-set [
-				offset: random scr
-				color: random 255.255.255
-			]
+		loop i [
+			append main make gob! []
 		]
 	]
 	true
