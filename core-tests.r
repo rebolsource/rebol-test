@@ -9892,6 +9892,10 @@
 	]
 	do f 1
 ]
+; functions/context/resolve.r
+#r3only
+; bug#2017: crash in RESOLVE/extend/only
+[get in resolve/extend/only context [] context [a: true] [a] 'a]
 ; functions/context/unset.r
 [
 	a: none
