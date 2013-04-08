@@ -735,6 +735,8 @@
 [email? #[email! ""]]
 [strict-equal? #[email! ""] make email! 0]
 [strict-equal? #[email! ""] to email! ""]
+[equal? mold/all #[email! ""] {#[email! ""]}]
+[equal? mold/all #[email! "a"] {#[email! "a"]}]
 ; datatypes/error.r
 [error? try [1 / 0]]
 [not error? 1]
@@ -1475,25 +1477,13 @@
 ; bug#1947
 ; empty get-path test
 #r3only
-[
-	any [
-	    error? try [make get-path! []]
-	    equal? make get-path! [] load mold/all make get-path! []
-	]
-]
-; one-element get-path test
-#r3only
-[
-	any [
-	    error? try [make get-path! [a]]
-	    equal? make get-path! [a] load mold/all make get-path! [a]
-	]
-]
-; this may be controversial, but such paths exist
-#r3only
 [get-path? load "#[get-path! []]"]
 #r3only
 [get-path? load "#[get-path! [a]]"]
+#r3only
+[equal? mold/all load "#[get-path! []]" "#[get-path! []]"]
+#r3only
+[equal? mold/all load "#[get-path! [a]]" "#[get-path! [a]]"]
 #r3only
 [
 	all [
@@ -1590,6 +1580,18 @@
 [image! = type? make image! 0x0]
 ; minimum
 [image? #[image! 0x0 #{}]]
+[equal? load mold/all #[image! 0x0 #{}] #[image! 0x0 #{}]]
+; default colours
+#r2only
+[
+	a-value: #[image! 1x1 #{}]
+	equal? pick a-value 0x0 0.0.0.0
+]
+#r3only
+[
+	a-value: #[image! 1x1 #{}]
+	equal? pick a-value 0x0 0.0.0.255
+]
 ; datatypes/integer.r
 [integer? 0]
 ; bug#33
@@ -1676,23 +1678,10 @@
 [lit-path! = type? first ['a/b]]
 ; minimum
 ; bug#1947
-; empty lit-path test
-[
-	any [
-	    error? try [make lit-path! []]
-	    equal? make lit-path! [] load mold/all make lit-path! []
-	]
-]
-; one-element lit-path test
-[
-	any [
-	    error? try [make lit-path! [a]]
-	    equal? make lit-path! [a] load mold/all make lit-path! [a]
-	]
-]
-; this may be controversial, but such paths exist
 [lit-path? load "#[lit-path! []]"]
 [lit-path? load "#[lit-path! [a]]"]
+[equal? mold/all load "#[lit-path! []]" "#[lit-path! []]"]
+[equal? mold/all load "#[lit-path! [a]]" "#[lit-path! [a]]"]
 [
 	all [
 		lit-path? a: load "#[lit-path! [a b c] 2]"
@@ -2154,23 +2143,10 @@
 [path! = type? 'a/b]
 ; the minimum
 ; bug#1947
-; empty path test
-[
-	any [
-	    error? try [make path! []]
-	    equal? make path! [] load mold/all make path! []
-	]
-]
-; one-element path test
-[
-	any [
-	    error? try [make path! [a]]
-	    equal? make path! [a] load mold/all make path! [a]
-	]
-]
-; this may be controversial, but such paths exist
 [path? load "#[path! []]"]
 [path? load "#[path! [a]]"]
+[equal? mold/all load "#[path! []]" "#[path! []]"]
+[equal? mold/all load "#[path! [a]]" "#[path! [a]]"]
 [
 	all [
 		path? a: load "#[path! [a b c] 2]"
@@ -2224,9 +2200,15 @@
 	a-value: func [/local a] [a]
 	1 == a-value/local 1
 ]
+#r2only
 [
 	a-value: make image! 1x1
 	0.0.0.0 == a-value/1
+]
+#r3only
+[
+	a-value: make image! 1x1
+	0.0.0.255 == a-value/1
 ]
 #r2only
 [
@@ -2496,23 +2478,10 @@
 [set-path! = type? first [a/b:]]
 ; the minimum
 ; bug#1947
-; empty set-path test
-[
-	any [
-	    error? try [make set-path! []]
-	    equal? make set-path! [] load mold/all make set-path! []
-	]
-]
-; one-element set-path test
-[
-	any [
-	    error? try [make set-path! [a]]
-	    equal? make set-path! [a] load mold/all make set-path! [a]
-	]
-]
-; this may be controversial, but such paths exist
 [set-path? load "#[set-path! []]"]
 [set-path? load "#[set-path! [a]]"]
+[equal? mold/all load "#[set-path! []]" "#[set-path! []]"]
+[equal? mold/all load "#[set-path! [a]]" "#[set-path! [a]]"]
 [
 	all [
 		set-path? a: load "#[set-path! [a b c] 2]"
@@ -2803,6 +2772,7 @@
 [strict-equal? #[tag! ""] make tag! 0]
 [strict-equal? #[tag! ""] to tag! ""]
 ["<tag>" == mold <tag>]
+[equal? mold/all #[tag! ""] {#[tag! ""]}]
 ; datatypes/time.r
 [time? 0:00]
 [not time? 1]
@@ -2936,6 +2906,8 @@
 [strict-equal? #[url! ""] to url! ""]
 ["http://" = mold http://]
 ["http://a%2520b" = mold http://a%2520b]
+[equal? mold/all #[url! ""] {#[url! ""]}]
+[equal? mold/all #[url! "a"] {#[url! "a"]}]
 ; datatypes/word.r
 [word? 'a]
 [not word? 1]
@@ -3199,10 +3171,14 @@
 [not equal? #[image! 2x1 #{000000}] #[image! 1x1 #{000000}]]
 ; image! different rgb
 [not equal? #[image! 1x1 #{000001}] #[image! 1x1 #{000000}]]
+#r2only
 ; image! alpha not specified = 0
 [equal? #[image! 1x1 #{000000} #{00}] #[image! 1x1 #{000000}]]
+#r3only
+; image! alpha not specified = ff
+[equal? #[image! 1x1 #{000000} #{ff}] #[image! 1x1 #{000000}]]
 ; image! alpha different
-[not equal? #[image! 1x1 #{000000} #{01}] #[image! 1x1 #{000000}]]
+[not equal? #[image! 1x1 #{000000} #{01}] #[image! 1x1 #{000000} #{00}]]
 #r3only
 ; Literal offset not supported in R2.
 [equal? #[image! 1x1 #{000000} 2] #[image! 1x1 #{000000} 2]]
@@ -5830,8 +5806,8 @@
 ]
 ; bug#1706
 ; image
-[(make image! [1x1 #{000000}]) = complement make image! [1x1 #{ffffff} #{ff}]]
-[(make image! [1x1 #{ffffff} #{ff}]) = complement make image! [1x1 #{000000}]]
+[(make image! [1x1 #{000000} #{00}]) = complement make image! [1x1 #{ffffff} #{ff}]]
+[(make image! [1x1 #{ffffff} #{ff}]) = complement make image! [1x1 #{000000} #{00}]]
 ; typeset
 ; bug#799
 #r3only
