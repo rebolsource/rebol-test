@@ -10,7 +10,7 @@ do %catch-any.r
 
 make object! compose [
 	log-file: none
-	
+
 	log: func [report [block!]] [
 		write/append log-file to binary! rejoin report
 	]
@@ -21,10 +21,6 @@ make object! compose [
 	crashes: none
 	dialect-failures: none
 	successes: none
-
-	; checksums
-	interpreter-checksum: none
-	test-checksum: none
 
 	test-mode: none
 
@@ -102,29 +98,15 @@ make object! compose [
 		{Executes tests in the FILE and recovers from crash}
 		file [file!] {test file}
 		flags [block!] {which flags to accept}
-		/local summary interpreter last-vector value position next-position
-		test-sources log-file-prefix
+		code-checksum [binary!]
+		/local interpreter last-vector value position next-position
+		test-sources log-file-prefix test-checksum
 	] [
 		allowed-flags: flags
 		
 		log-file-prefix: %r
 
-		; calculate checksums
-		case [
-			all [file? system/options/boot #"/" = first system/options/boot] [
-				interpreter-checksum: checksum/method read-binary
-					system/options/boot 'sha1
-			]
-			string? system/script/args [
-				interpreter-checksum: checksum/method read-binary
-					to-rebol-file system/script/args 'sha1
-			]
-			'else [
-				; use system/build
-				interpreter-checksum: checksum/method to binary!
-					mold system/build 'sha1
-			] 
-		]
+		; calculate test checksum
 		test-checksum: checksum/method read-binary file 'sha1
 		
 		log-file: log-file-prefix
@@ -132,7 +114,7 @@ make object! compose [
 			append log-file "_"
 			append log-file mold version/:i
 		]
-		foreach checksum reduce [interpreter-checksum test-checksum] [
+		foreach checksum reduce [code-checksum test-checksum] [
 			append log-file "_"
 			append log-file copy/part skip mold checksum 2 6
 		]
@@ -210,7 +192,7 @@ make object! compose [
 				"^(line)"
 				"system/version: " system/version
 				"^(line)"
-				"interpreter-checksum: " interpreter-checksum
+				"code-checksum: " code-checksum
 				"^(line)"
 				"test-checksum: " test-checksum
 				"^(line)"
