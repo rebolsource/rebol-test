@@ -11,7 +11,7 @@ do %test-framework.r
 ; appropriate flags depending on the interpreter version.
 
 do-core-tests: has [
-	flags crash-flags result log-file summary interpreter-checksum
+	flags result log-file summary interpreter-checksum
 ] [
 	; Check if we run R3 or R2.
 	set 'flags pick [
