@@ -11,7 +11,7 @@ do %test-framework.r
 ; appropriate flags depending on the interpreter version.
 
 do-core-tests: has [
-	flags result log-file summary interpreter-checksum
+	flags result log-file summary interpreter-checksum log-file-prefix
 ] [
 	; Check if we run R3 or R2.
 	set 'flags pick [
@@ -36,8 +36,14 @@ do-core-tests: has [
 		] 
 	]
 
+	log-file-prefix: %r
+	repeat i length? version: system/version [
+		append log-file-prefix "_"
+		append log-file-prefix mold version/:i
+	]
+
 	print "Testing ..."
-	result: do-recover %core-tests.r flags interpreter-checksum
+	result: do-recover %core-tests.r flags interpreter-checksum log-file-prefix
 	set [log-file summary] result
 
 	print ["Done, see the log file:" log-file]

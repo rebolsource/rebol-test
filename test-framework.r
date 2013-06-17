@@ -99,25 +99,22 @@ make object! compose [
 		file [file!] {test file}
 		flags [block!] {which flags to accept}
 		code-checksum [binary!]
+		log-file-prefix [file!]
 		/local interpreter last-vector value position next-position
-		test-sources log-file-prefix test-checksum
+		test-sources test-checksum
 	] [
 		allowed-flags: flags
 		
-		log-file-prefix: %r
-
 		; calculate test checksum
 		test-checksum: checksum/method read-binary file 'sha1
 		
 		log-file: log-file-prefix
-		repeat i length? version: system/version [
-			append log-file "_"
-			append log-file mold version/:i
-		]
+
 		foreach checksum reduce [code-checksum test-checksum] [
 			append log-file "_"
 			append log-file copy/part skip mold checksum 2 6
 		]
+
 		append log-file ".log"
 		log-file: clean-path log-file
 
