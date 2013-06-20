@@ -45,6 +45,8 @@
 [bitset! = type? make bitset! "a"]
 ; minimum, literal representation
 [bitset? #[bitset! #{}]]
+; TS crash
+[bitset? charset reduce [to-char "^(A0)"]
 ; datatypes/block.r
 [block? [1]]
 [not block? 1]
