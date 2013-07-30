@@ -486,6 +486,8 @@
 		2 = c
 	]
 ]
+; bug#447
+[slf: 'self do closure [x] [same? slf 'self] 1]
 ; bug#1528
 [closure? closure [self] []]
 ; datatypes/datatype.r
@@ -1474,6 +1476,14 @@
 ]
 ; bug#1528
 [function? func [self] []]
+#r3only
+; bug#2025
+[
+	body: [x + y]
+	f: make function! reduce [[x] body]
+	g: make function! reduce [[y] body]
+	error? try [f 1]
+]
 ; datatypes/get-path.r
 ; minimum
 ; bug#1947
@@ -9945,6 +9955,9 @@
 ; functions/context/valueq.r
 [false == value? 'nonsense]
 [true == value? 'value?]
+#r3only
+; bug#1914
+[none? value? do func [x] ['x] none]
 ; functions/series/append.r
 ; bug#75
 #r3only
@@ -11000,8 +11013,13 @@
 ]
 ; bug#1655
 [not head? bind next [1] 'rebol]
-; bug#892
+; bug#892, bug#216
 [y: 'x do has [x] [x: true get bind y 'x]]
+; bug#1893
+[
+	word: do func [x] ['x] 1
+	same? word bind 'x word
+]
 ; functions/context/set.r
 ; bug#1745
 [equal? error? try [set /a 1] error? try [set [/a] 1]]
