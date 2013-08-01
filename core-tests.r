@@ -9957,7 +9957,7 @@
 [true == value? 'value?]
 #r3only
 ; bug#1914
-[none? value? do func [x] ['x] none]
+[false == value? do func [x] ['x] none]
 ; functions/series/append.r
 ; bug#75
 #r3only
