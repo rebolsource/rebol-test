@@ -10146,6 +10146,12 @@
 	error? try [copy/deep a]
 	true
 ]
+; bug#2043
+[
+	f: func [] []
+	error? try [copy :f]
+	true
+]
 ; functions/series/difference.r
 ; bug#799
 #r3only
