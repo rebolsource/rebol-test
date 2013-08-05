@@ -1484,6 +1484,12 @@
 	g: make function! reduce [[y] body]
 	error? try [f 1]
 ]
+; bug#2044
+[
+	o: make object! [f: func [x] ['x]]
+	p: make o []
+	not same? o/f 1 p/f 1
+]
 ; datatypes/get-path.r
 ; minimum
 ; bug#1947
