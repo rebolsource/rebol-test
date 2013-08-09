@@ -2098,6 +2098,26 @@
 	]
 	1 = f
 ]
+; object cloning
+; bug#2045
+[
+	a: 1
+	f: func [] [a]
+	g: :f
+	o: make object! [a: 2 g: :f]
+	p: make o [a: 3]
+	1 == p/g
+]
+; object cloning
+; bug#2045
+[
+	a: 1
+	b: [a]
+	c: b
+	o: make object! [a: 2 c: b]
+	p: make o [a: 3]
+	1 == do p/c
+]
 ; datatypes/op.r
 [op? get '+]
 [not op? 1]
