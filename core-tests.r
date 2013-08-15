@@ -10853,6 +10853,8 @@
 ; bug#1152: SORT not stable (order not preserved)
 [strict-equal? ["A" "a"] sort ["A" "a"]]
 ; bug#1152: SORT not stable (order not preserved)
+[strict-equal? ["A" "a"] sort/reverse ["A" "a"]]
+; bug#1152: SORT not stable (order not preserved)
 [strict-equal? ["a" "A"] sort ["a" "A"]]
 ; bug#1152: SORT not stable (order not preserved)
 [strict-equal? ["A" "a"] sort/case ["a" "A"]]
