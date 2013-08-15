@@ -490,6 +490,14 @@
 [slf: 'self do closure [x] [same? slf 'self] 1]
 ; bug#1528
 [closure? closure [self] []]
+; bug#2048
+#r3only
+[
+	f: make closure! reduce [[x] f-body: [x + x]]
+	change f-body 'x
+	x: 1
+	3 == f 2 
+]
 ; datatypes/datatype.r
 [not datatype? 1]
 [datatype! = type? action!]
