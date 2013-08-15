@@ -2126,6 +2126,14 @@
 	p: make o [a: 3]
 	1 == do p/c
 ]
+; multiple inheritance
+; bug#1863
+[
+	o: make object! [a: 1 f: does [a]]
+	p: make object! [a: 2]
+	q: make o p
+	2 == q/f
+]
 ; datatypes/op.r
 [op? get '+]
 [not op? 1]
