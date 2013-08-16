@@ -2126,6 +2126,13 @@
 	p: make o [a: 3]
 	1 == do p/c
 ]
+; object cloning
+; bug#2050
+[
+    o: make object! [n: 'o b: reduce [func [] [n]]]
+	p: make o [n: 'p]
+	o/b/1 = 'o
+]
 ; multiple inheritance
 ; bug#1863
 [
@@ -10859,6 +10866,8 @@
 ; functions/series/sort.r
 ; bug#1152: SORT not stable (order not preserved)
 [strict-equal? ["A" "a"] sort ["A" "a"]]
+; bug#1152: SORT not stable (order not preserved)
+[strict-equal? ["A" "a"] sort/reverse ["A" "a"]]
 ; bug#1152: SORT not stable (order not preserved)
 [strict-equal? ["a" "A"] sort ["a" "A"]]
 ; bug#1152: SORT not stable (order not preserved)
