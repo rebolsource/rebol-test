@@ -2126,6 +2126,13 @@
 	p: make o [a: 3]
 	1 == do p/c
 ]
+; object cloning
+; bug#2050
+[
+    o: make object! [n: 'o b: reduce [func [] [n]]]
+	p: make o [n: 'p]
+	o/b/1 = 'o
+]
 ; multiple inheritance
 ; bug#1863
 [
