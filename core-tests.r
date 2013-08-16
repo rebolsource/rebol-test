@@ -2134,6 +2134,13 @@
 	q: make o p
 	2 == q/f
 ]
+; object cloning
+; bug#2049
+[
+	o: make object! [n: 'o f: closure [] [n]]
+	p: make o [n: 'c]
+	'c = p/f
+]
 ; datatypes/op.r
 [op? get '+]
 [not op? 1]
