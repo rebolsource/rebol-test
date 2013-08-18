@@ -6436,6 +6436,14 @@
 	random/seed 0
 	2 = random/only next [1 2]
 ]
+; bug#932
+[
+	s: "aa"
+	random/seed s
+	a: random 10000
+	random/seed s
+	a = random 10000
+]
 ; functions/math/remainder.r
 #64bit
 ; integer! tests
