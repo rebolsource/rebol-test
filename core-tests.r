@@ -2145,8 +2145,8 @@
 ; bug#2049
 [
 	o: make object! [n: 'o f: closure [] [n]]
-	p: make o [n: 'c]
-	'c = p/f
+	p: make o [n: 'p]
+	'p = p/f
 ]
 ; datatypes/op.r
 [op? get '+]
