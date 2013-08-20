@@ -10894,6 +10894,72 @@
 ]
 ; bug#1152: SORT not stable (order not preserved)
 [equal? [1 9 1 5 1 7] sort/skip/compare [1 9 1 5 1 7] 2 1]
+; functions/series/split.r
+; Tests taken from bug#1886.
+#r3only
+[["1234" "5678" "1234" "5678"] == split "1234567812345678" 4]
+#r3only
+[["123" "456" "781" "234" "567" "8"] == split "1234567812345678" 3]
+#r3only
+[["12345" "67812" "34567" "8"] == split "1234567812345678" 5]
+#r3only
+[[[1 2 3] [4 5 6]] == split/into [1 2 3 4 5 6] 2]
+#r3only
+[["12345678" "12345678"] == split/into "1234567812345678" 2]
+#r3only
+[["12345" "67812" "345678"] == split/into "1234567812345678" 3]
+#r3only
+[["123" "456" "781" "234" "5678"] == split/into "1234567812345678" 5]
+#r3only
+; Delimiter longer than series
+#r3only
+[["1" "2" "3" "" "" ""] == split/into "123" 6]
+#r3only
+[[[1] [2] [3] [] [] []] == split/into [1 2 3] 6]
+#r3only
+[[[1 2] [3] [4 5 6]] == split [1 2 3 4 5 6] [2 1 3]]
+#r3only
+[["1234" "5678" "12" "34" "5" "6" "7" "8"] == split "1234567812345678" [4 4 2 2 1 1 1 1]]
+#r3only
+[[(1 2 3) (4 5 6) (7 8 9)] == split first [(1 2 3 4 5 6 7 8 9)] 3]
+#r3only
+[[#{01020304} #{050607} #{08} #{090A}] == split #{0102030405060708090A} [4 3 1 2]]
+#r3only
+[[[1 2] [3]] == split [1 2 3 4 5 6] [2 1]]
+#r3only
+[[[1 2] [3] [4 5 6] []] == split [1 2 3 4 5 6] [2 1 3 5]]
+#r3only
+[[[1 2] [3] [4 5 6]] == split [1 2 3 4 5 6] [2 1 6]]
+#r3only
+[[[1 2] [5 6]] == split [1 2 3 4 5 6] [2 -2 2]]
+#r3only
+[["abc" "de" "fghi" "jk"] == split "abc,de,fghi,jk" #","]
+#r3only
+[["abc" "de" "fghi" "jk"] == split "abc<br>de<br>fghi<br>jk" <br>]
+#r3only
+[["a" "b" "c"] == split "a.b.c" "."]
+#r3only
+[["c" "c"] == split "c c" " "]
+#r3only
+[["1,2,3"] == split "1,2,3" " "]
+#r3only
+[["1" "2" "3"] == split "1,2,3" ","]
+#r3only
+[["1" "2" "3" ""] == split "1,2,3," ","]
+#r3only
+[["1" "2" "3" ""] == split "1,2,3," charset ",."]
+#r3only
+[["1" "2" "3" ""] == split "1.2,3." charset ",."]
+#r3only
+[["-" "-"] == split "-a-a" ["a"]]
+#r3only
+[["-" "-" "'"] == split "-a-a'" ["a"]]
+#r3only
+[["abc" "de" "fghi" "jk"] == split "abc|de/fghi:jk" charset "|/:"]
+#r3only
+[["abc" "de" "fghi" "jk"] == split "abc^M^Jde^Mfghi^Jjk" [crlf | #"^M" | newline]]
+#r3only
+[["abc" "de" "fghi" "jk"] == split "abc     de fghi  jk" [some #" "]]
 ; functions/series/trim.r
 ; bug#83
 ; refinement order
