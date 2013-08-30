@@ -124,6 +124,7 @@ make object! compose [
 
 		either case [
 			not exists? log-file [
+				print "new log"
 				process-tests test-sources :process-vector
 				true
 			]
