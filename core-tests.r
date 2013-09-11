@@ -11106,6 +11106,9 @@
 ["#[block! [1 2] 2]" == mold/all next [1 2]]
 ; bug#77
 [none? find mold/flat make object! [a: 1] "    "]
+; bug#84
+[equal? mold make bitset! "^(00)" "make bitset! #{80}"]
+[equal? mold/all make bitset! "^(00)" "#[bitset! #{80}]"]
 ; functions/convert/to.r
 ; bug#12
 [image? to image! make gob! []]

@@ -22,8 +22,6 @@ make object! compose [
 	dialect-failures: none
 	successes: none
 
-	test-mode: none
-
 	exceptions: make object! [
 		return: "return/exit out of the test code"
 		error: "error was caused in the test code"
@@ -45,12 +43,10 @@ make object! compose [
 			exit
 		]
 
-		unless test-mode = 'run [log [source]]
+		log [source]
 		if error? try [test-block: load source] [
 			test-failures: test-failures + 1
-			log either test-mode = 'run [
-				[source "^/"]
-			] [[{ "failed, cannot load test source"^/}]]
+			log [{ "failed, cannot load test source"^/}]
 			exit
 		]
 
@@ -64,12 +60,10 @@ make object! compose [
 
 		either test-block = "succeeded" [
 			successes: successes + 1
-			unless test-mode = 'run [log [{ "} test-block {"^/}]]
+			log [{ "} test-block {"^/}]
 		] [
 			test-failures: test-failures + 1
-			log either test-mode = 'run [
-				[source "^/"]
-			] [reduce [{ "} test-block {"^/}]]
+			log reduce [{ "} test-block {"^/}]
 		]
 	]
 
