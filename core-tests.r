@@ -8150,6 +8150,7 @@
 	]
 ]
 ; /all refinement
+; bug#86
 [
 	s1: false
 	s2: false
