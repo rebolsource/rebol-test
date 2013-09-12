@@ -45,13 +45,14 @@ make object! compose [
 		source [string!]
 		/local test-block exception
 	] [
+		log [source]
+
 		unless empty? exclude flags allowed-flags [
 			skipped: skipped + 1
-			log [source { "skipped"^/}]
+			log [{ "skipped"^/}]
 			exit
 		]
 
-		log [source]
 		if error? try [test-block: load source] [
 			test-failures: test-failures + 1
 			log [{ "failed, cannot load test source"^/}]
