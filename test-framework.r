@@ -60,13 +60,15 @@ make object! compose [
 		]
 
 		error? set/any 'test-block catch-any test-block 'exception
-		recycle
+
 		test-block: case [
 			exception [rejoin ["failed, " exceptions/:exception]]
 			not logic? get/any 'test-block ["failed, not a logic value"]
 			:test-block ["succeeded"]
 			true ["failed"]
 		]
+
+		recycle
 
 		either test-block = "succeeded" [
 			successes: successes + 1
