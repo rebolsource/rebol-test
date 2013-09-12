@@ -3197,6 +3197,9 @@ datatypes/action.r
 	a-value: 'a
 	:a-value == a-value
 ]
+; functions/comparison/maximum-of.r
+; bug#8
+[3 = first maximum-of [1 2 3]]
 ; functions/comparison/equalq.r
 ; reflexivity test for native!
 [equal? :abs :abs]
@@ -5462,13 +5465,2999 @@ datatypes/action.r
 ; functions/comparison/strict-not-equalq.r
 ; bug#32
 [strict-not-equal? 0 1]
-; functions/comparison/maximum-of.r
-; bug#8
-[3 = first maximum-of [1 2 3]]
+; functions/context/bind.r
+; bug#50
+#r3only
+[none? bind? to word! "zzz"]
+; BIND works 'as expected' in object spec
+; bug#1549
+[
+	b1: [self]
+	ob: make object! [
+	    b2: [self]
+	    set 'a same? first b2 first bind/copy b1 'b2
+	]
+	a
+]
+; bug#1549
+; BIND works 'as expected' in function body
+[
+	b1: [self]
+	f: func [/local b2] [
+	    b2: [self]
+	    same? first b2 first bind/copy b1 'b2
+	]
+	f
+]
+; bug#1549
+; BIND works 'as expected' in closure body
+[
+	b1: [self]
+	f: closure [/local b2] [
+	    b2: [self]
+	    same? first b2 first bind/copy b1 'b2
+	]
+	f
+]
+; bug#1549
+; BIND works 'as expected' in REPEAT body
+[
+	b1: [self]
+	repeat i 1 [
+	    b2: [self]
+	    same? first b2 first bind/copy b1 'i
+	]
+]
+; bug#1655
+[not head? bind next [1] 'rebol]
+; bug#892, bug#216
+[y: 'x do has [x] [x: true get bind y 'x]]
+; bug#1893
+[
+	word: do func [x] ['x] 1
+	same? word bind 'x word
+]
+; functions/context/boundq.r
+; also, functions/context/bindq.r
+[
+	o: make object! [a: none]
+	same? o bound? in o 'a
+]
+; functions/context/resolve.r
+#r3only
+; bug#2017: crash in RESOLVE/extend/only
+[get in resolve/extend/only context [] context [a: true] [a] 'a]
+; functions/context/set.r
+; bug#1745
+[equal? error? try [set /a 1] error? try [set [/a] 1]]
+; bug#1745
+[equal? error? try [set #a 1] error? try [set [#a] 1]]
+; bug#1763
+[a: 1 all [error? try [set [a] reduce [()]] a = 1]]
+[a: 1 set [a] reduce [2 ()] a = 2]
+[a: 1 attempt [set [a b] reduce [2 ()]] a = 1]
+[x: construct [a: 1] all [error? try [set x reduce [()]] x/a = 1]]
+[x: construct [a: 1] set x reduce [2 ()] x/a = 2]
+[x: construct [a: 1 b: 2] all [error? try [set x reduce [3 ()]] x/a = 1]]
+[a: 1 set/any [a] reduce [()] unset? get/any 'a]
+[a: 1 b: 2 set/any [a b] reduce [3 ()] all [a = 3 unset? get/any 'b]]
+[x: construct [a: 1] set/any x reduce [()] unset? get/any in x 'a]
+[x: construct [a: 1 b: 2] set/any x reduce [3 ()] all [a = 3 unset? get/any in x 'b]]
+; set [:get-word] [word]
+[a: 1 b: none set [:b] [a] b =? 1]
+[unset 'a b: none all [error? try [set [:b] [a]] none? b]]
+[unset 'a b: none set/any [:b] [a] unset? get/any 'b]
+; functions/context/unset.r
+[
+	a: none
+	unset 'a
+	not value? 'a
+]
+[
+	a: none
+	unset 'a
+	unset 'a
+	not value? 'a
+]
+; functions/context/use.r
+; local word test
+[
+	a: 1
+	use [a] [a: 2]
+	a = 1
+]
+[
+	a: 1
+	error? try [use 'a [a: 2]]
+	a = 1
+]
+; initialization
+#r2only
+[use [a] [unset? get/any 'a]]
+#r3only
+[use [a] [none? :a]]
+; BREAK out of USE
+[
+	1 = loop 1 [
+		use [a] [break/return 1]
+		2
+	]
+]
+; THROW out of USE
+[
+	1 = catch [
+		use [a] [throw 1]
+		2
+	]
+]
+; "error out" of USE
+[
+	error? try [
+		use [a] [1 / 0]
+		2
+	]
+]
+; bug#539
+; RETURN out of USE
+[
+	f: func [] [
+		use [a] [return 1]
+		2
+	]
+	1 = f
+]
+; bug#539
+; EXIT out of USE
+[
+	f: func [] [
+		use [] [exit]
+		42
+	]
+	unset? f
+]
+; functions/context/valueq.r
+[false == value? 'nonsense]
+[true == value? 'value?]
+#r3only
+; bug#1914
+[false == value? do func [x] ['x] none]
+; functions/control/all.r
+; zero values
+[true == all []]
+; one value
+[:abs = all [:abs]]
+[
+	a-value: #{}
+	same? a-value all [a-value]
+]
+[
+	a-value: charset ""
+	same? a-value all [a-value]
+]
+[
+	a-value: []
+	same? a-value all [a-value]
+]
+[
+	a-value: none!
+	same? a-value all [a-value]
+]
+[1/Jan/0000 = all [1/Jan/0000]]
+[0.0 == all [0.0]]
+[1.0 == all [1.0]]
+[
+	a-value: me@here.com
+	same? a-value all [a-value]
+]
+[error? all [try [1 / 0]]]
+[
+	a-value: %""
+	same? a-value all [a-value]
+]
+[
+	a-value: does []
+	same? :a-value all [:a-value]
+]
+[
+	a-value: first [:a]
+	:a-value == all [:a-value]
+]
+[#"^@" == all [#"^@"]]
+[
+	a-value: make image! 0x0
+	same? a-value all [a-value]
+]
+[0 == all [0]]
+[1 == all [1]]
+[#a == all [#a]]
+[
+	a-value: first ['a/b]
+	:a-value == all [:a-value]
+]
+[
+	a-value: first ['a]
+	:a-value == all [:a-value]
+]
+[true = all [true]]
+[none? all [false]]
+[$1 == all [$1]]
+[same? :type? all [:type?]]
+[none? all [#[none]]]
+[
+	a-value: make object! []
+	same? :a-value all [:a-value]
+]
+[
+	a-value: first [()]
+	same? :a-value all [:a-value]
+]
+[same? get '+ all [get '+]]
+[0x0 == all [0x0]]
+[
+	a-value: 'a/b
+	:a-value == all [:a-value]
+]
+[
+	a-value: make port! http://
+	port? all [:a-value]
+]
+[/a == all [/a]]
+[
+	a-value: first [a/b:]
+	:a-value == all [:a-value]
+]
+[
+	a-value: first [a:]
+	:a-value == all [:a-value]
+]
+[
+	a-value: ""
+	same? :a-value all [:a-value]
+]
+[
+	a-value: make tag! ""
+	same? :a-value all [:a-value]
+]
+[0:00 == all [0:00]]
+[0.0.0 == all [0.0.0]]
+[unset? all [()]]
+['a == all ['a]]
+; two values
+[:abs = all [true :abs]]
+[
+	a-value: #{}
+	same? a-value all [true a-value]
+]
+[
+	a-value: charset ""
+	same? a-value all [true a-value]
+]
+[
+	a-value: []
+	same? a-value all [true a-value]
+]
+[
+	a-value: none!
+	same? a-value all [true a-value]
+]
+[1/Jan/0000 = all [true 1/Jan/0000]]
+[0.0 == all [true 0.0]]
+[1.0 == all [true 1.0]]
+[
+	a-value: me@here.com
+	same? a-value all [true a-value]
+]
+[error? all [true try [1 / 0]]]
+[
+	a-value: %""
+	same? a-value all [true a-value]
+]
+[
+	a-value: does []
+	same? :a-value all [true :a-value]
+]
+[
+	a-value: first [:a]
+	same? :a-value all [true :a-value]
+]
+[#"^@" == all [true #"^@"]]
+[
+	a-value: make image! 0x0
+	same? a-value all [true a-value]
+]
+[0 == all [true 0]]
+[1 == all [true 1]]
+[#a == all [true #a]]
+[
+	a-value: first ['a/b]
+	:a-value == all [true :a-value]
+]
+[
+	a-value: first ['a]
+	:a-value == all [true :a-value]
+]
+[$1 == all [true $1]]
+[same? :type? all [true :type?]]
+[none? all [true #[none]]]
+[
+	a-value: make object! []
+	same? :a-value all [true :a-value]
+]
+[
+	a-value: first [()]
+	same? :a-value all [true :a-value]
+]
+[same? get '+ all [true get '+]]
+[0x0 == all [true 0x0]]
+[
+	a-value: 'a/b
+	:a-value == all [true :a-value]
+]
+[
+	a-value: make port! http://
+	port? all [true :a-value]
+]
+[/a == all [true /a]]
+[
+	a-value: first [a/b:]
+	:a-value == all [true :a-value]
+]
+[
+	a-value: first [a:]
+	:a-value == all [true :a-value]
+]
+[
+	a-value: ""
+	same? :a-value all [true :a-value]
+]
+[
+	a-value: make tag! ""
+	same? :a-value all [true :a-value]
+]
+[0:00 == all [true 0:00]]
+[0.0.0 == all [true 0.0.0]]
+[unset? all [true ()]]
+['a == all [true 'a]]
+[true = all [:abs true]]
+[
+	a-value: #{}
+	true = all [a-value true]
+]
+[
+	a-value: charset ""
+	true = all [a-value true]
+]
+[
+	a-value: []
+	true = all [a-value true]
+]
+[
+	a-value: none!
+	true = all [a-value true]
+]
+[true = all [1/Jan/0000 true]]
+[true = all [0.0 true]]
+[true = all [1.0 true]]
+[
+	a-value: me@here.com
+	true = all [a-value true]
+]
+[true = all [try [1 / 0] true]]
+[
+	a-value: %""
+	true = all [a-value true]
+]
+[
+	a-value: does []
+	true = all [:a-value true]
+]
+[
+	a-value: first [:a]
+	true = all [:a-value true]
+]
+[true = all [#"^@" true]]
+[
+	a-value: make image! 0x0
+	true = all [a-value true]
+]
+[true = all [0 true]]
+[true = all [1 true]]
+[true = all [#a true]]
+[
+	a-value: first ['a/b]
+	true = all [:a-value true]
+]
+[
+	a-value: first ['a]
+	true = all [:a-value true]
+]
+[true = all [true true]]
+[none? all [false true]]
+[none? all [true false]]
+[true = all [$1 true]]
+[true = all [:type? true]]
+[none? all [#[none] true]]
+[
+	a-value: make object! []
+	true = all [:a-value true]
+]
+[
+	a-value: first [()]
+	true = all [:a-value true]
+]
+[true = all [get '+ true]]
+[true = all [0x0 true]]
+[
+	a-value: 'a/b
+	true = all [:a-value true]
+]
+[
+	a-value: make port! http://
+	true = all [:a-value true]
+]
+[true = all [/a true]]
+[
+	a-value: first [a/b:]
+	true = all [:a-value true]
+]
+[
+	a-value: first [a:]
+	true = all [:a-value true]
+]
+[
+	a-value: ""
+	true = all [:a-value true]
+]
+[
+	a-value: make tag! ""
+	true = all [:a-value true]
+]
+[true = all [0:00 true]]
+[true = all [0.0.0 true]]
+[true = all [() true]]
+[true = all ['a true]]
+; evaluation stops after encountering FALSE or NONE
+[
+	success: true
+	all [false success: false]
+	success
+]
+[
+	success: true
+	all [none success: false]
+	success
+]
+; evaluation continues otherwise
+[
+	success: false
+	all [true success: true]
+	success
+]
+[
+	success: false
+	all [1 success: true]
+	success
+]
+; RETURN stops evaluation
+[
+	f1: does [all [return 1 2] 2]
+	1 = f1
+]
+; THROW stops evaluation
+[
+	1 = catch [
+		all [
+			throw 1
+			2
+		]
+	]
+]
+; BREAK stops evaluation
+[
+	1 = loop 1 [
+		all [
+			break/return 1
+			2
+		]
+	]
+]
+; recursivity
+[all [true all [true]]]
+[not all [true all [false]]]
+; infinite recursion
+[
+	blk: [all blk]
+	error? try blk
+]
+; functions/control/any.r
+; zero values
+[none? any []]
+; one value
+[:abs = any [:abs]]
+[
+	a-value: #{}
+	same? a-value any [a-value]
+]
+[
+	a-value: charset ""
+	same? a-value any [a-value]
+]
+[
+	a-value: []
+	same? a-value any [a-value]
+]
+[
+	a-value: none!
+	same? a-value any [a-value]
+]
+[1/Jan/0000 = any [1/Jan/0000]]
+[0.0 == any [0.0]]
+[1.0 == any [1.0]]
+[
+	a-value: me@here.com
+	same? a-value any [a-value]
+]
+[error? any [try [1 / 0]]]
+[
+	a-value: %""
+	same? a-value any [a-value]
+]
+[
+	a-value: does []
+	same? :a-value any [:a-value]
+]
+[
+	a-value: first [:a]
+	:a-value == any [:a-value]
+]
+[#"^@" == any [#"^@"]]
+[
+	a-value: make image! 0x0
+	same? a-value any [a-value]
+]
+[0 == any [0]]
+[1 == any [1]]
+[#a == any [#a]]
+[
+	a-value: first ['a/b]
+	:a-value == any [:a-value]
+]
+[
+	a-value: first ['a]
+	:a-value == any [:a-value]
+]
+[true = any [true]]
+[none? any [false]]
+[$1 == any [$1]]
+[same? :type? any [:type?]]
+[none? any [#[none]]]
+[
+	a-value: make object! []
+	same? :a-value any [:a-value]
+]
+[
+	a-value: first [()]
+	same? :a-value any [:a-value]
+]
+[same? get '+ any [get '+]]
+[0x0 == any [0x0]]
+[
+	a-value: 'a/b
+	:a-value == any [:a-value]
+]
+[
+	a-value: make port! http://
+	port? any [:a-value]
+]
+[/a == any [/a]]
+; routine test?
+[
+	a-value: first [a/b:]
+	:a-value == any [:a-value]
+]
+[
+	a-value: first [a:]
+	:a-value == any [:a-value]
+]
+[
+	a-value: ""
+	same? :a-value any [:a-value]
+]
+[
+	a-value: make tag! ""
+	same? :a-value any [:a-value]
+]
+[0:00 == any [0:00]]
+[0.0.0 == any [0.0.0]]
+#r2only
+[unset? any [()]]
+#r3only
+[none? any [()]]
+['a == any ['a]]
+; two values
+[:abs = any [false :abs]]
+[
+	a-value: #{}
+	same? a-value any [false a-value]
+]
+[
+	a-value: charset ""
+	same? a-value any [false a-value]
+]
+[
+	a-value: []
+	same? a-value any [false a-value]
+]
+[
+	a-value: none!
+	same? a-value any [false a-value]
+]
+[1/Jan/0000 = any [false 1/Jan/0000]]
+[0.0 == any [false 0.0]]
+[1.0 == any [false 1.0]]
+[
+	a-value: me@here.com
+	same? a-value any [false a-value]
+]
+[error? any [false try [1 / 0]]]
+[
+	a-value: %""
+	same? a-value any [false a-value]
+]
+[
+	a-value: does []
+	same? :a-value any [false :a-value]
+]
+[
+	a-value: first [:a]
+	:a-value == any [false :a-value]
+]
+[#"^@" == any [false #"^@"]]
+[
+	a-value: make image! 0x0
+	same? a-value any [false a-value]
+]
+[0 == any [false 0]]
+[1 == any [false 1]]
+[#a == any [false #a]]
+[
+	a-value: first ['a/b]
+	:a-value == any [false :a-value]
+]
+[
+	a-value: first ['a]
+	:a-value == any [false :a-value]
+]
+[true = any [false true]]
+[none? any [false false]]
+[$1 == any [false $1]]
+[same? :type? any [false :type?]]
+[none? any [false #[none]]]
+[
+	a-value: make object! []
+	same? :a-value any [false :a-value]
+]
+[
+	a-value: first [()]
+	same? :a-value any [false :a-value]
+]
+[same? get '+ any [false get '+]]
+[0x0 == any [false 0x0]]
+[
+	a-value: 'a/b
+	:a-value == any [false :a-value]
+]
+[
+	a-value: make port! http://
+	port? any [false :a-value]
+]
+[/a == any [false /a]]
+[
+	a-value: first [a/b:]
+	:a-value == any [false :a-value]
+]
+[
+	a-value: first [a:]
+	:a-value == any [false :a-value]
+]
+[
+	a-value: ""
+	same? :a-value any [false :a-value]
+]
+[
+	a-value: make tag! ""
+	same? :a-value any [false :a-value]
+]
+[0:00 == any [false 0:00]]
+[0.0.0 == any [false 0.0.0]]
+#r2only
+[unset? any [false ()]]
+#r3only
+[none? any [false ()]]
+['a == any [false 'a]]
+[:abs = any [:abs false]]
+[
+	a-value: #{}
+	same? a-value any [a-value false]
+]
+[
+	a-value: charset ""
+	same? a-value any [a-value false]
+]
+[
+	a-value: []
+	same? a-value any [a-value false]
+]
+[
+	a-value: none!
+	same? a-value any [a-value false]
+]
+[1/Jan/0000 = any [1/Jan/0000 false]]
+[0.0 == any [0.0 false]]
+[1.0 == any [1.0 false]]
+[
+	a-value: me@here.com
+	same? a-value any [a-value false]
+]
+[error? any [try [1 / 0] false]]
+[
+	a-value: %""
+	same? a-value any [a-value false]
+]
+[
+	a-value: does []
+	same? :a-value any [:a-value false]
+]
+[
+	a-value: first [:a]
+	:a-value == any [:a-value false]
+]
+[#"^@" == any [#"^@" false]]
+[
+	a-value: make image! 0x0
+	same? a-value any [a-value false]
+]
+[0 == any [0 false]]
+[1 == any [1 false]]
+[#a == any [#a false]]
+[
+	a-value: first ['a/b]
+	:a-value == any [:a-value false]
+]
+[
+	a-value: first ['a]
+	:a-value == any [:a-value false]
+]
+[true = any [true false]]
+[$1 == any [$1 false]]
+[same? :type? any [:type? false]]
+[none? any [#[none] false]]
+[
+	a-value: make object! []
+	same? :a-value any [:a-value false]
+]
+[
+	a-value: first [()]
+	same? :a-value any [:a-value false]
+]
+[same? get '+ any [get '+ false]]
+[0x0 == any [0x0 false]]
+[
+	a-value: 'a/b
+	:a-value == any [:a-value false]
+]
+[
+	a-value: make port! http://
+	port? any [:a-value false]
+]
+[/a == any [/a false]]
+[
+	a-value: first [a/b:]
+	:a-value == any [:a-value false]
+]
+[
+	a-value: first [a:]
+	:a-value == any [:a-value false]
+]
+[
+	a-value: ""
+	same? :a-value any [:a-value false]
+]
+[
+	a-value: make tag! ""
+	same? :a-value any [:a-value false]
+]
+[0:00 == any [0:00 false]]
+[0.0.0 == any [0.0.0 false]]
+#r2only
+[unset? any [() false]]
+#r3only
+[none? any [() false]]
+['a == any ['a false]]
+; evaluation stops after encountering something else than FALSE or NONE
+[
+	success: true
+	any [true success: false]
+	success
+]
+[
+	success: true
+	any [1 success: false]
+	success
+]
+; evaluation continues otherwise
+[
+	success: false
+	any [false success: true]
+	success
+]
+[
+	success: false
+	any [none success: true]
+	success
+]
+; RETURN stops evaluation
+[
+	f1: does [any [return 1 2] 2]
+	1 = f1
+]
+; THROW stops evaluation
+[
+	1 = catch [
+		any [
+			throw 1
+			2
+		]
+	]
+]
+; BREAK stops evaluation
+[
+	1 = loop 1 [
+		any [
+			break/return 1
+			2
+		]
+	]
+]
+; recursivity
+[any [false any [true]]]
+[none? any [false any [false]]]
+; infinite recursion
+[
+	blk: [any blk]
+	error? try blk
+]
+; functions/control/apply.r
+; bug#44
+[error? try [apply 'type?/word []]]
+; bug#1949: RETURN/redo can break APPLY security
+[same? :add attempt [apply does [return/redo :add] []]]
+; DO is special
+[2 == do does [return apply :do [:add 1 1] 4 4]]
+[1 == apply :subtract [2 1]]
+#r3only
+[1 == apply :- [2 1]]
+#r2only
+[-2 == apply :- [2]]
+[none == apply func [a] [a] []]
+[none == apply/only func [a] [a] []]
+[1 == apply func [a] [a] [1 2]]
+[1 == apply/only func [a] [a] [1 2]]
+[true == apply func [/a] [a] [true]]
+[none == apply func [/a] [a] [false]]
+[none == apply func [/a] [a] []]
+[true == apply/only func [/a] [a] [true]]
+; the word 'false
+[true == apply/only func [/a] [a] [false]]
+[false == apply/only func [/a] [a] [#[false]]]
+[none == apply/only func [/a] [a] []]
+[use [a] [a: true true == apply func [/a] [a] [a]]]
+[use [a] [a: false none == apply func [/a] [a] [a]]]
+[use [a] [a: false true == apply func [/a] [a] ['a]]]
+[use [a] [a: false true == apply func [/a] [a] [/a]]]
+[use [a] [a: false true == apply/only func [/a] [a] [a]]]
+[paren! == apply/only :type? [()]]
+['paren! == apply/only :type? [() true]]
+[[1] == head apply :insert [copy [] [1] none none none]]
+[[1] == head apply :insert [copy [] [1] none none false]]
+[[[1]] == head apply :insert [copy [] [1] none none true]]
+[native! == apply :type? [:print]]
+[get-word! == apply/only :type? [:print]]
+[1 == do does [apply :return [1] 2]]
+; bug#1760
+[1 == do does [apply does [] [return 1] 2]]
+; bug#1760
+[1 == do does [apply func [a] [a] [return 1] 2]]
+; bug#1760
+[1 == do does [apply does [] [return 1]]]
+[1 == do does [apply func [a] [a] [return 1]]]
+[1 == do does [apply :also [return 1 2]]]
+; bug#1760
+[1 == do does [apply :also [2 return 1]]]
+[unset? apply func [x [any-type!]] [get/any 'x] [()]]
+[unset? apply func ['x [any-type!]] [get/any 'x] [()]]
+[unset? apply func [:x [any-type!]] [get/any 'x] [()]]
+[unset? apply func [x [any-type!]] [return get/any 'x] [()]]
+[unset? apply func ['x [any-type!]] [return get/any 'x] [()]]
+[unset? apply func [:x [any-type!]] [return get/any 'x] [()]]
+[error? apply :make [error! ""]]
+#r3only
+[error? apply func [:x [any-type!]] [return get/any 'x] [make error! ""]]
+[
+	error? apply/only func [x [any-type!]] [
+		return get/any 'x
+	] head insert copy [] make error! ""
+]
+[
+	error? apply/only func ['x [any-type!]] [
+		return get/any 'x
+	] head insert copy [] make error! ""
+]
+[
+	error? apply/only func [:x [any-type!]] [
+		return get/any 'x
+	] head insert copy [] make error! ""
+]
+[use [x] [x: 1 strict-equal? 1 apply func ['x] [:x] [:x]]]
+[use [x] [x: 1 strict-equal? first [:x] apply/only func ['x] [:x] [:x]]]
+[
+	use [x] [
+		unset 'x
+		strict-equal? first [:x] apply/only func ['x [any-type!]] [
+			return get/any 'x
+		] [:x]
+	]
+]
+[use [x] [x: 1 strict-equal? 1 apply func [:x] [:x] [x]]]
+[use [x] [x: 1 strict-equal? 'x apply func [:x] [:x] ['x]]]
+[use [x] [x: 1 strict-equal? 'x apply/only func [:x] [:x] [x]]]
+[use [x] [x: 1 strict-equal? 'x apply/only func [:x] [return :x] [x]]]
+[
+	use [x] [
+		unset 'x
+		strict-equal? 'x apply/only func [:x [any-type!]] [
+			return get/any 'x
+		] [x]
+	]
+]
+; functions/control/attempt.r
+; bug#41
+[none? attempt [1 / 0]]
+[1 = attempt [1]]
+[unset? attempt []]
+; RETURN stops attempt evaluation
+[
+	f1: does [attempt [return 1 2] 2]
+	1 == f1
+]
+; THROW stops attempt evaluation
+[1 == catch [attempt [throw 1 2] 2]]
+; BREAK stops attempt evaluation
+[unset? loop 1 [attempt [break 2] 2]]
+[1 == loop 1 [attempt [break/return 1 2] 2]]
+; recursion
+[1 = attempt [attempt [1]]]
+[none? attempt [attempt [1 / 0]]]
+; infinite recursion
+[
+	blk: [attempt blk]
+	none? attempt blk
+]
+; functions/control/break.r
+; see loop functions for basic breaking functionality
+; just testing return values, but written as if break could fail altogether
+; in case that becomes an issue. break failure tests are with the functions
+; that they are failing to break from.
+; break should return #[unset!]
+[unset? loop 1 [break 2]]
+; break/return should return argument
+[none? loop 1 [break/return none 2]]
+[false =? loop 1 [break/return false 2]]
+[true =? loop 1 [break/return true 2]]
+[unset? loop 1 [break/return () 2]]
+[error? loop 1 [break/return try [1 / 0] 2]]
+; the "result" of break should not be assignable, bug#1515
+[a: 1 loop 1 [a: break] :a =? 1]
+[a: 1 loop 1 [set 'a break] :a =? 1]
+[a: 1 loop 1 [set/any 'a break] :a =? 1]
+[a: 1 loop 1 [a: break/return 2] :a =? 1]
+[a: 1 loop 1 [set 'a break/return 2] :a =? 1]
+[a: 1 loop 1 [set/any 'a break/return 2] :a =? 1]
+; the "result" of break should not be passable to functions, bug#1509
+[a: 1 loop 1 [a: error? break] :a =? 1]
+[a: 1 loop 1 [a: error? break/return 2] :a =? 1]
+; bug#1535
+[loop 1 [words-of break] true]
+[loop 1 [values-of break] true]
+; bug#1945
+[loop 1 [spec-of break] true]
+; the "result" of break should not be caught by try
+[a: 1 loop 1 [a: error? try [break]] :a =? 1]
+; functions/control/case.r
+[
+	success: false
+	case [true [success: true]]
+	success
+]
+[
+	success: true
+	case [false [success: false]]
+	success
+]
+; not sure these are consistent with other control functions
+[not case []]
+[logic! = type? case [true []]]
+; case results
+[case [true [true]]]
+[not case [true [false]]]
+; RETURN stops evaluation
+[
+	f1: does [case [return 1 2]]
+	1 = f1
+]
+; THROW stops evaluation
+[
+	1 = catch [
+		case [throw 1 2]
+		2
+	]
+]
+; BREAK stops evaluation
+[
+	1 = loop 1 [
+		case [break/return 1 2]
+		2
+	]
+]
+; /all refinement
+; bug#86
+[
+	s1: false
+	s2: false
+	case/all [
+		true [s1: true]
+		true [s2: true]
+	]
+	s1 and s2
+]
+; recursivity
+[1 = case [true [case [true [1]]]]]
+; infinite recursion
+[
+	blk: [case blk]
+	error? try blk
+]
+; functions/control/catch.r
+; see also functions/control/throw.r
+[
+	catch [
+		throw success: true
+		sucess: false
+	]
+	success
+]
+; catch results
+[unset? catch []]
+[unset? catch [()]]
+#r3only
+[error? catch [try [1 / 0]]]
+[1 = catch [1]]
+[unset? catch [throw ()]]
+[error? catch [throw try [1 / 0]]]
+[1 = catch [throw 1]]
+; catch/name results
+[unset? catch/name [] 'catch]
+[unset? catch/name [()] 'catch]
+#r3only
+[error? catch/name [try [1 / 0]] 'catch]
+[1 = catch/name [1] 'catch]
+[unset? catch/name [throw/name () 'catch] 'catch]
+[error? catch/name [throw/name try [1 / 0] 'catch] 'catch]
+[1 = catch/name [throw/name 1 'catch] 'catch]
+; recursive cases
+[
+	num: 1
+	catch [
+		catch [throw 1]
+		num: 2
+	]
+	2 = num
+]
+[
+	num: 1
+	catch [
+		catch/name [
+			throw 1
+		] 'catch
+		num: 2
+	]
+	1 = num
+]
+[
+	num: 1
+	catch/name [
+		catch [throw 1]
+		num: 2
+	] 'catch
+	2 = num
+]
+[
+	num: 1
+	catch/name [
+		catch/name [
+			throw/name 1 'name
+		] 'name
+		num: 2
+	] 'name
+	2 = num
+]
+; CATCH and RETURN
+[
+	f: does [catch [return 1] 2]
+	1 = f
+]
+; CATCH and BREAK
+[
+	1 = loop 1 [
+		catch [break/return 1 2]
+		2
+	]
+]
+#r3only
+; CATCH/QUIT
+[
+	catch/quit [quit]
+	true
+]
+#r3only
+; bug#851
+[error? try [catch/quit [] do make error! ""]]
+; bug#851
+[none? attempt [catch/quit [] do make error! ""]]
+; functions/control/compose.r
+[
+	num: 1
+	[1 num] = compose [(num) num]
+]
+[[] = compose []]
+[
+	blk: []
+	append blk [try [1 / 0]]
+	blk = compose blk
+]
+[
+	blk: reduce [()]
+	blk = compose blk
+]
+; RETURN stops the evaluation
+[
+	f1: does [compose [(return 1)] 2]
+	1 = f1
+]
+; THROW stops the evaluation
+[1 = catch [compose [(throw 1 2)] 2]]
+; BREAK stops the evaluation
+[1 = loop 1 [compose [(break/return 1 2)] 2]]
+#r3only
+; Test that errors do not stop the evaluation:
+[block? compose [(try [1 / 0])]]
+[
+	blk: []
+	not same? blk compose blk
+]
+[
+	blk: [[]]
+	same? first blk first compose blk
+]
+[
+	blk: []
+	same? blk first compose [(reduce [blk])]
+]
+[
+	blk: []
+	same? blk first compose/only [(blk)]
+]
+; recursion
+[
+	num: 1
+	[num 1] = compose [num (compose [(num)])]
+]
+; infinite recursion
+[
+	blk: [(compose blk)]
+	error? try blk
+]
+; #1906
+[
+	b: copy [] insert/dup b 1 32768 compose b
+]
+; functions/control/continue.r
+; see loop functions for basic continuing functionality
+; the "result" of continue should not be assignable, bug#1515
+#r3only
+[a: 1 loop 1 [a: continue] :a =? 1]
+#r3only
+[a: 1 loop 1 [set 'a continue] :a =? 1]
+#r3only
+[a: 1 loop 1 [set/any 'a continue] :a =? 1]
+; the "result" of continue should not be passable to functions, bug#1509
+#r3only
+[a: 1 loop 1 [a: error? continue] :a =? 1]
+; bug#1535
+#r3only
+[loop 1 [words-of continue] true]
+#r3only
+[loop 1 [values-of continue] true]
+#r3only
+; bug#1945
+[loop 1 [spec-of continue] true]
+; continue should not be caught by try
+#r3only
+[a: 1 loop 1 [a: error? try [continue]] :a =? 1]
+; functions/control/disarm.r
+#r2only
+[object? disarm try [1 / 0]]
+; functions/control/do.r
+[
+	success: false
+	do [success: true]
+	success
+]
+[1 == do :abs -1]
+[
+	a-value: #{}
+	same? a-value do a-value
+]
+[
+	a-value: charset ""
+	same? a-value do a-value
+]
+; do block start
+[unset? do []]
+[:abs = do [:abs]]
+[
+	a-value: #{}
+	same? a-value do reduce [a-value]
+]
+[
+	a-value: charset ""
+	same? a-value do reduce [a-value]
+]
+[
+	a-value: []
+	same? a-value do reduce [a-value]
+]
+[same? none! do reduce [none!]]
+[1/Jan/0000 = do [1/Jan/0000]]
+[0.0 == do [0.0]]
+[1.0 == do [1.0]]
+[
+	a-value: me@here.com
+	same? a-value do reduce [a-value]
+]
+#r3only
+[error? do [try [1 / 0]]]
+[
+	a-value: %""
+	same? a-value do reduce [a-value]
+]
+[
+	a-value: does []
+	same? :a-value do [:a-value]
+]
+[
+	a-value: first [:a-value]
+	:a-value == do reduce [:a-value]
+]
+[#"^@" == do [#"^@"]]
+[
+	a-value: make image! 0x0
+	same? a-value do reduce [a-value]
+]
+[0 == do [0]]
+[1 == do [1]]
+[#a == do [#a]]
+[
+	a-value: first ['a/b]
+	:a-value == do [:a-value]
+]
+[
+	a-value: first ['a]
+	:a-value == do [:a-value]
+]
+[#[true] == do [#[true]]]
+[#[false] == do [#[false]]]
+[$1 == do [$1]]
+[same? :type? do [:type?]]
+[none? do [#[none]]]
+[
+	a-value: make object! []
+	same? :a-value do reduce [:a-value]
+]
+[
+	a-value: first [()]
+	same? :a-value do [:a-value]
+]
+[same? get '+ do [get '+]]
+[0x0 == do [0x0]]
+[
+	a-value: 'a/b
+	:a-value == do [:a-value]
+]
+[
+	a-value: make port! http://
+	port? do reduce [:a-value]
+]
+[/a == do [/a]]
+[
+	a-value: first [a/b:]
+	:a-value == do [:a-value]
+]
+[
+	a-value: first [a:]
+	:a-value == do [:a-value]
+]
+[
+	a-value: ""
+	same? :a-value do reduce [:a-value]
+]
+[
+	a-value: make tag! ""
+	same? :a-value do reduce [:a-value]
+]
+[0:00 == do [0:00]]
+[0.0.0 == do [0.0.0]]
+[unset? do [()]]
+['a == do ['a]]
+; do block end
+[
+	a-value: none!
+	same? a-value do a-value
+]
+[1/Jan/0000 == do 1/Jan/0000]
+[0.0 == do 0.0]
+[1.0 == do 1.0]
+[
+	a-value: me@here.com
+	same? a-value do a-value
+]
+#r3only
+[error? try [do try [1 / 0] 1]]
+[
+	a-value: does [5]
+	5 == do :a-value
+]
+#r2only
+[
+	a: 12
+	a-value: first [:a]
+	:a-value == do :a-value
+]
+#r3only
+[
+	a: 12
+	a-value: first [:a]
+	:a == do :a-value
+]
+[#"^@" == do #"^@"]
+[
+	a-value: make image! 0x0
+	same? a-value do a-value
+]
+[0 == do 0]
+[1 == do 1]
+[#a == do #a]
+[
+	a-value: first ['a/b]
+	:a-value == do :a-value
+]
+#r2only
+[
+	a-value: first ['a]
+	:a-value == do :a-value
+]
+#r3only
+[
+	a-value: first ['a]
+	a-value == do :a-value
+]
+[true = do true]
+[false = do false]
+[$1 == do $1]
+[unset! = do :type? ()]
+[none? do #[none]]
+[
+	a-value: make object! []
+	same? :a-value do :a-value
+]
+[
+	a-value: first [(2)]
+	2 == do :a-value
+]
+#r2only
+[
+	a-value: 'a/b
+	a: make object! [b: 1]
+	1 == do :a-value
+]
+#r3only
+[
+	a-value: 'a/b
+	a: make object! [b: 1]
+	a-value == do :a-value
+]
+[
+	a-value: make port! http://
+	port? do :a-value
+]
+[
+	a-value: first [a/b:]
+	:a-value == do :a-value
+]
+#r2only
+[
+	a-value: first [a:]
+	:a-value == do :a-value
+]
+[
+	a-value: "1"
+	1 == do :a-value
+]
+[unset? do ""]
+[
+	a-value: make tag! ""
+	same? :a-value do :a-value
+]
+[0:00 == do 0:00]
+[0.0.0 == do 0.0.0]
+[
+	a-value: 'b-value
+	b-value: 1
+	1 == do :a-value
+]
+; RETURN stops the evaluation
+[
+	f1: does [do [return 1 2] 2]
+	1 = f1
+]
+; bug#539
+[
+	f1: does [do "return 1 2" 2]
+	1 = f1	
+]
+; THROW stops evaluation
+[
+	1 = catch [
+		do [
+			throw 1
+			2
+		]
+		2
+	]
+]
+; BREAK stops evaluation
+[
+	1 = loop 1 [
+		do [
+			break/return 1
+			2
+		]
+		2
+	]
+]
+; do/next block tests
+#r2only
+[
+	success: false
+	do/next [success: true success: false]
+	success
+]
+#r3only
+[
+	success: false
+	do/next [success: true success: false] 'b
+	success
+]
+#r2only
+[[1 [2]] = do/next [1 2]]
+#r3only
+[
+	all [
+		1 = do/next [1 2] 'b
+		[2] = b
+	]
+]
+#r2only
+[unset? first do/next []]
+#r3only
+[unset? do/next [] 'b]
+#r3only
+[error? do/next [try [1 / 0]] 'b]
+#r2only
+; RETURN stops the evaluation
+[
+	f1: does [do/next [return 1 2] 2]
+	1 = f1
+]
+#r3only
+[
+	f1: does [do/next [return 1 2] 'b 2]
+	1 = f1
+]
+; recursive behaviour
+[1 = do [do [1]]]
+[1 = do "do [1]"]
+[1 == 1]
+[3 = do :do :add 1 2]
+; infinite recursion for block
+[
+	blk: [do blk]
+	error? try blk
+]
+; infinite recursion for string
+; bug#1896
+[
+	str: "do str"
+	error? try [do str]
+]
+; infinite recursion for do/next
+#r2only
+[
+	blk: [do/next blk]
+	error? try blk
+]
+#r3only
+[
+	blk: [do/next blk 'b]
+	error? try blk
+]
+#r2only
+; are error reports for do and do/next consistent?
+[
+	val1: disarm try [do [1 / 0]]
+	val2: disarm try [do/next [1 / 0]]
+	val1/near = val2/near
+]
+#r3only
+[
+	val1: try [do [1 / 0]]
+	val2: try [do/next [1 / 0] 'b]
+	val1/near = val2/near
+]
+; functions/control/either.r
+[
+	either true [success: true] [success: false]
+	success
+]
+[
+	either false [success: false] [success: true]
+	success
+]
+[1 = either true [1] [2]]
+[2 = either false [1] [2]]
+[unset? either true [] [1]]
+[unset? either false [1] []]
+#r3only
+[error? either true [try [1 / 0]] []]
+#r3only
+[error? either false [] [try [1 / 0]]]
+; RETURN stops the evaluation
+[
+	f1: does [
+		either true [return 1 2] [2]
+		2
+	]
+	1 = f1
+]
+[
+	f1: does [
+		either false [2] [return 1 2]
+		2
+	]
+	1 = f1
+]
+; THROW stops the evaluation
+[
+	1 == catch [
+		either true [throw 1 2] [2]
+		2
+	]
+]
+[
+	1 == catch [
+		either false [2] [throw 1 2]
+		2
+	]
+]
+; BREAK stops the evaluation
+[
+	1 == loop 1 [
+		either true [break/return 1 2] [2]
+		2
+	]
+]
+[
+	1 == loop 1 [
+		either false [2] [break/return 1 2]
+		2
+	]
+]
+; recursive behaviour
+[2 = either true [either false [1] [2]] []]
+[1 = either false [] [either true [1] [2]]]
+; infinite recursion
+[
+	blk: [either true blk []]
+	error? try blk
+]
+[
+	blk: [either false [] blk]
+	error? try blk
+]
+; functions/control/else.r
+#r2only
+[error? err: try [else] c: disarm err c/id = 'else-gone]
+#r3only
+[error? err: try [else] c: err c/id = 'no-value]
+; functions/control/exit.r
+[
+	success: true
+	f1: does [exit success: false]
+	f1
+	success
+]
+[
+	f1: does [exit]
+	unset? f1
+]
+; the "result" of exit should not be assignable, bug#1515
+[a: 1 do does [a: exit] :a =? 1]
+[a: 1 do does [set 'a exit] :a =? 1]
+[a: 1 do does [set/any 'a exit] :a =? 1]
+; the "result" of exit should not be passable to functions, bug#1509
+[a: 1 do does [a: error? exit] :a =? 1]
+; bug#1535
+[do does [words-of exit] true]
+[do does [values-of exit] true]
+; bug#1945
+[do does [spec-of exit] true]
+; exit should not be caught by try
+[a: 1 do does [a: error? try [exit]] :a =? 1]
+; functions/control/for.r
+[
+	success: true
+	num: 0
+	for i 1 10 1 [
+		num: num + 1
+		success: i = num and success
+	]
+	10 = num and success
+]
+; cycle return value
+[false = for i 1 1 1 [false]]
+; break cycle
+[
+	num: 0
+	for i 1 10 1 [num: i break]
+	num = 1
+]
+; break return value
+[unset? for i 1 10 1 [break]]
+; break/return return value
+[2 = for i 1 10 1 [break/return 2]]
+; continue cycle
+; bug#58
+#r3only
+[
+	success: true
+	for i 1 1 1 [continue success: false]
+	success
+]
+#r3only
+[
+	success: true
+	x: "a"
+	for i x tail x 1 [continue success: false]
+	success
+]
+; string! test
+[
+	out: copy ""
+	for i s: "abc" back tail s 1 [append out i]
+	out = "abcbcc"
+]
+; block! test
+[
+	out: copy []
+	for i b: [1 2 3] back tail b 1 [append out i]
+	out = [1 2 3 2 3 3]
+]
+; zero repetition
+[
+	success: true
+	for i 1 0 1 [success: false]
+	success
+]
+; zero repetition block test
+[
+	success: true
+	for i b: [1] tail :b -1 [success: false]
+	success
+]
+; Test that return stops the loop
+[
+	f1: does [for i 1 1 1 [return 1 2] 2]
+	1 = f1
+]
+#r3only
+; Test that errors do not stop the loop and errors can be returned
+[
+	num: 0
+	e: for i 1 2 1 [num: i try [1 / 0]]
+	all [error? e num = 2]
+]
+; infinite loop tests
+[
+	num: 0
+	for i b: [1] tail b 1 [
+		num: num + 1
+		if num > 2 [break]
+	]
+	num <= 2
+]
+[
+	num: 0
+	for i 2147483647 2147483647 1 [
+		num: num + 1
+		either num > 1 [break/return false] [true]
+	]
+]
+[
+	num: 0
+	for i -2147483648 -2147483648 -1 [
+		num: num + 1
+		either num > 1 [break/return false] [true]
+	]
+]
+; bug#1136
+#64bit
+[
+	num: 0
+	for i 9223372036854775807 9223372036854775807 1 [
+		num: num + 1
+		either num > 1 [break/return false] [true]
+	]
+]
+#64bit
+[
+	num: 0
+	for i -9223372036854775808 -9223372036854775808 -1 [
+		num: num + 1
+		either num > 1 [break/return false] [true]
+	]
+]
+; bug#1994
+#64bit
+[
+	num: 0
+	for i 9223372036854775807 9223372036854775807 9223372036854775807 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+#64bit
+[
+	num: 0
+	for i 9223372036854775807 9223372036854775807 -9223372036854775808 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+#64bit
+[
+	num: 0
+	for i -9223372036854775808 -9223372036854775808 9223372036854775807 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+#64bit
+[
+	num: 0
+	for i -9223372036854775808 -9223372036854775808 -9223372036854775808 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+[
+	num: 0
+	for i 2147483647 2147483647 2147483647 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+[
+	num: 0
+	for i 2147483647 2147483647 -2147483648 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+[
+	num: 0
+	for i -2147483648 -2147483648 2147483647 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+[
+	num: 0
+	for i -2147483648 -2147483648 -2147483648 [
+		num: num + 1
+		if num <> 1 [break/return false]
+		true
+	]
+]
+; bug#1993
+[equal? type? for i 1 2 0 [break] type? for i 2 1 0 [break]]
+[equal? type? for i -1 -2 0 [break] type? for i 2 1 0 [break]]
+[equal? type? for i -1 -2 0 [break] type? for i -2 -1 0 [break]]
+#r2only
+; char tests
+[
+	num: 0
+	char: #"^(ff)"
+	not for i char char 1 [
+		num: num + 1
+		if num > 1 [break/return true]
+	]
+]
+#r2only
+[
+	num: 0
+	char: #"^(0)"
+	not for i char char -1 [
+		num: num + 1
+		if num > 1 [break/return true]
+	]
+]
+; skip before head test
+[[] = for i b: tail [1] head b -2 [i]]
+; "recursive safety", "locality" and "body constantness" test in one
+[for i 1 1 1 b: [not same? 'i b/3]]
+; recursivity
+[
+	num: 0
+	for i 1 5 1 [
+		for i 1 2 1 [num: num + 1]
+	]
+	num = 10
+]
+; infinite recursion
+[
+	blk: [for i 1 1 1 blk]
+	error? try blk
+]
+; local variable changeability - this is how it works in R3
+[
+	test: false
+	for i 1 3 1 [
+		if i = 2 [
+			if test [break/return true]
+			test: true
+			i: 1
+		]
+	]
+]
+; THROW error test
+#r2only
+[
+	b: head insert copy [] try [1 / 0]
+	pokus1: func [[catch] block [block!] /local elem] [
+		for i 1 length? block 1 [
+			if error? set/any 'elem first block [
+				throw make error! {Dangerous element}
+			]
+			block: next block
+		]
+	]
+	b: disarm try [pokus1 b]
+	b/near = [pokus1 b]
+]
+; local variable type safety
+#r3only
+[
+	test: false
+	error? try [
+		for i 1 2 [
+			either test [i == 2] [
+				test: true
+				i: false
+			]
+		]
+	]
+]
+; FOR should not bind 'self
+; bug#1529
+[same? 'self for i 1 1 1 ['self]]
+; functions/control/forall.r
+[
+	str: "abcdef"
+	out: copy ""
+	forall str [append out first str]
+	all [
+		head? str
+		out = head str
+	]
+]
+[
+	blk: [1 2 3 4]
+	sum: 0
+	forall blk [sum: sum + first blk]
+	sum = 10
+]
+; cycle return value
+[
+	blk: [1 2 3 4]
+	true = forall blk [true]
+]
+[
+	blk: [1 2 3 4]
+	false = forall blk [false]
+]
+; break cycle
+[
+	str: "abcdef"
+	forall str [if #"c" = char: str/1 [break]]
+	char = #"c"
+]
+; break return value
+[
+	blk: [1 2 3 4]
+	unset? forall blk [break]
+]
+; break/return return value
+[
+	blk: [1 2 3 4]
+	1 = forall blk [break/return 1]
+]
+; continue cycle
+#r3only
+[
+	success: true
+	x: "a"
+	forall x [continue success: false]
+	success
+]
+; zero repetition
+[
+	success: true
+	blk: []
+	forall blk [success: false]
+	success
+]
+; Test that return stops the loop
+[
+	blk: [1]
+	f1: does [forall blk [return 1 2]]
+	1 = f1
+]
+#r3only
+; Test that errors do not stop the loop and errors can be returned
+[
+	num: 0
+	blk: [1 2]
+	e: forall blk [num: first blk try [1 / 0]]
+	all [error? e num = 2]
+]
+; recursivity
+[
+	num: 0
+	blk1: [1 2 3 4 5]
+	blk2: [6 7]
+	forall blk1 [
+		num: num + first blk1
+		forall blk2 [num: num + first blk2]
+	]
+	num = 80
+]
+#r2only
+; in Rebol2 the FORALL function is unable to pass a THROW error test
+[
+	f: func [[catch] /local x] [
+		x: [1]
+		forall x [throw make error! ""]
+	]
+	e: disarm try [f]
+	e/near = [f]
+]
+; bug#81
+[
+	blk: [1]
+	1 == forall blk [blk/1]
+]
+; functions/control/foreach.r
+[
+	out: copy ""
+	str: "abcdef"
+	foreach i str [append out i]
+	out = str
+]
+[
+	blk: [1 2 3 4]
+	sum: 0
+	foreach i blk [sum: sum + i]
+	sum = 10
+]
+; cycle return value
+[
+	blk: [1 2 3 4]
+	true = foreach i blk [true]
+]
+[
+	blk: [1 2 3 4]
+	false = foreach i blk [false]
+]
+; break cycle
+[
+	str: "abcdef"
+	foreach i str [
+		num: i
+		if i = #"c" [break]
+	]
+	num = #"c"
+]
+; break return value
+[
+	blk: [1 2 3 4]
+	unset? foreach i blk [break]
+]
+; break/return return value
+[
+	blk: [1 2 3 4]
+	1 = foreach i blk [break/return 1]
+]
+; continue cycle
+#r3only
+[
+	success: true
+	foreach i [1] [continue success: false]
+	success
+]
+; zero repetition
+[
+	success: true
+	blk: []
+	foreach i blk [success: false]
+	success
+]
+; Test that return stops the loop
+[
+	blk: [1]
+	f1: does [foreach i blk [return 1 2]]
+	1 = f1
+]
+#r3only
+; Test that errors do not stop the loop and errors can be returned
+[
+	num: 0
+	blk: [1 2]
+	e: foreach i blk [num: i try [1 / 0]]
+	all [error? e num = 2]
+]
+; "recursive safety", "locality" and "body constantness" test in one
+[foreach i [1] b: [not same? 'i b/3]]
+; recursivity
+[
+	num: 0
+	foreach i [1 2 3 4 5] [
+		foreach i [1 2] [num: num + 1]
+	]
+	num = 10
+]
+; functions/control/forever.r
+[
+	num: 0
+	forever [
+		num: num + 1
+		if num = 10 [break]
+	]
+	num = 10
+]
+; Test break, break/return and continue
+[unset? forever [break]]
+[1 = forever [break/return 1]]
+#r3only
+[
+	success: true
+	cycle?: true
+	forever [if cycle? [cycle?: false continue success: false] break]
+	success
+]
+; Test that return stops the loop
+[
+	f1: does [forever [return 1]]
+	1 = f1
+]
+; Test that exit stops the loop
+[unset? do does [forever [exit]]]
+#r3only
+; Test that errors do not stop the loop and errors can be returned
+[
+	num: 0
+	e: forever [
+		num: num + 1
+		if num = 10 [break/return try [1 / 0]]
+		try [1 / 0]
+	]
+	all [error? e num = 10]
+]
+; Recursion check
+[
+	num1: 0
+	num3: 0
+	forever [
+		if num1 = 5 [break]
+		num2: 0
+		forever [
+			if num2 = 2 [break]
+			num3: num3 + 1
+			num2: num2 + 1
+		]
+		num1: num1 + 1
+	]
+	10 = num3
+]
+; functions/control/forskip.r
+#r2only
+[
+	blk: copy out: copy []
+	for i #"A" #"Z" 1 [append blk i]
+	forskip blk 2 [append out blk/1]
+	out = [#"A" #"C" #"E" #"G" #"I" #"K" #"M" #"O" #"Q" #"S" #"U" #"W" #"Y"]
+]
+[
+	blk: copy out: copy []
+	for i 1 25 1 [append blk i]
+	forskip blk 3 [append out blk/1]
+	out = [1 4 7 10 13 16 19 22 25]
+]
+; cycle return value
+[
+	blk: [1 2 3 4]
+	true = forskip blk 1 [true]
+]
+[
+	blk: [1 2 3 4]
+	false = forskip blk 1 [false]
+]
+; break cycle
+[
+	str: "abcdef"
+	forskip str 2 [if #"c" = char: str/1 [break]
+	]
+	char = #"c"
+]
+; break return value
+[
+	blk: [1 2 3 4]
+	unset? forskip blk 2 [break]
+]
+; break/return return value
+[
+	blk: [1 2 3 4]
+	1 = forskip blk 2 [break/return 1]
+]
+; continue cycle
+#r3only
+[
+	success: true
+	x: "a"
+	forskip x 1 [continue success: false]
+	success
+]
+; zero repetition
+[
+	success: true
+	blk: []
+	forskip blk 1 [success: false]
+	success
+]
+; Test that return stops the loop
+[
+	blk: [1]
+	f1: does [forskip blk 2 [return 1 2]]
+	1 = f1
+]
+#r3only
+; Test that errors do not stop the loop and errors can be returned
+[
+	num: 0
+	blk: [1 2]
+	e: forskip blk 1 [num: first blk try [1 / 0]]
+	all [error? e num = 2]
+]
+; recursivity
+[
+	num: 0
+	blk1: [1 2 3 4 5]
+	blk2: [6 7]
+	forskip blk1 1 [
+		num: num + first blk1
+		forskip blk2 1 [num: num + first blk2]
+	]
+	num = 80
+]
+#r2only
+; in Rebol2 the FORSKIP function is unable to pass a THROW error test
+[
+	f: func [[catch] /local x] [
+		x: [1]
+		forskip x 1 [throw make error! ""]
+	]
+	e: disarm try [f]
+	e/near = [f]
+]
+; functions/control/halt.r
+[any-function? :halt]
+; functions/control/if.r
+[
+	success: false
+	if true [success: true]
+	success
+]
+[
+	success: true
+	if false [success: false]
+	success
+]
+[1 = if true [1]]
+[unset? if true []]
+#r3only
+[error? if true [try [1 / 0]]]
+; RETURN stops the evaluation
+[
+	f1: does [
+		if true [return 1 2]
+		2
+	]
+	1 = f1
+]
+; condition datatype tests; action
+[if get 'abs [true]]
+; binary
+[if #{00} [true]]
+; bitset
+[if make bitset! "" [true]]
+; block
+[if [] [true]]
+; datatype
+[if none! [true]]
+; typeset
+[if number! [true]]
+; date
+[if 1/1/0000 [true]]
+; decimal
+[if 0.0 [true]]
+[if 1.0 [true]]
+[if -1.0 [true]]
+; email
+[if me@rt.com [true]]
+[if %"" [true]]
+[if does [] [true]]
+[if first [:first] [true]]
+[if #"^@" [true]]
+[if make image! 0x0 [true]]
+; integer
+[if 0 [true]]
+[if 1 [true]]
+[if -1 [true]]
+[if #a [true]]
+[if first ['a/b] [true]]
+[if first ['a] [true]]
+[if true [true]]
+[none? if false [true]]
+[if $1 [true]]
+[if :type? [true]]
+[none? if none [true]]
+[if make object! [] [true]]
+[if get '+ [true]]
+[if 0x0 [true]]
+[if first [()] [true]]
+[if 'a/b [true]]
+[if make port! http:// [true]]
+[if /a [true]]
+[if first [a/b:] [true]]
+[if first [a:] [true]]
+[if "" [true]]
+[if to tag! "" [true]]
+[if 0:00 [true]]
+[if 0.0.0 [true]]
+[if  http:// [true]]
+[if 'a [true]]
+; recursive behaviour
+[none? if true [if false [1]]]
+[1 = if true [if true [1]]]
+; infinite recursion
+[
+	blk: [if true blk]
+	error? try blk
+]
+; functions/control/loop.r
+[
+	num: 0
+	loop 10 [num: num + 1] 
+	10 = num
+]
+; cycle return value
+[false = loop 1 [false]]
+; break cycle
+[
+	num: 0
+	loop 10 [num: num + 1 break]
+	num = 1
+]
+; break return value
+[unset? loop 10 [break]]
+; break/return return value
+[2 = loop 10 [break/return 2]]
+; continue cycle
+#r3only
+[
+	success: true
+	loop 1 [continue success: false]
+	success
+]
+; zero repetition
+[
+	success: true
+	loop 0 [success: false]
+	success
+]
+[
+	success: true
+	loop -1 [success: false]
+	success
+]
+; Test that return stops the loop
+[
+	f1: does [loop 1 [return 1 2]]
+	1 = f1
+]
+#r3only
+; Test that errors do not stop the loop and errors can be returned
+[
+	num: 0
+	e: loop 2 [num: num + 1 try [1 / 0]]
+	all [error? e num = 2]
+]
+; loop recursivity
+[
+	num: 0
+	loop 5 [
+		loop 2 [num: num + 1]
+	]
+	num = 10
+]
+; recursive use of 'break
+[
+	f: func [x] [
+		loop 1 [
+			if x = 1 [
+				use [break] [
+					break: 1
+					f 2
+					1 = get/any 'break
+				] 
+			]
+		]
+	]
+	f 1
+]
+; functions/control/map-each.r
+; "return bug"
+[
+	integer? do does [map-each v [] [] 1]
+]
+; functions/control/reduce.r
+[[1 2] = reduce [1 1 + 1]]
+[
+	success: false
+	reduce [success: true]
+	success
+]
+[[] = reduce []]
+[unset? first reduce [()]]
+["1 + 1" = reduce "1 + 1"]
+#r3only
+[error? first reduce [try [1 / 0]]]
+; unwind functions should stop evaluation, bug#1760
+[unset? loop 1 [reduce [break]]]
+[unset? loop 1 [reduce/no-set [a: break]]]
+[1 = loop 1 [reduce [break/return 1]]]
+#r3only
+[unset? loop 1 [reduce [continue]]]
+[1 = catch [reduce [throw 1]]]
+[1 = catch/name [reduce [throw/name 1 'a]] 'a]
+[1 = do does [reduce [return 1 2] 2]]
+[unset? do does [reduce [exit 1] 2]]
+; recursive behaviour
+[1 = first reduce [first reduce [1]]]
+; infinite recursion
+[
+	blk: [reduce blk]
+	error? try blk
+]
+; functions/control/remove-each.r
+[
+	remove-each i s: [1 2] [true]
+	empty? s
+]
+[
+	remove-each i s: [1 2] [false]
+	[1 2] = s
+]
+; functions/control/repeat.r
+[
+	success: true
+	num: 0
+	repeat i 10 [
+		num: num + 1
+		success: i = num and success
+	]
+	10 = num and success
+]
+; cycle return value
+[false = repeat i 1 [false]]
+; break cycle
+[
+	num: 0
+	repeat i 10 [num: i break]
+	num = 1
+]
+; break return value
+[unset? repeat i 10 [break]]
+; break/return return value
+[2 = repeat i 10 [break/return 2]]
+; continue cycle
+#r3only
+[
+	success: true
+	repeat i 1 [continue success: false]
+	success
+]
+#r3only
+[
+	success: true
+	repeat i "a" [continue success: false]
+	success
+]
+#r3only
+[
+	success: true
+	repeat i [a] [continue success: false]
+	success
+]
+#r2only
+; string! test
+[
+	out: copy ""
+	repeat i "abc" [append out i]
+	out = "abc"
+]
+#r3only
+; string! test
+[
+	out: copy ""
+	repeat i "abc" [append out i]
+	out = "abcbcc"
+]
+#r2only
+; block! test
+[
+	out: copy []
+	repeat i [1 2 3] [append out i]
+	out = [1 2 3]
+]
+#r3only
+; block! test
+[
+	out: copy []
+	repeat i [1 2 3] [append out i]
+	out = [1 2 3 2 3 3]
+]
+; is hash! test and list! test needed too?;zero repetition
+[
+	success: true
+	repeat i 0 [success: false]
+	success
+]
+[
+	success: true
+	repeat i -1 [success: false]
+	success
+]
+; Test that return stops the loop
+[
+	f1: does [repeat i 1 [return 1 2]]
+	1 = f1
+]
+#r3only
+; Test that errors do not stop the loop and errors can be returned
+[
+	num: 0
+	e: repeat i 2 [num: i try [1 / 0]]
+	all [error? e num = 2]
+]
+; "recursive safety", "locality" and "body constantness" test in one
+[repeat i 1 b: [not same? 'i b/3]]
+; recursivity
+[
+	num: 0
+	repeat i 5 [
+		repeat i 2 [num: num + 1]
+	]
+	num = 10
+]
+#r2only
+; local variable type safety
+[
+	test: false
+	repeat i 2 [
+		either test [i == 2] [
+			test: true
+			i: false
+			true
+		]
+	]
+]
+#r3only
+; local variable type safety
+[
+	test: false
+	error? try [
+		repeat i 2 [
+			either test [i == 2] [
+				test: true
+				i: false
+			]
+		]
+	]
+]
+; functions/control/return.r
+[
+	f1: does [return 1 2]
+	1 = f1
+]
+[
+	success: true
+	f1: does [return 1 success: false]
+	f1
+	success
+]
+; return value tests
+[
+	f1: does [return ()]
+	unset? f1
+]
+[
+	f1: does [return try [1 / 0]]
+	error? f1
+]
+; the "result" of return should not be assignable, bug#1515
+[a: 1 do does [a: return 2] :a =? 1]
+[a: 1 do does [set 'a return 2] :a =? 1]
+[a: 1 do does [set/any 'a return 2] :a =? 1]
+; the "result" of return should not be passable to functions, bug#1509
+[a: 1 do does [a: error? return 2] :a =? 1]
+; bug#1535
+[do does [words-of return none] true]
+[do does [values-of return none] true]
+; bug#1945
+[do does [spec-of return none] true]
+; return should not be caught by try
+[a: 1 do does [a: error? try [return 2]] :a =? 1]
+; functions/control/switch.r
+[
+	11 = switch 1 [
+		1 [11]
+		2 [12]
+	]
+]
+[
+	12 = switch 2 [
+		1 [11]
+		2 [12]
+	]
+]
+[unset? switch 1 [1 []]]
+#r3only
+[
+	cases: reduce [1 head insert copy [] try [1 / 0]]
+	error? switch 1 cases
+]
+; functions/control/throw.r
+; see functions/control/catch.r for basic functionality
+; the "result" of throw should not be assignable, bug#1515
+[a: 1 catch [a: throw 2] :a =? 1]
+[a: 1 catch [set 'a throw 2] :a =? 1]
+[a: 1 catch [set/any 'a throw 2] :a =? 1]
+[a: 1 catch/name [a: throw/name 2 'b] 'b :a =? 1]
+[a: 1 catch/name [set 'a throw/name 2 'b] 'b :a =? 1]
+[a: 1 catch/name [set/any 'a throw/name 2 'b] 'b :a =? 1]
+; the "result" of throw should not be passable to functions, bug#1509
+[a: 1 catch [a: error? throw 2] :a =? 1]
+; bug#1535
+[catch [words-of throw none] true]
+[catch [values-of throw none] true]
+; bug#1945
+[catch [spec-of throw none] true]
+[a: 1 catch/name [a: error? throw/name 2 'b] 'b :a =? 1]
+; throw should not be caught by try
+[a: 1 catch [a: error? try [throw 2]] :a =? 1]
+[a: 1 catch/name [a: error? try [throw/name 2 'b]] 'b :a =? 1]
+; functions/control/try.r
+#r2only
+[
+	e: disarm try [1 / 0]
+	e/id = 'zero-divide
+]
+#r3only
+[
+	e: try [1 / 0]
+	e/id = 'zero-divide
+]
+[
+	success: true
+	error? try [
+		1 / 0
+		success: false
+	]
+	success
+]
+[
+	success: true
+	f1: does [
+		1 / 0
+		success: false
+	]
+	error? try [f1]
+	success
+]
+#r3only
+; testing TRY/EXCEPT
+; bug#822
+[error? try/except [make error! ""] [0]]
+#r3only
+[try/except [do make error! ""] [true]]
+; functions/control/unless.r
+[
+	success: false
+	unless false [success: true]
+	success
+]
+[
+	success: true
+	unless true [success: false]
+	success
+]
+[1 = unless false [1]]
+[none? unless true [1]]
+[unset? unless false []]
+#r3only
+[error? unless false [try [1 / 0]]]
+; RETURN stops the evaluation
+[
+	f1: does [
+		unless false [return 1 2]
+		2
+	]
+	1 = f1
+]
+; functions/control/until.r
+[
+	num: 0
+	until [num: num + 1 num > 9]
+	num = 10
+]
+; Test body-block return values
+[1 = until [1]]
+; Test break and break/return
+[unset? until [break true]]
+[1 = until [break/return 1 true]]
+; Test continue
+#r3only
+[
+	success: true
+	cycle?: true
+	until [if cycle? [cycle?: false continue success: false] true]
+	success
+]
+; Test that return stops the loop
+[
+	f1: does [until [return 1]]
+	1 = f1
+]
+#r3only
+; Test that errors do not stop the loop
+[1 = until [try [1 / 0] 1]]
+; Recursion check
+[
+	num1: 0
+	num3: 0
+	until [
+		num2: 0
+		until [
+			num3: num3 + 1
+			1 < num2: num2 + 1
+		]
+		4 < num1: num1 + 1
+	]
+	10 = num3
+]
+; functions/control/wait.r
+; bug#5
+[wait 0:0:0.3 true]
+; functions/control/while.r
+[
+	num: 0
+	while [num < 10] [num: num + 1]
+	num = 10
+]
+; bug#37
+; Test body-block return values
+[
+	num: 0 
+	1 = while [num < 1] [num: num + 1]
+]
+[none? while [false] []]
+; zero repetition
+[
+	success: true
+	while [false] [success: false]
+	success
+]
+; Test break, break/return and continue
+[cycle?: true unset? while [cycle?] [break cycle?: false]]
+[cycle?: true unset? while [if cycle? [break] cycle?] [cycle?: false]]  ; bug#1519
+[cycle?: true 1 = while [cycle?] [break/return 1 cycle?: false]]
+[cycle?: true 1 = while [if cycle? [break/return 1] cycle?] [cycle?: false]]  ; bug#1519
+#r3only
+[
+	success: true
+	cycle?: true
+	while [cycle?] [cycle?: false continue success: false]
+	success
+]
+#r3only
+[  ; bug#1519
+	success: true
+	cycle?: true
+	while [if cycle? [cycle?: false continue success: false] cycle?] []
+	success
+]
+[
+	num: 0
+	while [true] [num: 1 break num: 2]
+	num = 1
+]
+; RETURN should stop the loop
+[
+	cycle?: true
+	f1: does [while [cycle?] [cycle?: false return 1] 2]
+	1 = f1
+]
+[  ; bug#1519
+	cycle?: true
+	f1: does [while [if cycle? [return 1] cycle?] [cycle?: false 2]]
+	1 = f1
+]
+; EXIT should stop the loop
+[
+	cycle?: true
+	f1: does [while [cycle?] [cycle?: false exit] 2]
+	unset? f1
+]
+[  ; bug#1519
+	cycle?: true
+	f1: does [while [if cycle? [exit] cycle?] [cycle?: false 2]]
+	unset? f1
+]
+; THROW should stop the loop
+[1 = catch [cycle?: true while [cycle?] [throw 1 cycle?: false]]]
+[  ; bug#1519
+	cycle?: true
+	1 = catch [while [if cycle? [throw 1] false] [cycle?: false]]
+]
+[1 = catch/name [cycle?: true while [cycle?] [throw/name 1 'a cycle?: false]] 'a]
+[  ; bug#1519
+	cycle?: true
+	1 = catch/name [while [if cycle? [throw/name 1 'a] false] [cycle?: false]] 'a
+]
+#r3only
+; Test that disarmed errors do not stop the loop and errors can be returned
+[
+	num: 0
+	e: while [num < 10] [num: num + 1 try [1 / 0]]
+	all [error? e num = 10]
+]
+; Recursion check
+[
+	num1: 0
+	num3: 0
+	while [num1 < 5] [
+		num2: 0
+		while [num2 < 2] [
+			num3: num3 + 1
+			num2: num2 + 1
+		]
+		num1: num1 + 1
+	]
+	10 = num3
+]
+; functions/convert/as-binary.r
+#r2only
+[
+	a: "a"
+	b: as-binary a
+	b == to binary! a
+	change a "b"
+	b == to binary! a
+]
+; functions/convert/as-string.r
+#r2only
+[
+	a: #{00}
+	b: as-string a
+	b == to string! a
+	change a #{01}
+	b == to string! a
+]
+; functions/convert/load.r
+; bug#20
+[block? load/all "1"]
+; bug#22a
+[error? try [load "':a"]]
+; bug#22b
+[error? try [load "':a:"]]
+; bug#858
+[
+	a: [ < ]
+	a = load mold a
+]
+[error? try [load "1xyz#"]]
+; load/next
+#r2only
+[block? load/next "1"]
+; bug#1703  bug#1711
+#r3only
+[error? try [load/next "1"]]
+; bug#1122
+[
+	any [
+		error? try [load "9999999999999999999"]
+		greater? load "9999999999999999999" load "9223372036854775807"
+	]
+]
+; R2 bug
+[
+	 x: 1
+	 error? try [x: load/header ""]
+	 not error? x
+]
+; functions/convert/mold.r
+; bug#860
+; bug#6
+; cyclic block
+[
+	a: copy []
+	insert/only a a
+	string? mold a
+]
+; cyclic paren
+[
+	a: first [()]
+	insert/only a a
+	string? mold a
+]
+; cyclic object
+; bug#69
+[
+	a: make object! [a: self]
+	string? mold a
+]
+; closure mold
+; bug#23
+#r3only
+[
+	c: closure [a] [print a]
+	equal? "make closure! [[a] [print a]]" mold :c
+]
+; deep nested block mold
+; bug#876
+[
+	n: 1
+	forever [
+		a: copy []
+		if error? try [
+			loop n [a: append/only copy [] a]
+			mold a
+		] [break/return true]
+		n: n * 2
+	]
+]
+; bug#719
+["()" = mold quote ()]
+; bug#77
+["#[block! [1 2] 2]" == mold/all next [1 2]]
+; bug#77
+[none? find mold/flat make object! [a: 1] "    "]
+; bug#84
+[equal? mold make bitset! "^(00)" "make bitset! #{80}"]
+[equal? mold/all make bitset! "^(00)" "#[bitset! #{80}]"]
+; functions/convert/to.r
+; bug#12
+[image? to image! make gob! []]
+; bug#38
+['logic! = to word! logic!]
+#r3only
+['percent! = to word! percent!]
+['money! = to word! money!]
+; bug#1967
+[not same? to binary! [1] to binary! [2]]
 ; functions/datatype/as-pair.r
 #r3only
 ; bug#1624
 [native? :as-pair]
+; functions/define/func.r
+; recursive safety
+[
+	f: func [] [
+		func [x] [
+			if x = 1 [
+				do f 2
+				x = 1
+			]
+		]
+	]
+	do f 1
+]
+; functions/file/clean-path.r
+; bug#35
+[any-function? :clean-path]
+; functions/file/existsq.r
+; bug#1613
+[exists? http://www.rebol.com/index.html]
+; functions/file/make-dir.r
+; bug#1674
+#r2only
+[
+	any [
+		not error? e: try [make-dir %/folder-to-save-test-files]
+		(e: disarm e e/type = 'access)
+	]
+]
+#r3only
+[
+	any [
+		not error? e: try [make-dir %/folder-to-save-test-files]
+		e/type = 'access
+	]
+]
+; functions/file/open.r
+; bug#1422: "Rebol crashes when opening the 128th port"
+[error? try [repeat n 200 [try [close open open join tcp://localhost: n]]] true]
+; functions/file/file-typeq.r
+; bug#1651: "FILE-TYPE? should return NONE for unknown types"
+#r3only
+[none? file-type? %foo.0123456789bar0123456789]
 ; functions/math/absolute.r
 [:abs = :absolute]
 [0 = abs 0]
@@ -7281,2777 +10270,12 @@ datatypes/action.r
 [not zero? 0.255.0]
 [not zero? 0.0.1]
 [not zero? 0.0.255]
-; functions/control/all.r
-; zero values
-[true == all []]
-; one value
-[:abs = all [:abs]]
+; functions/reflectors/body-of.r
+; bug#49
 [
-	a-value: #{}
-	same? a-value all [a-value]
+	f: func [] []
+	not same? body-of :f body-of :f
 ]
-[
-	a-value: charset ""
-	same? a-value all [a-value]
-]
-[
-	a-value: []
-	same? a-value all [a-value]
-]
-[
-	a-value: none!
-	same? a-value all [a-value]
-]
-[1/Jan/0000 = all [1/Jan/0000]]
-[0.0 == all [0.0]]
-[1.0 == all [1.0]]
-[
-	a-value: me@here.com
-	same? a-value all [a-value]
-]
-[error? all [try [1 / 0]]]
-[
-	a-value: %""
-	same? a-value all [a-value]
-]
-[
-	a-value: does []
-	same? :a-value all [:a-value]
-]
-[
-	a-value: first [:a]
-	:a-value == all [:a-value]
-]
-[#"^@" == all [#"^@"]]
-[
-	a-value: make image! 0x0
-	same? a-value all [a-value]
-]
-[0 == all [0]]
-[1 == all [1]]
-[#a == all [#a]]
-[
-	a-value: first ['a/b]
-	:a-value == all [:a-value]
-]
-[
-	a-value: first ['a]
-	:a-value == all [:a-value]
-]
-[true = all [true]]
-[none? all [false]]
-[$1 == all [$1]]
-[same? :type? all [:type?]]
-[none? all [#[none]]]
-[
-	a-value: make object! []
-	same? :a-value all [:a-value]
-]
-[
-	a-value: first [()]
-	same? :a-value all [:a-value]
-]
-[same? get '+ all [get '+]]
-[0x0 == all [0x0]]
-[
-	a-value: 'a/b
-	:a-value == all [:a-value]
-]
-[
-	a-value: make port! http://
-	port? all [:a-value]
-]
-[/a == all [/a]]
-[
-	a-value: first [a/b:]
-	:a-value == all [:a-value]
-]
-[
-	a-value: first [a:]
-	:a-value == all [:a-value]
-]
-[
-	a-value: ""
-	same? :a-value all [:a-value]
-]
-[
-	a-value: make tag! ""
-	same? :a-value all [:a-value]
-]
-[0:00 == all [0:00]]
-[0.0.0 == all [0.0.0]]
-[unset? all [()]]
-['a == all ['a]]
-; two values
-[:abs = all [true :abs]]
-[
-	a-value: #{}
-	same? a-value all [true a-value]
-]
-[
-	a-value: charset ""
-	same? a-value all [true a-value]
-]
-[
-	a-value: []
-	same? a-value all [true a-value]
-]
-[
-	a-value: none!
-	same? a-value all [true a-value]
-]
-[1/Jan/0000 = all [true 1/Jan/0000]]
-[0.0 == all [true 0.0]]
-[1.0 == all [true 1.0]]
-[
-	a-value: me@here.com
-	same? a-value all [true a-value]
-]
-[error? all [true try [1 / 0]]]
-[
-	a-value: %""
-	same? a-value all [true a-value]
-]
-[
-	a-value: does []
-	same? :a-value all [true :a-value]
-]
-[
-	a-value: first [:a]
-	same? :a-value all [true :a-value]
-]
-[#"^@" == all [true #"^@"]]
-[
-	a-value: make image! 0x0
-	same? a-value all [true a-value]
-]
-[0 == all [true 0]]
-[1 == all [true 1]]
-[#a == all [true #a]]
-[
-	a-value: first ['a/b]
-	:a-value == all [true :a-value]
-]
-[
-	a-value: first ['a]
-	:a-value == all [true :a-value]
-]
-[$1 == all [true $1]]
-[same? :type? all [true :type?]]
-[none? all [true #[none]]]
-[
-	a-value: make object! []
-	same? :a-value all [true :a-value]
-]
-[
-	a-value: first [()]
-	same? :a-value all [true :a-value]
-]
-[same? get '+ all [true get '+]]
-[0x0 == all [true 0x0]]
-[
-	a-value: 'a/b
-	:a-value == all [true :a-value]
-]
-[
-	a-value: make port! http://
-	port? all [true :a-value]
-]
-[/a == all [true /a]]
-[
-	a-value: first [a/b:]
-	:a-value == all [true :a-value]
-]
-[
-	a-value: first [a:]
-	:a-value == all [true :a-value]
-]
-[
-	a-value: ""
-	same? :a-value all [true :a-value]
-]
-[
-	a-value: make tag! ""
-	same? :a-value all [true :a-value]
-]
-[0:00 == all [true 0:00]]
-[0.0.0 == all [true 0.0.0]]
-[unset? all [true ()]]
-['a == all [true 'a]]
-[true = all [:abs true]]
-[
-	a-value: #{}
-	true = all [a-value true]
-]
-[
-	a-value: charset ""
-	true = all [a-value true]
-]
-[
-	a-value: []
-	true = all [a-value true]
-]
-[
-	a-value: none!
-	true = all [a-value true]
-]
-[true = all [1/Jan/0000 true]]
-[true = all [0.0 true]]
-[true = all [1.0 true]]
-[
-	a-value: me@here.com
-	true = all [a-value true]
-]
-[true = all [try [1 / 0] true]]
-[
-	a-value: %""
-	true = all [a-value true]
-]
-[
-	a-value: does []
-	true = all [:a-value true]
-]
-[
-	a-value: first [:a]
-	true = all [:a-value true]
-]
-[true = all [#"^@" true]]
-[
-	a-value: make image! 0x0
-	true = all [a-value true]
-]
-[true = all [0 true]]
-[true = all [1 true]]
-[true = all [#a true]]
-[
-	a-value: first ['a/b]
-	true = all [:a-value true]
-]
-[
-	a-value: first ['a]
-	true = all [:a-value true]
-]
-[true = all [true true]]
-[none? all [false true]]
-[none? all [true false]]
-[true = all [$1 true]]
-[true = all [:type? true]]
-[none? all [#[none] true]]
-[
-	a-value: make object! []
-	true = all [:a-value true]
-]
-[
-	a-value: first [()]
-	true = all [:a-value true]
-]
-[true = all [get '+ true]]
-[true = all [0x0 true]]
-[
-	a-value: 'a/b
-	true = all [:a-value true]
-]
-[
-	a-value: make port! http://
-	true = all [:a-value true]
-]
-[true = all [/a true]]
-[
-	a-value: first [a/b:]
-	true = all [:a-value true]
-]
-[
-	a-value: first [a:]
-	true = all [:a-value true]
-]
-[
-	a-value: ""
-	true = all [:a-value true]
-]
-[
-	a-value: make tag! ""
-	true = all [:a-value true]
-]
-[true = all [0:00 true]]
-[true = all [0.0.0 true]]
-[true = all [() true]]
-[true = all ['a true]]
-; evaluation stops after encountering FALSE or NONE
-[
-	success: true
-	all [false success: false]
-	success
-]
-[
-	success: true
-	all [none success: false]
-	success
-]
-; evaluation continues otherwise
-[
-	success: false
-	all [true success: true]
-	success
-]
-[
-	success: false
-	all [1 success: true]
-	success
-]
-; RETURN stops evaluation
-[
-	f1: does [all [return 1 2] 2]
-	1 = f1
-]
-; THROW stops evaluation
-[
-	1 = catch [
-		all [
-			throw 1
-			2
-		]
-	]
-]
-; BREAK stops evaluation
-[
-	1 = loop 1 [
-		all [
-			break/return 1
-			2
-		]
-	]
-]
-; recursivity
-[all [true all [true]]]
-[not all [true all [false]]]
-; infinite recursion
-[
-	blk: [all blk]
-	error? try blk
-]
-; functions/control/any.r
-; zero values
-[none? any []]
-; one value
-[:abs = any [:abs]]
-[
-	a-value: #{}
-	same? a-value any [a-value]
-]
-[
-	a-value: charset ""
-	same? a-value any [a-value]
-]
-[
-	a-value: []
-	same? a-value any [a-value]
-]
-[
-	a-value: none!
-	same? a-value any [a-value]
-]
-[1/Jan/0000 = any [1/Jan/0000]]
-[0.0 == any [0.0]]
-[1.0 == any [1.0]]
-[
-	a-value: me@here.com
-	same? a-value any [a-value]
-]
-[error? any [try [1 / 0]]]
-[
-	a-value: %""
-	same? a-value any [a-value]
-]
-[
-	a-value: does []
-	same? :a-value any [:a-value]
-]
-[
-	a-value: first [:a]
-	:a-value == any [:a-value]
-]
-[#"^@" == any [#"^@"]]
-[
-	a-value: make image! 0x0
-	same? a-value any [a-value]
-]
-[0 == any [0]]
-[1 == any [1]]
-[#a == any [#a]]
-[
-	a-value: first ['a/b]
-	:a-value == any [:a-value]
-]
-[
-	a-value: first ['a]
-	:a-value == any [:a-value]
-]
-[true = any [true]]
-[none? any [false]]
-[$1 == any [$1]]
-[same? :type? any [:type?]]
-[none? any [#[none]]]
-[
-	a-value: make object! []
-	same? :a-value any [:a-value]
-]
-[
-	a-value: first [()]
-	same? :a-value any [:a-value]
-]
-[same? get '+ any [get '+]]
-[0x0 == any [0x0]]
-[
-	a-value: 'a/b
-	:a-value == any [:a-value]
-]
-[
-	a-value: make port! http://
-	port? any [:a-value]
-]
-[/a == any [/a]]
-; routine test?
-[
-	a-value: first [a/b:]
-	:a-value == any [:a-value]
-]
-[
-	a-value: first [a:]
-	:a-value == any [:a-value]
-]
-[
-	a-value: ""
-	same? :a-value any [:a-value]
-]
-[
-	a-value: make tag! ""
-	same? :a-value any [:a-value]
-]
-[0:00 == any [0:00]]
-[0.0.0 == any [0.0.0]]
-#r2only
-[unset? any [()]]
-#r3only
-[none? any [()]]
-['a == any ['a]]
-; two values
-[:abs = any [false :abs]]
-[
-	a-value: #{}
-	same? a-value any [false a-value]
-]
-[
-	a-value: charset ""
-	same? a-value any [false a-value]
-]
-[
-	a-value: []
-	same? a-value any [false a-value]
-]
-[
-	a-value: none!
-	same? a-value any [false a-value]
-]
-[1/Jan/0000 = any [false 1/Jan/0000]]
-[0.0 == any [false 0.0]]
-[1.0 == any [false 1.0]]
-[
-	a-value: me@here.com
-	same? a-value any [false a-value]
-]
-[error? any [false try [1 / 0]]]
-[
-	a-value: %""
-	same? a-value any [false a-value]
-]
-[
-	a-value: does []
-	same? :a-value any [false :a-value]
-]
-[
-	a-value: first [:a]
-	:a-value == any [false :a-value]
-]
-[#"^@" == any [false #"^@"]]
-[
-	a-value: make image! 0x0
-	same? a-value any [false a-value]
-]
-[0 == any [false 0]]
-[1 == any [false 1]]
-[#a == any [false #a]]
-[
-	a-value: first ['a/b]
-	:a-value == any [false :a-value]
-]
-[
-	a-value: first ['a]
-	:a-value == any [false :a-value]
-]
-[true = any [false true]]
-[none? any [false false]]
-[$1 == any [false $1]]
-[same? :type? any [false :type?]]
-[none? any [false #[none]]]
-[
-	a-value: make object! []
-	same? :a-value any [false :a-value]
-]
-[
-	a-value: first [()]
-	same? :a-value any [false :a-value]
-]
-[same? get '+ any [false get '+]]
-[0x0 == any [false 0x0]]
-[
-	a-value: 'a/b
-	:a-value == any [false :a-value]
-]
-[
-	a-value: make port! http://
-	port? any [false :a-value]
-]
-[/a == any [false /a]]
-[
-	a-value: first [a/b:]
-	:a-value == any [false :a-value]
-]
-[
-	a-value: first [a:]
-	:a-value == any [false :a-value]
-]
-[
-	a-value: ""
-	same? :a-value any [false :a-value]
-]
-[
-	a-value: make tag! ""
-	same? :a-value any [false :a-value]
-]
-[0:00 == any [false 0:00]]
-[0.0.0 == any [false 0.0.0]]
-#r2only
-[unset? any [false ()]]
-#r3only
-[none? any [false ()]]
-['a == any [false 'a]]
-[:abs = any [:abs false]]
-[
-	a-value: #{}
-	same? a-value any [a-value false]
-]
-[
-	a-value: charset ""
-	same? a-value any [a-value false]
-]
-[
-	a-value: []
-	same? a-value any [a-value false]
-]
-[
-	a-value: none!
-	same? a-value any [a-value false]
-]
-[1/Jan/0000 = any [1/Jan/0000 false]]
-[0.0 == any [0.0 false]]
-[1.0 == any [1.0 false]]
-[
-	a-value: me@here.com
-	same? a-value any [a-value false]
-]
-[error? any [try [1 / 0] false]]
-[
-	a-value: %""
-	same? a-value any [a-value false]
-]
-[
-	a-value: does []
-	same? :a-value any [:a-value false]
-]
-[
-	a-value: first [:a]
-	:a-value == any [:a-value false]
-]
-[#"^@" == any [#"^@" false]]
-[
-	a-value: make image! 0x0
-	same? a-value any [a-value false]
-]
-[0 == any [0 false]]
-[1 == any [1 false]]
-[#a == any [#a false]]
-[
-	a-value: first ['a/b]
-	:a-value == any [:a-value false]
-]
-[
-	a-value: first ['a]
-	:a-value == any [:a-value false]
-]
-[true = any [true false]]
-[$1 == any [$1 false]]
-[same? :type? any [:type? false]]
-[none? any [#[none] false]]
-[
-	a-value: make object! []
-	same? :a-value any [:a-value false]
-]
-[
-	a-value: first [()]
-	same? :a-value any [:a-value false]
-]
-[same? get '+ any [get '+ false]]
-[0x0 == any [0x0 false]]
-[
-	a-value: 'a/b
-	:a-value == any [:a-value false]
-]
-[
-	a-value: make port! http://
-	port? any [:a-value false]
-]
-[/a == any [/a false]]
-[
-	a-value: first [a/b:]
-	:a-value == any [:a-value false]
-]
-[
-	a-value: first [a:]
-	:a-value == any [:a-value false]
-]
-[
-	a-value: ""
-	same? :a-value any [:a-value false]
-]
-[
-	a-value: make tag! ""
-	same? :a-value any [:a-value false]
-]
-[0:00 == any [0:00 false]]
-[0.0.0 == any [0.0.0 false]]
-#r2only
-[unset? any [() false]]
-#r3only
-[none? any [() false]]
-['a == any ['a false]]
-; evaluation stops after encountering something else than FALSE or NONE
-[
-	success: true
-	any [true success: false]
-	success
-]
-[
-	success: true
-	any [1 success: false]
-	success
-]
-; evaluation continues otherwise
-[
-	success: false
-	any [false success: true]
-	success
-]
-[
-	success: false
-	any [none success: true]
-	success
-]
-; RETURN stops evaluation
-[
-	f1: does [any [return 1 2] 2]
-	1 = f1
-]
-; THROW stops evaluation
-[
-	1 = catch [
-		any [
-			throw 1
-			2
-		]
-	]
-]
-; BREAK stops evaluation
-[
-	1 = loop 1 [
-		any [
-			break/return 1
-			2
-		]
-	]
-]
-; recursivity
-[any [false any [true]]]
-[none? any [false any [false]]]
-; infinite recursion
-[
-	blk: [any blk]
-	error? try blk
-]
-; functions/control/apply.r
-; bug#44
-[error? try [apply 'type?/word []]]
-; bug#1949: RETURN/redo can break APPLY security
-[same? :add attempt [apply does [return/redo :add] []]]
-; DO is special
-[2 == do does [return apply :do [:add 1 1] 4 4]]
-[1 == apply :subtract [2 1]]
-#r3only
-[1 == apply :- [2 1]]
-#r2only
-[-2 == apply :- [2]]
-[none == apply func [a] [a] []]
-[none == apply/only func [a] [a] []]
-[1 == apply func [a] [a] [1 2]]
-[1 == apply/only func [a] [a] [1 2]]
-[true == apply func [/a] [a] [true]]
-[none == apply func [/a] [a] [false]]
-[none == apply func [/a] [a] []]
-[true == apply/only func [/a] [a] [true]]
-; the word 'false
-[true == apply/only func [/a] [a] [false]]
-[false == apply/only func [/a] [a] [#[false]]]
-[none == apply/only func [/a] [a] []]
-[use [a] [a: true true == apply func [/a] [a] [a]]]
-[use [a] [a: false none == apply func [/a] [a] [a]]]
-[use [a] [a: false true == apply func [/a] [a] ['a]]]
-[use [a] [a: false true == apply func [/a] [a] [/a]]]
-[use [a] [a: false true == apply/only func [/a] [a] [a]]]
-[paren! == apply/only :type? [()]]
-['paren! == apply/only :type? [() true]]
-[[1] == head apply :insert [copy [] [1] none none none]]
-[[1] == head apply :insert [copy [] [1] none none false]]
-[[[1]] == head apply :insert [copy [] [1] none none true]]
-[native! == apply :type? [:print]]
-[get-word! == apply/only :type? [:print]]
-[1 == do does [apply :return [1] 2]]
-; bug#1760
-[1 == do does [apply does [] [return 1] 2]]
-; bug#1760
-[1 == do does [apply func [a] [a] [return 1] 2]]
-; bug#1760
-[1 == do does [apply does [] [return 1]]]
-[1 == do does [apply func [a] [a] [return 1]]]
-[1 == do does [apply :also [return 1 2]]]
-; bug#1760
-[1 == do does [apply :also [2 return 1]]]
-[unset? apply func [x [any-type!]] [get/any 'x] [()]]
-[unset? apply func ['x [any-type!]] [get/any 'x] [()]]
-[unset? apply func [:x [any-type!]] [get/any 'x] [()]]
-[unset? apply func [x [any-type!]] [return get/any 'x] [()]]
-[unset? apply func ['x [any-type!]] [return get/any 'x] [()]]
-[unset? apply func [:x [any-type!]] [return get/any 'x] [()]]
-[error? apply :make [error! ""]]
-#r3only
-[error? apply func [:x [any-type!]] [return get/any 'x] [make error! ""]]
-[
-	error? apply/only func [x [any-type!]] [
-		return get/any 'x
-	] head insert copy [] make error! ""
-]
-[
-	error? apply/only func ['x [any-type!]] [
-		return get/any 'x
-	] head insert copy [] make error! ""
-]
-[
-	error? apply/only func [:x [any-type!]] [
-		return get/any 'x
-	] head insert copy [] make error! ""
-]
-[use [x] [x: 1 strict-equal? 1 apply func ['x] [:x] [:x]]]
-[use [x] [x: 1 strict-equal? first [:x] apply/only func ['x] [:x] [:x]]]
-[
-	use [x] [
-		unset 'x
-		strict-equal? first [:x] apply/only func ['x [any-type!]] [
-			return get/any 'x
-		] [:x]
-	]
-]
-[use [x] [x: 1 strict-equal? 1 apply func [:x] [:x] [x]]]
-[use [x] [x: 1 strict-equal? 'x apply func [:x] [:x] ['x]]]
-[use [x] [x: 1 strict-equal? 'x apply/only func [:x] [:x] [x]]]
-[use [x] [x: 1 strict-equal? 'x apply/only func [:x] [return :x] [x]]]
-[
-	use [x] [
-		unset 'x
-		strict-equal? 'x apply/only func [:x [any-type!]] [
-			return get/any 'x
-		] [x]
-	]
-]
-; functions/control/attempt.r
-; bug#41
-[none? attempt [1 / 0]]
-[1 = attempt [1]]
-[unset? attempt []]
-; RETURN stops attempt evaluation
-[
-	f1: does [attempt [return 1 2] 2]
-	1 == f1
-]
-; THROW stops attempt evaluation
-[1 == catch [attempt [throw 1 2] 2]]
-; BREAK stops attempt evaluation
-[unset? loop 1 [attempt [break 2] 2]]
-[1 == loop 1 [attempt [break/return 1 2] 2]]
-; recursion
-[1 = attempt [attempt [1]]]
-[none? attempt [attempt [1 / 0]]]
-; infinite recursion
-[
-	blk: [attempt blk]
-	none? attempt blk
-]
-; functions/control/break.r
-; see loop functions for basic breaking functionality
-; just testing return values, but written as if break could fail altogether
-; in case that becomes an issue. break failure tests are with the functions
-; that they are failing to break from.
-; break should return #[unset!]
-[unset? loop 1 [break 2]]
-; break/return should return argument
-[none? loop 1 [break/return none 2]]
-[false =? loop 1 [break/return false 2]]
-[true =? loop 1 [break/return true 2]]
-[unset? loop 1 [break/return () 2]]
-[error? loop 1 [break/return try [1 / 0] 2]]
-; the "result" of break should not be assignable, bug#1515
-[a: 1 loop 1 [a: break] :a =? 1]
-[a: 1 loop 1 [set 'a break] :a =? 1]
-[a: 1 loop 1 [set/any 'a break] :a =? 1]
-[a: 1 loop 1 [a: break/return 2] :a =? 1]
-[a: 1 loop 1 [set 'a break/return 2] :a =? 1]
-[a: 1 loop 1 [set/any 'a break/return 2] :a =? 1]
-; the "result" of break should not be passable to functions, bug#1509
-[a: 1 loop 1 [a: error? break] :a =? 1]
-[a: 1 loop 1 [a: error? break/return 2] :a =? 1]
-; bug#1535
-[loop 1 [words-of break] true]
-[loop 1 [values-of break] true]
-; bug#1945
-[loop 1 [spec-of break] true]
-; the "result" of break should not be caught by try
-[a: 1 loop 1 [a: error? try [break]] :a =? 1]
-; functions/control/case.r
-[
-	success: false
-	case [true [success: true]]
-	success
-]
-[
-	success: true
-	case [false [success: false]]
-	success
-]
-; not sure these are consistent with other control functions
-[not case []]
-[logic! = type? case [true []]]
-; case results
-[case [true [true]]]
-[not case [true [false]]]
-; RETURN stops evaluation
-[
-	f1: does [case [return 1 2]]
-	1 = f1
-]
-; THROW stops evaluation
-[
-	1 = catch [
-		case [throw 1 2]
-		2
-	]
-]
-; BREAK stops evaluation
-[
-	1 = loop 1 [
-		case [break/return 1 2]
-		2
-	]
-]
-; /all refinement
-[
-	s1: false
-	s2: false
-	case/all [
-		true [s1: true]
-		true [s2: true]
-	]
-	s1 and s2
-]
-; recursivity
-[1 = case [true [case [true [1]]]]]
-; infinite recursion
-[
-	blk: [case blk]
-	error? try blk
-]
-; functions/control/catch.r
-; see also functions/control/throw.r
-[
-	catch [
-		throw success: true
-		sucess: false
-	]
-	success
-]
-; catch results
-[unset? catch []]
-[unset? catch [()]]
-#r3only
-[error? catch [try [1 / 0]]]
-[1 = catch [1]]
-[unset? catch [throw ()]]
-[error? catch [throw try [1 / 0]]]
-[1 = catch [throw 1]]
-; catch/name results
-[unset? catch/name [] 'catch]
-[unset? catch/name [()] 'catch]
-#r3only
-[error? catch/name [try [1 / 0]] 'catch]
-[1 = catch/name [1] 'catch]
-[unset? catch/name [throw/name () 'catch] 'catch]
-[error? catch/name [throw/name try [1 / 0] 'catch] 'catch]
-[1 = catch/name [throw/name 1 'catch] 'catch]
-; recursive cases
-[
-	num: 1
-	catch [
-		catch [throw 1]
-		num: 2
-	]
-	2 = num
-]
-[
-	num: 1
-	catch [
-		catch/name [
-			throw 1
-		] 'catch
-		num: 2
-	]
-	1 = num
-]
-[
-	num: 1
-	catch/name [
-		catch [throw 1]
-		num: 2
-	] 'catch
-	2 = num
-]
-[
-	num: 1
-	catch/name [
-		catch/name [
-			throw/name 1 'name
-		] 'name
-		num: 2
-	] 'name
-	2 = num
-]
-; CATCH and RETURN
-[
-	f: does [catch [return 1] 2]
-	1 = f
-]
-; CATCH and BREAK
-[
-	1 = loop 1 [
-		catch [break/return 1 2]
-		2
-	]
-]
-#r3only
-; CATCH/QUIT
-[
-	catch/quit [quit]
-	true
-]
-#r3only
-; bug#851
-[error? try [catch/quit [] do make error! ""]]
-; bug#851
-[none? attempt [catch/quit [] do make error! ""]]
-; functions/control/compose.r
-[
-	num: 1
-	[1 num] = compose [(num) num]
-]
-[[] = compose []]
-[
-	blk: []
-	append blk [try [1 / 0]]
-	blk = compose blk
-]
-[
-	blk: reduce [()]
-	blk = compose blk
-]
-; RETURN stops the evaluation
-[
-	f1: does [compose [(return 1)] 2]
-	1 = f1
-]
-; THROW stops the evaluation
-[1 = catch [compose [(throw 1 2)] 2]]
-; BREAK stops the evaluation
-[1 = loop 1 [compose [(break/return 1 2)] 2]]
-#r3only
-; Test that errors do not stop the evaluation:
-[block? compose [(try [1 / 0])]]
-[
-	blk: []
-	not same? blk compose blk
-]
-[
-	blk: [[]]
-	same? first blk first compose blk
-]
-[
-	blk: []
-	same? blk first compose [(reduce [blk])]
-]
-[
-	blk: []
-	same? blk first compose/only [(blk)]
-]
-; recursion
-[
-	num: 1
-	[num 1] = compose [num (compose [(num)])]
-]
-; infinite recursion
-[
-	blk: [(compose blk)]
-	error? try blk
-]
-; #1906
-[
-	b: copy [] insert/dup b 1 32768 compose b
-]
-; functions/control/continue.r
-; see loop functions for basic continuing functionality
-; the "result" of continue should not be assignable, bug#1515
-#r3only
-[a: 1 loop 1 [a: continue] :a =? 1]
-#r3only
-[a: 1 loop 1 [set 'a continue] :a =? 1]
-#r3only
-[a: 1 loop 1 [set/any 'a continue] :a =? 1]
-; the "result" of continue should not be passable to functions, bug#1509
-#r3only
-[a: 1 loop 1 [a: error? continue] :a =? 1]
-; bug#1535
-#r3only
-[loop 1 [words-of continue] true]
-#r3only
-[loop 1 [values-of continue] true]
-#r3only
-; bug#1945
-[loop 1 [spec-of continue] true]
-; continue should not be caught by try
-#r3only
-[a: 1 loop 1 [a: error? try [continue]] :a =? 1]
-; functions/control/disarm.r
-#r2only
-[object? disarm try [1 / 0]]
-; functions/control/do.r
-[
-	success: false
-	do [success: true]
-	success
-]
-[1 == do :abs -1]
-[
-	a-value: #{}
-	same? a-value do a-value
-]
-[
-	a-value: charset ""
-	same? a-value do a-value
-]
-; do block start
-[unset? do []]
-[:abs = do [:abs]]
-[
-	a-value: #{}
-	same? a-value do reduce [a-value]
-]
-[
-	a-value: charset ""
-	same? a-value do reduce [a-value]
-]
-[
-	a-value: []
-	same? a-value do reduce [a-value]
-]
-[same? none! do reduce [none!]]
-[1/Jan/0000 = do [1/Jan/0000]]
-[0.0 == do [0.0]]
-[1.0 == do [1.0]]
-[
-	a-value: me@here.com
-	same? a-value do reduce [a-value]
-]
-#r3only
-[error? do [try [1 / 0]]]
-[
-	a-value: %""
-	same? a-value do reduce [a-value]
-]
-[
-	a-value: does []
-	same? :a-value do [:a-value]
-]
-[
-	a-value: first [:a-value]
-	:a-value == do reduce [:a-value]
-]
-[#"^@" == do [#"^@"]]
-[
-	a-value: make image! 0x0
-	same? a-value do reduce [a-value]
-]
-[0 == do [0]]
-[1 == do [1]]
-[#a == do [#a]]
-[
-	a-value: first ['a/b]
-	:a-value == do [:a-value]
-]
-[
-	a-value: first ['a]
-	:a-value == do [:a-value]
-]
-[#[true] == do [#[true]]]
-[#[false] == do [#[false]]]
-[$1 == do [$1]]
-[same? :type? do [:type?]]
-[none? do [#[none]]]
-[
-	a-value: make object! []
-	same? :a-value do reduce [:a-value]
-]
-[
-	a-value: first [()]
-	same? :a-value do [:a-value]
-]
-[same? get '+ do [get '+]]
-[0x0 == do [0x0]]
-[
-	a-value: 'a/b
-	:a-value == do [:a-value]
-]
-[
-	a-value: make port! http://
-	port? do reduce [:a-value]
-]
-[/a == do [/a]]
-[
-	a-value: first [a/b:]
-	:a-value == do [:a-value]
-]
-[
-	a-value: first [a:]
-	:a-value == do [:a-value]
-]
-[
-	a-value: ""
-	same? :a-value do reduce [:a-value]
-]
-[
-	a-value: make tag! ""
-	same? :a-value do reduce [:a-value]
-]
-[0:00 == do [0:00]]
-[0.0.0 == do [0.0.0]]
-[unset? do [()]]
-['a == do ['a]]
-; do block end
-[
-	a-value: none!
-	same? a-value do a-value
-]
-[1/Jan/0000 == do 1/Jan/0000]
-[0.0 == do 0.0]
-[1.0 == do 1.0]
-[
-	a-value: me@here.com
-	same? a-value do a-value
-]
-#r3only
-[error? try [do try [1 / 0] 1]]
-[
-	a-value: does [5]
-	5 == do :a-value
-]
-#r2only
-[
-	a: 12
-	a-value: first [:a]
-	:a-value == do :a-value
-]
-#r3only
-[
-	a: 12
-	a-value: first [:a]
-	:a == do :a-value
-]
-[#"^@" == do #"^@"]
-[
-	a-value: make image! 0x0
-	same? a-value do a-value
-]
-[0 == do 0]
-[1 == do 1]
-[#a == do #a]
-[
-	a-value: first ['a/b]
-	:a-value == do :a-value
-]
-#r2only
-[
-	a-value: first ['a]
-	:a-value == do :a-value
-]
-#r3only
-[
-	a-value: first ['a]
-	a-value == do :a-value
-]
-[true = do true]
-[false = do false]
-[$1 == do $1]
-[unset! = do :type? ()]
-[none? do #[none]]
-[
-	a-value: make object! []
-	same? :a-value do :a-value
-]
-[
-	a-value: first [(2)]
-	2 == do :a-value
-]
-#r2only
-[
-	a-value: 'a/b
-	a: make object! [b: 1]
-	1 == do :a-value
-]
-#r3only
-[
-	a-value: 'a/b
-	a: make object! [b: 1]
-	a-value == do :a-value
-]
-[
-	a-value: make port! http://
-	port? do :a-value
-]
-[
-	a-value: first [a/b:]
-	:a-value == do :a-value
-]
-#r2only
-[
-	a-value: first [a:]
-	:a-value == do :a-value
-]
-[
-	a-value: "1"
-	1 == do :a-value
-]
-[unset? do ""]
-[
-	a-value: make tag! ""
-	same? :a-value do :a-value
-]
-[0:00 == do 0:00]
-[0.0.0 == do 0.0.0]
-[
-	a-value: 'b-value
-	b-value: 1
-	1 == do :a-value
-]
-; RETURN stops the evaluation
-[
-	f1: does [do [return 1 2] 2]
-	1 = f1
-]
-; bug#539
-[
-	f1: does [do "return 1 2" 2]
-	1 = f1	
-]
-; THROW stops evaluation
-[
-	1 = catch [
-		do [
-			throw 1
-			2
-		]
-		2
-	]
-]
-; BREAK stops evaluation
-[
-	1 = loop 1 [
-		do [
-			break/return 1
-			2
-		]
-		2
-	]
-]
-; do/next block tests
-#r2only
-[
-	success: false
-	do/next [success: true success: false]
-	success
-]
-#r3only
-[
-	success: false
-	do/next [success: true success: false] 'b
-	success
-]
-#r2only
-[[1 [2]] = do/next [1 2]]
-#r3only
-[
-	all [
-		1 = do/next [1 2] 'b
-		[2] = b
-	]
-]
-#r2only
-[unset? first do/next []]
-#r3only
-[unset? do/next [] 'b]
-#r3only
-[error? do/next [try [1 / 0]] 'b]
-#r2only
-; RETURN stops the evaluation
-[
-	f1: does [do/next [return 1 2] 2]
-	1 = f1
-]
-#r3only
-[
-	f1: does [do/next [return 1 2] 'b 2]
-	1 = f1
-]
-; recursive behaviour
-[1 = do [do [1]]]
-[1 = do "do [1]"]
-[1 == 1]
-[3 = do :do :add 1 2]
-; infinite recursion for block
-[
-	blk: [do blk]
-	error? try blk
-]
-; infinite recursion for string
-; bug#1896
-[
-	str: "do str"
-	error? try [do str]
-]
-; infinite recursion for do/next
-#r2only
-[
-	blk: [do/next blk]
-	error? try blk
-]
-#r3only
-[
-	blk: [do/next blk 'b]
-	error? try blk
-]
-#r2only
-; are error reports for do and do/next consistent?
-[
-	val1: disarm try [do [1 / 0]]
-	val2: disarm try [do/next [1 / 0]]
-	val1/near = val2/near
-]
-#r3only
-[
-	val1: try [do [1 / 0]]
-	val2: try [do/next [1 / 0] 'b]
-	val1/near = val2/near
-]
-; functions/control/either.r
-[
-	either true [success: true] [success: false]
-	success
-]
-[
-	either false [success: false] [success: true]
-	success
-]
-[1 = either true [1] [2]]
-[2 = either false [1] [2]]
-[unset? either true [] [1]]
-[unset? either false [1] []]
-#r3only
-[error? either true [try [1 / 0]] []]
-#r3only
-[error? either false [] [try [1 / 0]]]
-; RETURN stops the evaluation
-[
-	f1: does [
-		either true [return 1 2] [2]
-		2
-	]
-	1 = f1
-]
-[
-	f1: does [
-		either false [2] [return 1 2]
-		2
-	]
-	1 = f1
-]
-; THROW stops the evaluation
-[
-	1 == catch [
-		either true [throw 1 2] [2]
-		2
-	]
-]
-[
-	1 == catch [
-		either false [2] [throw 1 2]
-		2
-	]
-]
-; BREAK stops the evaluation
-[
-	1 == loop 1 [
-		either true [break/return 1 2] [2]
-		2
-	]
-]
-[
-	1 == loop 1 [
-		either false [2] [break/return 1 2]
-		2
-	]
-]
-; recursive behaviour
-[2 = either true [either false [1] [2]] []]
-[1 = either false [] [either true [1] [2]]]
-; infinite recursion
-[
-	blk: [either true blk []]
-	error? try blk
-]
-[
-	blk: [either false [] blk]
-	error? try blk
-]
-; functions/control/else.r
-#r2only
-[error? err: try [else] c: disarm err c/id = 'else-gone]
-#r3only
-[error? err: try [else] c: err c/id = 'no-value]
-; functions/control/exit.r
-[
-	success: true
-	f1: does [exit success: false]
-	f1
-	success
-]
-[
-	f1: does [exit]
-	unset? f1
-]
-; the "result" of exit should not be assignable, bug#1515
-[a: 1 do does [a: exit] :a =? 1]
-[a: 1 do does [set 'a exit] :a =? 1]
-[a: 1 do does [set/any 'a exit] :a =? 1]
-; the "result" of exit should not be passable to functions, bug#1509
-[a: 1 do does [a: error? exit] :a =? 1]
-; bug#1535
-[do does [words-of exit] true]
-[do does [values-of exit] true]
-; bug#1945
-[do does [spec-of exit] true]
-; exit should not be caught by try
-[a: 1 do does [a: error? try [exit]] :a =? 1]
-; functions/control/for.r
-[
-	success: true
-	num: 0
-	for i 1 10 1 [
-		num: num + 1
-		success: i = num and success
-	]
-	10 = num and success
-]
-; cycle return value
-[false = for i 1 1 1 [false]]
-; break cycle
-[
-	num: 0
-	for i 1 10 1 [num: i break]
-	num = 1
-]
-; break return value
-[unset? for i 1 10 1 [break]]
-; break/return return value
-[2 = for i 1 10 1 [break/return 2]]
-; continue cycle
-; bug#58
-#r3only
-[
-	success: true
-	for i 1 1 1 [continue success: false]
-	success
-]
-#r3only
-[
-	success: true
-	x: "a"
-	for i x tail x 1 [continue success: false]
-	success
-]
-; string! test
-[
-	out: copy ""
-	for i s: "abc" back tail s 1 [append out i]
-	out = "abcbcc"
-]
-; block! test
-[
-	out: copy []
-	for i b: [1 2 3] back tail b 1 [append out i]
-	out = [1 2 3 2 3 3]
-]
-; zero repetition
-[
-	success: true
-	for i 1 0 1 [success: false]
-	success
-]
-; zero repetition block test
-[
-	success: true
-	for i b: [1] tail :b -1 [success: false]
-	success
-]
-; Test that return stops the loop
-[
-	f1: does [for i 1 1 1 [return 1 2] 2]
-	1 = f1
-]
-#r3only
-; Test that errors do not stop the loop and errors can be returned
-[
-	num: 0
-	e: for i 1 2 1 [num: i try [1 / 0]]
-	all [error? e num = 2]
-]
-; infinite loop tests
-[
-	num: 0
-	for i b: [1] tail b 1 [
-		num: num + 1
-		if num > 2 [break]
-	]
-	num <= 2
-]
-[
-	num: 0
-	for i 2147483647 2147483647 1 [
-		num: num + 1
-		either num > 1 [break/return false] [true]
-	]
-]
-[
-	num: 0
-	for i -2147483648 -2147483648 -1 [
-		num: num + 1
-		either num > 1 [break/return false] [true]
-	]
-]
-; bug#1136
-#64bit
-[
-	num: 0
-	for i 9223372036854775807 9223372036854775807 1 [
-		num: num + 1
-		either num > 1 [break/return false] [true]
-	]
-]
-#64bit
-[
-	num: 0
-	for i -9223372036854775808 -9223372036854775808 -1 [
-		num: num + 1
-		either num > 1 [break/return false] [true]
-	]
-]
-; bug#1994
-#64bit
-[
-	num: 0
-	for i 9223372036854775807 9223372036854775807 9223372036854775807 [
-		num: num + 1
-		if num <> 1 [break/return false]
-		true
-	]
-]
-#64bit
-[
-	num: 0
-	for i 9223372036854775807 9223372036854775807 -9223372036854775808 [
-		num: num + 1
-		if num <> 1 [break/return false]
-		true
-	]
-]
-#64bit
-[
-	num: 0
-	for i -9223372036854775808 -9223372036854775808 9223372036854775807 [
-		num: num + 1
-		if num <> 1 [break/return false]
-		true
-	]
-]
-#64bit
-[
-	num: 0
-	for i -9223372036854775808 -9223372036854775808 -9223372036854775808 [
-		num: num + 1
-		if num <> 1 [break/return false]
-		true
-	]
-]
-[
-	num: 0
-	for i 2147483647 2147483647 2147483647 [
-		num: num + 1
-		if num <> 1 [break/return false]
-		true
-	]
-]
-[
-	num: 0
-	for i 2147483647 2147483647 -2147483648 [
-		num: num + 1
-		if num <> 1 [break/return false]
-		true
-	]
-]
-[
-	num: 0
-	for i -2147483648 -2147483648 2147483647 [
-		num: num + 1
-		if num <> 1 [break/return false]
-		true
-	]
-]
-[
-	num: 0
-	for i -2147483648 -2147483648 -2147483648 [
-		num: num + 1
-		if num <> 1 [break/return false]
-		true
-	]
-]
-; bug#1993
-[equal? type? for i 1 2 0 [break] type? for i 2 1 0 [break]]
-[equal? type? for i -1 -2 0 [break] type? for i 2 1 0 [break]]
-[equal? type? for i -1 -2 0 [break] type? for i -2 -1 0 [break]]
-#r2only
-; char tests
-[
-	num: 0
-	char: #"^(ff)"
-	not for i char char 1 [
-		num: num + 1
-		if num > 1 [break/return true]
-	]
-]
-#r2only
-[
-	num: 0
-	char: #"^(0)"
-	not for i char char -1 [
-		num: num + 1
-		if num > 1 [break/return true]
-	]
-]
-; skip before head test
-[[] = for i b: tail [1] head b -2 [i]]
-; "recursive safety", "locality" and "body constantness" test in one
-[for i 1 1 1 b: [not same? 'i b/3]]
-; recursivity
-[
-	num: 0
-	for i 1 5 1 [
-		for i 1 2 1 [num: num + 1]
-	]
-	num = 10
-]
-; infinite recursion
-[
-	blk: [for i 1 1 1 blk]
-	error? try blk
-]
-; local variable changeability - this is how it works in R3
-[
-	test: false
-	for i 1 3 1 [
-		if i = 2 [
-			if test [break/return true]
-			test: true
-			i: 1
-		]
-	]
-]
-; THROW error test
-#r2only
-[
-	b: head insert copy [] try [1 / 0]
-	pokus1: func [[catch] block [block!] /local elem] [
-		for i 1 length? block 1 [
-			if error? set/any 'elem first block [
-				throw make error! {Dangerous element}
-			]
-			block: next block
-		]
-	]
-	b: disarm try [pokus1 b]
-	b/near = [pokus1 b]
-]
-; local variable type safety
-#r3only
-[
-	test: false
-	error? try [
-		for i 1 2 [
-			either test [i == 2] [
-				test: true
-				i: false
-			]
-		]
-	]
-]
-; FOR should not bind 'self
-; bug#1529
-[same? 'self for i 1 1 1 ['self]]
-; functions/control/forall.r
-[
-	str: "abcdef"
-	out: copy ""
-	forall str [append out first str]
-	all [
-		head? str
-		out = head str
-	]
-]
-[
-	blk: [1 2 3 4]
-	sum: 0
-	forall blk [sum: sum + first blk]
-	sum = 10
-]
-; cycle return value
-[
-	blk: [1 2 3 4]
-	true = forall blk [true]
-]
-[
-	blk: [1 2 3 4]
-	false = forall blk [false]
-]
-; break cycle
-[
-	str: "abcdef"
-	forall str [if #"c" = char: str/1 [break]]
-	char = #"c"
-]
-; break return value
-[
-	blk: [1 2 3 4]
-	unset? forall blk [break]
-]
-; break/return return value
-[
-	blk: [1 2 3 4]
-	1 = forall blk [break/return 1]
-]
-; continue cycle
-#r3only
-[
-	success: true
-	x: "a"
-	forall x [continue success: false]
-	success
-]
-; zero repetition
-[
-	success: true
-	blk: []
-	forall blk [success: false]
-	success
-]
-; Test that return stops the loop
-[
-	blk: [1]
-	f1: does [forall blk [return 1 2]]
-	1 = f1
-]
-#r3only
-; Test that errors do not stop the loop and errors can be returned
-[
-	num: 0
-	blk: [1 2]
-	e: forall blk [num: first blk try [1 / 0]]
-	all [error? e num = 2]
-]
-; recursivity
-[
-	num: 0
-	blk1: [1 2 3 4 5]
-	blk2: [6 7]
-	forall blk1 [
-		num: num + first blk1
-		forall blk2 [num: num + first blk2]
-	]
-	num = 80
-]
-#r2only
-; in Rebol2 the FORALL function is unable to pass a THROW error test
-[
-	f: func [[catch] /local x] [
-		x: [1]
-		forall x [throw make error! ""]
-	]
-	e: disarm try [f]
-	e/near = [f]
-]
-; bug#81
-[
-	blk: [1]
-	1 == forall blk [blk/1]
-]
-; functions/control/foreach.r
-[
-	out: copy ""
-	str: "abcdef"
-	foreach i str [append out i]
-	out = str
-]
-[
-	blk: [1 2 3 4]
-	sum: 0
-	foreach i blk [sum: sum + i]
-	sum = 10
-]
-; cycle return value
-[
-	blk: [1 2 3 4]
-	true = foreach i blk [true]
-]
-[
-	blk: [1 2 3 4]
-	false = foreach i blk [false]
-]
-; break cycle
-[
-	str: "abcdef"
-	foreach i str [
-		num: i
-		if i = #"c" [break]
-	]
-	num = #"c"
-]
-; break return value
-[
-	blk: [1 2 3 4]
-	unset? foreach i blk [break]
-]
-; break/return return value
-[
-	blk: [1 2 3 4]
-	1 = foreach i blk [break/return 1]
-]
-; continue cycle
-#r3only
-[
-	success: true
-	foreach i [1] [continue success: false]
-	success
-]
-; zero repetition
-[
-	success: true
-	blk: []
-	foreach i blk [success: false]
-	success
-]
-; Test that return stops the loop
-[
-	blk: [1]
-	f1: does [foreach i blk [return 1 2]]
-	1 = f1
-]
-#r3only
-; Test that errors do not stop the loop and errors can be returned
-[
-	num: 0
-	blk: [1 2]
-	e: foreach i blk [num: i try [1 / 0]]
-	all [error? e num = 2]
-]
-; "recursive safety", "locality" and "body constantness" test in one
-[foreach i [1] b: [not same? 'i b/3]]
-; recursivity
-[
-	num: 0
-	foreach i [1 2 3 4 5] [
-		foreach i [1 2] [num: num + 1]
-	]
-	num = 10
-]
-; functions/control/forever.r
-[
-	num: 0
-	forever [
-		num: num + 1
-		if num = 10 [break]
-	]
-	num = 10
-]
-; Test break, break/return and continue
-[unset? forever [break]]
-[1 = forever [break/return 1]]
-#r3only
-[
-	success: true
-	cycle?: true
-	forever [if cycle? [cycle?: false continue success: false] break]
-	success
-]
-; Test that return stops the loop
-[
-	f1: does [forever [return 1]]
-	1 = f1
-]
-; Test that exit stops the loop
-[unset? do does [forever [exit]]]
-#r3only
-; Test that errors do not stop the loop and errors can be returned
-[
-	num: 0
-	e: forever [
-		num: num + 1
-		if num = 10 [break/return try [1 / 0]]
-		try [1 / 0]
-	]
-	all [error? e num = 10]
-]
-; Recursion check
-[
-	num1: 0
-	num3: 0
-	forever [
-		if num1 = 5 [break]
-		num2: 0
-		forever [
-			if num2 = 2 [break]
-			num3: num3 + 1
-			num2: num2 + 1
-		]
-		num1: num1 + 1
-	]
-	10 = num3
-]
-; functions/control/forskip.r
-#r2only
-[
-	blk: copy out: copy []
-	for i #"A" #"Z" 1 [append blk i]
-	forskip blk 2 [append out blk/1]
-	out = [#"A" #"C" #"E" #"G" #"I" #"K" #"M" #"O" #"Q" #"S" #"U" #"W" #"Y"]
-]
-[
-	blk: copy out: copy []
-	for i 1 25 1 [append blk i]
-	forskip blk 3 [append out blk/1]
-	out = [1 4 7 10 13 16 19 22 25]
-]
-; cycle return value
-[
-	blk: [1 2 3 4]
-	true = forskip blk 1 [true]
-]
-[
-	blk: [1 2 3 4]
-	false = forskip blk 1 [false]
-]
-; break cycle
-[
-	str: "abcdef"
-	forskip str 2 [if #"c" = char: str/1 [break]
-	]
-	char = #"c"
-]
-; break return value
-[
-	blk: [1 2 3 4]
-	unset? forskip blk 2 [break]
-]
-; break/return return value
-[
-	blk: [1 2 3 4]
-	1 = forskip blk 2 [break/return 1]
-]
-; continue cycle
-#r3only
-[
-	success: true
-	x: "a"
-	forskip x 1 [continue success: false]
-	success
-]
-; zero repetition
-[
-	success: true
-	blk: []
-	forskip blk 1 [success: false]
-	success
-]
-; Test that return stops the loop
-[
-	blk: [1]
-	f1: does [forskip blk 2 [return 1 2]]
-	1 = f1
-]
-#r3only
-; Test that errors do not stop the loop and errors can be returned
-[
-	num: 0
-	blk: [1 2]
-	e: forskip blk 1 [num: first blk try [1 / 0]]
-	all [error? e num = 2]
-]
-; recursivity
-[
-	num: 0
-	blk1: [1 2 3 4 5]
-	blk2: [6 7]
-	forskip blk1 1 [
-		num: num + first blk1
-		forskip blk2 1 [num: num + first blk2]
-	]
-	num = 80
-]
-#r2only
-; in Rebol2 the FORSKIP function is unable to pass a THROW error test
-[
-	f: func [[catch] /local x] [
-		x: [1]
-		forskip x 1 [throw make error! ""]
-	]
-	e: disarm try [f]
-	e/near = [f]
-]
-; functions/control/halt.r
-[any-function? :halt]
-; functions/control/if.r
-[
-	success: false
-	if true [success: true]
-	success
-]
-[
-	success: true
-	if false [success: false]
-	success
-]
-[1 = if true [1]]
-[unset? if true []]
-#r3only
-[error? if true [try [1 / 0]]]
-; RETURN stops the evaluation
-[
-	f1: does [
-		if true [return 1 2]
-		2
-	]
-	1 = f1
-]
-; condition datatype tests; action
-[if get 'abs [true]]
-; binary
-[if #{00} [true]]
-; bitset
-[if make bitset! "" [true]]
-; block
-[if [] [true]]
-; datatype
-[if none! [true]]
-; typeset
-[if number! [true]]
-; date
-[if 1/1/0000 [true]]
-; decimal
-[if 0.0 [true]]
-[if 1.0 [true]]
-[if -1.0 [true]]
-; email
-[if me@rt.com [true]]
-[if %"" [true]]
-[if does [] [true]]
-[if first [:first] [true]]
-[if #"^@" [true]]
-[if make image! 0x0 [true]]
-; integer
-[if 0 [true]]
-[if 1 [true]]
-[if -1 [true]]
-[if #a [true]]
-[if first ['a/b] [true]]
-[if first ['a] [true]]
-[if true [true]]
-[none? if false [true]]
-[if $1 [true]]
-[if :type? [true]]
-[none? if none [true]]
-[if make object! [] [true]]
-[if get '+ [true]]
-[if 0x0 [true]]
-[if first [()] [true]]
-[if 'a/b [true]]
-[if make port! http:// [true]]
-[if /a [true]]
-[if first [a/b:] [true]]
-[if first [a:] [true]]
-[if "" [true]]
-[if to tag! "" [true]]
-[if 0:00 [true]]
-[if 0.0.0 [true]]
-[if  http:// [true]]
-[if 'a [true]]
-; recursive behaviour
-[none? if true [if false [1]]]
-[1 = if true [if true [1]]]
-; infinite recursion
-[
-	blk: [if true blk]
-	error? try blk
-]
-; functions/control/loop.r
-[
-	num: 0
-	loop 10 [num: num + 1] 
-	10 = num
-]
-; cycle return value
-[false = loop 1 [false]]
-; break cycle
-[
-	num: 0
-	loop 10 [num: num + 1 break]
-	num = 1
-]
-; break return value
-[unset? loop 10 [break]]
-; break/return return value
-[2 = loop 10 [break/return 2]]
-; continue cycle
-#r3only
-[
-	success: true
-	loop 1 [continue success: false]
-	success
-]
-; zero repetition
-[
-	success: true
-	loop 0 [success: false]
-	success
-]
-[
-	success: true
-	loop -1 [success: false]
-	success
-]
-; Test that return stops the loop
-[
-	f1: does [loop 1 [return 1 2]]
-	1 = f1
-]
-#r3only
-; Test that errors do not stop the loop and errors can be returned
-[
-	num: 0
-	e: loop 2 [num: num + 1 try [1 / 0]]
-	all [error? e num = 2]
-]
-; loop recursivity
-[
-	num: 0
-	loop 5 [
-		loop 2 [num: num + 1]
-	]
-	num = 10
-]
-; recursive use of 'break
-[
-	f: func [x] [
-		loop 1 [
-			if x = 1 [
-				use [break] [
-					break: 1
-					f 2
-					1 = get/any 'break
-				] 
-			]
-		]
-	]
-	f 1
-]
-; functions/control/map-each.r
-; "return bug"
-[
-	integer? do does [map-each v [] [] 1]
-]
-; functions/control/reduce.r
-[[1 2] = reduce [1 1 + 1]]
-[
-	success: false
-	reduce [success: true]
-	success
-]
-[[] = reduce []]
-[unset? first reduce [()]]
-["1 + 1" = reduce "1 + 1"]
-#r3only
-[error? first reduce [try [1 / 0]]]
-; unwind functions should stop evaluation, bug#1760
-[unset? loop 1 [reduce [break]]]
-[unset? loop 1 [reduce/no-set [a: break]]]
-[1 = loop 1 [reduce [break/return 1]]]
-#r3only
-[unset? loop 1 [reduce [continue]]]
-[1 = catch [reduce [throw 1]]]
-[1 = catch/name [reduce [throw/name 1 'a]] 'a]
-[1 = do does [reduce [return 1 2] 2]]
-[unset? do does [reduce [exit 1] 2]]
-; recursive behaviour
-[1 = first reduce [first reduce [1]]]
-; infinite recursion
-[
-	blk: [reduce blk]
-	error? try blk
-]
-; functions/control/remove-each.r
-[
-	remove-each i s: [1 2] [true]
-	empty? s
-]
-[
-	remove-each i s: [1 2] [false]
-	[1 2] = s
-]
-; functions/control/repeat.r
-[
-	success: true
-	num: 0
-	repeat i 10 [
-		num: num + 1
-		success: i = num and success
-	]
-	10 = num and success
-]
-; cycle return value
-[false = repeat i 1 [false]]
-; break cycle
-[
-	num: 0
-	repeat i 10 [num: i break]
-	num = 1
-]
-; break return value
-[unset? repeat i 10 [break]]
-; break/return return value
-[2 = repeat i 10 [break/return 2]]
-; continue cycle
-#r3only
-[
-	success: true
-	repeat i 1 [continue success: false]
-	success
-]
-#r3only
-[
-	success: true
-	repeat i "a" [continue success: false]
-	success
-]
-#r3only
-[
-	success: true
-	repeat i [a] [continue success: false]
-	success
-]
-#r2only
-; string! test
-[
-	out: copy ""
-	repeat i "abc" [append out i]
-	out = "abc"
-]
-#r3only
-; string! test
-[
-	out: copy ""
-	repeat i "abc" [append out i]
-	out = "abcbcc"
-]
-#r2only
-; block! test
-[
-	out: copy []
-	repeat i [1 2 3] [append out i]
-	out = [1 2 3]
-]
-#r3only
-; block! test
-[
-	out: copy []
-	repeat i [1 2 3] [append out i]
-	out = [1 2 3 2 3 3]
-]
-; is hash! test and list! test needed too?;zero repetition
-[
-	success: true
-	repeat i 0 [success: false]
-	success
-]
-[
-	success: true
-	repeat i -1 [success: false]
-	success
-]
-; Test that return stops the loop
-[
-	f1: does [repeat i 1 [return 1 2]]
-	1 = f1
-]
-#r3only
-; Test that errors do not stop the loop and errors can be returned
-[
-	num: 0
-	e: repeat i 2 [num: i try [1 / 0]]
-	all [error? e num = 2]
-]
-; "recursive safety", "locality" and "body constantness" test in one
-[repeat i 1 b: [not same? 'i b/3]]
-; recursivity
-[
-	num: 0
-	repeat i 5 [
-		repeat i 2 [num: num + 1]
-	]
-	num = 10
-]
-#r2only
-; local variable type safety
-[
-	test: false
-	repeat i 2 [
-		either test [i == 2] [
-			test: true
-			i: false
-			true
-		]
-	]
-]
-#r3only
-; local variable type safety
-[
-	test: false
-	error? try [
-		repeat i 2 [
-			either test [i == 2] [
-				test: true
-				i: false
-			]
-		]
-	]
-]
-; functions/control/return.r
-[
-	f1: does [return 1 2]
-	1 = f1
-]
-[
-	success: true
-	f1: does [return 1 success: false]
-	f1
-	success
-]
-; return value tests
-[
-	f1: does [return ()]
-	unset? f1
-]
-[
-	f1: does [return try [1 / 0]]
-	error? f1
-]
-; the "result" of return should not be assignable, bug#1515
-[a: 1 do does [a: return 2] :a =? 1]
-[a: 1 do does [set 'a return 2] :a =? 1]
-[a: 1 do does [set/any 'a return 2] :a =? 1]
-; the "result" of return should not be passable to functions, bug#1509
-[a: 1 do does [a: error? return 2] :a =? 1]
-; bug#1535
-[do does [words-of return none] true]
-[do does [values-of return none] true]
-; bug#1945
-[do does [spec-of return none] true]
-; return should not be caught by try
-[a: 1 do does [a: error? try [return 2]] :a =? 1]
-; functions/control/switch.r
-[
-	11 = switch 1 [
-		1 [11]
-		2 [12]
-	]
-]
-[
-	12 = switch 2 [
-		1 [11]
-		2 [12]
-	]
-]
-[unset? switch 1 [1 []]]
-#r3only
-[
-	cases: reduce [1 head insert copy [] try [1 / 0]]
-	error? switch 1 cases
-]
-; functions/control/throw.r
-; see functions/control/catch.r for basic functionality
-; the "result" of throw should not be assignable, bug#1515
-[a: 1 catch [a: throw 2] :a =? 1]
-[a: 1 catch [set 'a throw 2] :a =? 1]
-[a: 1 catch [set/any 'a throw 2] :a =? 1]
-[a: 1 catch/name [a: throw/name 2 'b] 'b :a =? 1]
-[a: 1 catch/name [set 'a throw/name 2 'b] 'b :a =? 1]
-[a: 1 catch/name [set/any 'a throw/name 2 'b] 'b :a =? 1]
-; the "result" of throw should not be passable to functions, bug#1509
-[a: 1 catch [a: error? throw 2] :a =? 1]
-; bug#1535
-[catch [words-of throw none] true]
-[catch [values-of throw none] true]
-; bug#1945
-[catch [spec-of throw none] true]
-[a: 1 catch/name [a: error? throw/name 2 'b] 'b :a =? 1]
-; throw should not be caught by try
-[a: 1 catch [a: error? try [throw 2]] :a =? 1]
-[a: 1 catch/name [a: error? try [throw/name 2 'b]] 'b :a =? 1]
-; functions/control/try.r
-#r2only
-[
-	e: disarm try [1 / 0]
-	e/id = 'zero-divide
-]
-#r3only
-[
-	e: try [1 / 0]
-	e/id = 'zero-divide
-]
-[
-	success: true
-	error? try [
-		1 / 0
-		success: false
-	]
-	success
-]
-[
-	success: true
-	f1: does [
-		1 / 0
-		success: false
-	]
-	error? try [f1]
-	success
-]
-#r3only
-; testing TRY/EXCEPT
-; bug#822
-[error? try/except [make error! ""] [0]]
-#r3only
-[try/except [do make error! ""] [true]]
-; functions/control/unless.r
-[
-	success: false
-	unless false [success: true]
-	success
-]
-[
-	success: true
-	unless true [success: false]
-	success
-]
-[1 = unless false [1]]
-[none? unless true [1]]
-[unset? unless false []]
-#r3only
-[error? unless false [try [1 / 0]]]
-; RETURN stops the evaluation
-[
-	f1: does [
-		unless false [return 1 2]
-		2
-	]
-	1 = f1
-]
-; functions/control/until.r
-[
-	num: 0
-	until [num: num + 1 num > 9]
-	num = 10
-]
-; Test body-block return values
-[1 = until [1]]
-; Test break and break/return
-[unset? until [break true]]
-[1 = until [break/return 1 true]]
-; Test continue
-#r3only
-[
-	success: true
-	cycle?: true
-	until [if cycle? [cycle?: false continue success: false] true]
-	success
-]
-; Test that return stops the loop
-[
-	f1: does [until [return 1]]
-	1 = f1
-]
-#r3only
-; Test that errors do not stop the loop
-[1 = until [try [1 / 0] 1]]
-; Recursion check
-[
-	num1: 0
-	num3: 0
-	until [
-		num2: 0
-		until [
-			num3: num3 + 1
-			1 < num2: num2 + 1
-		]
-		4 < num1: num1 + 1
-	]
-	10 = num3
-]
-; functions/control/wait.r
-; bug#5
-[wait 0:0:0.3 true]
-; functions/control/while.r
-[
-	num: 0
-	while [num < 10] [num: num + 1]
-	num = 10
-]
-; bug#37
-; Test body-block return values
-[
-	num: 0 
-	1 = while [num < 1] [num: num + 1]
-]
-[none? while [false] []]
-; zero repetition
-[
-	success: true
-	while [false] [success: false]
-	success
-]
-; Test break, break/return and continue
-[cycle?: true unset? while [cycle?] [break cycle?: false]]
-[cycle?: true unset? while [if cycle? [break] cycle?] [cycle?: false]]  ; bug#1519
-[cycle?: true 1 = while [cycle?] [break/return 1 cycle?: false]]
-[cycle?: true 1 = while [if cycle? [break/return 1] cycle?] [cycle?: false]]  ; bug#1519
-#r3only
-[
-	success: true
-	cycle?: true
-	while [cycle?] [cycle?: false continue success: false]
-	success
-]
-#r3only
-[  ; bug#1519
-	success: true
-	cycle?: true
-	while [if cycle? [cycle?: false continue success: false] cycle?] []
-	success
-]
-[
-	num: 0
-	while [true] [num: 1 break num: 2]
-	num = 1
-]
-; RETURN should stop the loop
-[
-	cycle?: true
-	f1: does [while [cycle?] [cycle?: false return 1] 2]
-	1 = f1
-]
-[  ; bug#1519
-	cycle?: true
-	f1: does [while [if cycle? [return 1] cycle?] [cycle?: false 2]]
-	1 = f1
-]
-; EXIT should stop the loop
-[
-	cycle?: true
-	f1: does [while [cycle?] [cycle?: false exit] 2]
-	unset? f1
-]
-[  ; bug#1519
-	cycle?: true
-	f1: does [while [if cycle? [exit] cycle?] [cycle?: false 2]]
-	unset? f1
-]
-; THROW should stop the loop
-[1 = catch [cycle?: true while [cycle?] [throw 1 cycle?: false]]]
-[  ; bug#1519
-	cycle?: true
-	1 = catch [while [if cycle? [throw 1] false] [cycle?: false]]
-]
-[1 = catch/name [cycle?: true while [cycle?] [throw/name 1 'a cycle?: false]] 'a]
-[  ; bug#1519
-	cycle?: true
-	1 = catch/name [while [if cycle? [throw/name 1 'a] false] [cycle?: false]] 'a
-]
-#r3only
-; Test that disarmed errors do not stop the loop and errors can be returned
-[
-	num: 0
-	e: while [num < 10] [num: num + 1 try [1 / 0]]
-	all [error? e num = 10]
-]
-; Recursion check
-[
-	num1: 0
-	num3: 0
-	while [num1 < 5] [
-		num2: 0
-		while [num2 < 2] [
-			num3: num3 + 1
-			num2: num2 + 1
-		]
-		num1: num1 + 1
-	]
-	10 = num3
-]
-; functions/define/func.r
-; recursive safety
-[
-	f: func [] [
-		func [x] [
-			if x = 1 [
-				do f 2
-				x = 1
-			]
-		]
-	]
-	do f 1
-]
-; functions/context/resolve.r
-#r3only
-; bug#2017: crash in RESOLVE/extend/only
-[get in resolve/extend/only context [] context [a: true] [a] 'a]
-; functions/context/unset.r
-[
-	a: none
-	unset 'a
-	not value? 'a
-]
-[
-	a: none
-	unset 'a
-	unset 'a
-	not value? 'a
-]
-; functions/context/use.r
-; local word test
-[
-	a: 1
-	use [a] [a: 2]
-	a = 1
-]
-[
-	a: 1
-	error? try [use 'a [a: 2]]
-	a = 1
-]
-; initialization
-#r2only
-[use [a] [unset? get/any 'a]]
-#r3only
-[use [a] [none? :a]]
-; BREAK out of USE
-[
-	1 = loop 1 [
-		use [a] [break/return 1]
-		2
-	]
-]
-; THROW out of USE
-[
-	1 = catch [
-		use [a] [throw 1]
-		2
-	]
-]
-; "error out" of USE
-[
-	error? try [
-		use [a] [1 / 0]
-		2
-	]
-]
-; bug#539
-; RETURN out of USE
-[
-	f: func [] [
-		use [a] [return 1]
-		2
-	]
-	1 = f
-]
-; bug#539
-; EXIT out of USE
-[
-	f: func [] [
-		use [] [exit]
-		42
-	]
-	unset? f
-]
-; functions/context/valueq.r
-[false == value? 'nonsense]
-[true == value? 'value?]
-#r3only
-; bug#1914
-[false == value? do func [x] ['x] none]
 ; functions/series/append.r
 ; bug#75
 #r3only
@@ -10894,13 +11118,6 @@ datatypes/action.r
 	blk: next [1 2 3]
 	same? head blk skip blk -2147483648
 ]
-; functions/series/tailq.r
-[tail? []]
-[
-	blk: tail [1]
-	clear head blk
-	tail? blk
-]
 ; functions/series/sort.r
 ; bug#1152: SORT not stable (order not preserved)
 [strict-equal? ["A" "a"] sort ["A" "a"]]
@@ -10990,6 +11207,13 @@ datatypes/action.r
 [["abc" "de" "fghi" "jk"] == split "abc^M^Jde^Mfghi^Jjk" [crlf | #"^M" | newline]]
 #r3
 [["abc" "de" "fghi" "jk"] == split "abc     de fghi  jk" [some #" "]]
+; functions/series/tailq.r
+[tail? []]
+[
+	blk: tail [1]
+	clear head blk
+	tail? blk
+]
 ; functions/series/trim.r
 ; bug#83
 ; refinement order
@@ -11029,220 +11253,6 @@ datatypes/action.r
 ["foo" == to string! decompress/gzip #{1F8B0800EF46BE4C00034BCBCF07002165738C03000000}]
 ; bug#3
 [value? try [decompress #{AAAAAAAAAAAAAAAAAAAA}]]
-; functions/convert/as-binary.r
-#r2only
-[
-	a: "a"
-	b: as-binary a
-	b == to binary! a
-	change a "b"
-	b == to binary! a
-]
-; functions/convert/as-string.r
-#r2only
-[
-	a: #{00}
-	b: as-string a
-	b == to string! a
-	change a #{01}
-	b == to string! a
-]
-; functions/convert/load.r
-; bug#20
-[block? load/all "1"]
-; bug#22a
-[error? try [load "':a"]]
-; bug#22b
-[error? try [load "':a:"]]
-; bug#858
-[
-	a: [ < ]
-	a = load mold a
-]
-[error? try [load "1xyz#"]]
-; load/next
-#r2only
-[block? load/next "1"]
-; bug#1703  bug#1711
-#r3only
-[error? try [load/next "1"]]
-; bug#1122
-[
-	any [
-		error? try [load "9999999999999999999"]
-		greater? load "9999999999999999999" load "9223372036854775807"
-	]
-]
-; R2 bug
-[
-	 x: 1
-	 error? try [x: load/header ""]
-	 not error? x
-]
-; functions/convert/mold.r
-; bug#860
-; bug#6
-; cyclic block
-[
-	a: copy []
-	insert/only a a
-	string? mold a
-]
-; cyclic paren
-[
-	a: first [()]
-	insert/only a a
-	string? mold a
-]
-; cyclic object
-; bug#69
-[
-	a: make object! [a: self]
-	string? mold a
-]
-; closure mold
-; bug#23
-#r3only
-[
-	c: closure [a] [print a]
-	equal? "make closure! [[a] [print a]]" mold :c
-]
-; deep nested block mold
-; bug#876
-[
-	n: 1
-	forever [
-		a: copy []
-		if error? try [
-			loop n [a: append/only copy [] a]
-			mold a
-		] [break/return true]
-		n: n * 2
-	]
-]
-; bug#719
-["()" = mold quote ()]
-; bug#77
-["#[block! [1 2] 2]" == mold/all next [1 2]]
-; bug#77
-[none? find mold/flat make object! [a: 1] "    "]
-; functions/convert/to.r
-; bug#12
-[image? to image! make gob! []]
-; bug#38
-['logic! = to word! logic!]
-#r3only
-['percent! = to word! percent!]
-['money! = to word! money!]
-; bug#1967
-[not same? to binary! [1] to binary! [2]]
-; functions/context/bind.r
-; bug#50
-#r3only
-[none? bind? to word! "zzz"]
-; BIND works 'as expected' in object spec
-; bug#1549
-[
-	b1: [self]
-	ob: make object! [
-	    b2: [self]
-	    set 'a same? first b2 first bind/copy b1 'b2
-	]
-	a
-]
-; bug#1549
-; BIND works 'as expected' in function body
-[
-	b1: [self]
-	f: func [/local b2] [
-	    b2: [self]
-	    same? first b2 first bind/copy b1 'b2
-	]
-	f
-]
-; bug#1549
-; BIND works 'as expected' in closure body
-[
-	b1: [self]
-	f: closure [/local b2] [
-	    b2: [self]
-	    same? first b2 first bind/copy b1 'b2
-	]
-	f
-]
-; bug#1549
-; BIND works 'as expected' in REPEAT body
-[
-	b1: [self]
-	repeat i 1 [
-	    b2: [self]
-	    same? first b2 first bind/copy b1 'i
-	]
-]
-; bug#1655
-[not head? bind next [1] 'rebol]
-; bug#892, bug#216
-[y: 'x do has [x] [x: true get bind y 'x]]
-; bug#1893
-[
-	word: do func [x] ['x] 1
-	same? word bind 'x word
-]
-; functions/context/set.r
-; bug#1745
-[equal? error? try [set /a 1] error? try [set [/a] 1]]
-; bug#1745
-[equal? error? try [set #a 1] error? try [set [#a] 1]]
-; bug#1763
-[a: 1 all [error? try [set [a] reduce [()]] a = 1]]
-[a: 1 set [a] reduce [2 ()] a = 2]
-[a: 1 attempt [set [a b] reduce [2 ()]] a = 1]
-[x: construct [a: 1] all [error? try [set x reduce [()]] x/a = 1]]
-[x: construct [a: 1] set x reduce [2 ()] x/a = 2]
-[x: construct [a: 1 b: 2] all [error? try [set x reduce [3 ()]] x/a = 1]]
-[a: 1 set/any [a] reduce [()] unset? get/any 'a]
-[a: 1 b: 2 set/any [a b] reduce [3 ()] all [a = 3 unset? get/any 'b]]
-[x: construct [a: 1] set/any x reduce [()] unset? get/any in x 'a]
-[x: construct [a: 1 b: 2] set/any x reduce [3 ()] all [a = 3 unset? get/any in x 'b]]
-; set [:get-word] [word]
-[a: 1 b: none set [:b] [a] b =? 1]
-[unset 'a b: none all [error? try [set [:b] [a]] none? b]]
-[unset 'a b: none set/any [:b] [a] unset? get/any 'b]
-; functions/file/clean-path.r
-; bug#35
-[any-function? :clean-path]
-; functions/file/existsq.r
-; bug#1613
-[exists? http://www.rebol.com/index.html]
-; functions/file/make-dir.r
-; bug#1674
-#r2only
-[
-	any [
-		not error? e: try [make-dir %/folder-to-save-test-files]
-		(e: disarm e e/type = 'access)
-	]
-]
-#r3only
-[
-	any [
-		not error? e: try [make-dir %/folder-to-save-test-files]
-		e/type = 'access
-	]
-]
-; functions/file/open.r
-; bug#1422: "Rebol crashes when opening the 128th port"
-[error? try [repeat n 200 [try [close open open join tcp://localhost: n]]] true]
-; functions/file/file-typeq.r
-; bug#1651: "FILE-TYPE? should return NONE for unknown types"
-#r3only
-[none? file-type? %foo.0123456789bar0123456789]
-; functions/reflectors/body-of.r
-; bug#49
-[
-	f: func [] []
-	not same? body-of :f body-of :f
-]
 ; system/system.r
 ; bug#76
 [date? system/build]
