@@ -3177,6 +3177,9 @@
 	a-value: 'a
 	:a-value == a-value
 ]
+; functions/comparison/maximum-of.r
+; bug#8
+[3 = first maximum-of [1 2 3]]
 ; functions/comparison/equalq.r
 ; reflexivity test for native!
 [equal? :abs :abs]
@@ -5442,1825 +5445,162 @@
 ; functions/comparison/strict-not-equalq.r
 ; bug#32
 [strict-not-equal? 0 1]
-; functions/comparison/maximum-of.r
-; bug#8
-[3 = first maximum-of [1 2 3]]
-; functions/datatype/as-pair.r
+; functions/context/bind.r
+; bug#50
 #r3only
-; bug#1624
-[native? :as-pair]
-; functions/math/absolute.r
-[:abs = :absolute]
-[0 = abs 0]
-[1 = abs 1]
-[1 = abs -1]
-[2147483647 = abs 2147483647]
-[2147483647 = abs -2147483647]
-[0.0 = abs 0.0]
-[zero? 1.0 - abs 1.0]
-[zero? 1.0 - abs -1.0]
-#64bit
-; simple tests verify correct args and refinements; integer tests
-[9223372036854775807 = abs 9223372036854775807]
-#64bit
-[9223372036854775807 = abs -9223372036854775807]
-; pair! tests
-[0x0 = abs 0x0]
-[0x1 = abs 0x1]
-[1x0 = abs 1x0]
-[1x1 = abs 1x1]
-[0x1 = abs 0x-1]
-[1x0 = abs -1x0]
-[1x1 = abs -1x-1]
-[2147483647x2147483647 = abs 2147483647x2147483647]
-[2147483647x2147483647 = abs 2147483647x-2147483647]
-[2147483647x2147483647 = abs -2147483647x2147483647]
-[2147483647x2147483647 = abs -2147483647x-2147483647]
-#64bit
-; bug#833
+[none? bind? to word! "zzz"]
+; BIND works 'as expected' in object spec
+; bug#1549
 [
-	a: try [abs to integer! #{8000000000000000}]
-	any [error? a not negative? a]
+	b1: [self]
+	ob: make object! [
+	    b2: [self]
+	    set 'a same? first b2 first bind/copy b1 'b2
+	]
+	a
 ]
-; functions/math/add.r
-[3 = add 1 2]
-#64bit
-; integer -9223372036854775808 + x tests
-[error? try [add -9223372036854775808 -9223372036854775808]]
-#64bit
-[error? try [add -9223372036854775808 -9223372036854775807]]
-#64bit
-[error? try [add -9223372036854775808 -2147483648]]
-#64bit
-[error? try [add -9223372036854775808 -1]]
-#64bit
-[-9223372036854775808 = add -9223372036854775808 0]
-#64bit
-[-9223372036854775807 = add -9223372036854775808 1]
-#64bit
-[-2 = add -9223372036854775808 9223372036854775806]
-#64bit
-[-1 = add -9223372036854775808 9223372036854775807]
-#64bit
-; integer -9223372036854775807 + x tests
-[error? try [add -9223372036854775807 -9223372036854775808]]
-#64bit
-[error? try [add -9223372036854775807 -9223372036854775807]]
-#64bit
-[-9223372036854775808 = add -9223372036854775807 -1]
-#64bit
-[-9223372036854775807 = add -9223372036854775807 0]
-#64bit
-[-9223372036854775806 = add -9223372036854775807 1]
-#64bit
-[-1 = add -9223372036854775807 9223372036854775806]
-#64bit
-[0 = add -9223372036854775807 9223372036854775807]
-#32bit
-; integer -2147483648 + x tests
-[error? try [add -2147483648 -2147483648]]
-#64bit
-[-4294967296 = add -2147483648 -2147483648]
-#32bit
-[error? try [add -2147483648 -1]]
-#64bit
-[-2147483649 = add -2147483648 -1]
-[-2147483648 = add -2147483648 0]
-[-2147483647 = add -2147483648 1]
-[-1 = add -2147483648 2147483647]
-#64bit
-; integer -1 + x tests
-[error? try [add -1 -9223372036854775808]]
-#64bit
-[-9223372036854775808 = add -1 -9223372036854775807]
-[-2 = add -1 -1]
-[-1 = add -1 0]
-[0 = add -1 1]
-#64bit
-[9223372036854775805 = add -1 9223372036854775806]
-#64bit
-[9223372036854775806 = add -1 9223372036854775807]
-#64bit
-; integer 0 + x tests
-[-9223372036854775808 = add 0 -9223372036854775808]
-#64bit
-[-9223372036854775807 = add 0 -9223372036854775807]
-[-1 = add 0 -1]
-; bug#28
-[0 = add 0 0]
-[1 = add 0 1]
-#64bit
-[9223372036854775806 = add 0 9223372036854775806]
-#64bit
-[9223372036854775807 = add 0 9223372036854775807]
-#64bit
-; integer 1 + x tests
-[-9223372036854775807 = add 1 -9223372036854775808]
-#64bit
-[-9223372036854775806 = add 1 -9223372036854775807]
-[0 = add 1 -1]
-[1 = add 1 0]
-[2 = add 1 1]
-#64bit
-[9223372036854775807 = add 1 9223372036854775806]
-#64bit
-[error? try [add 1 9223372036854775807]]
-; integer 2147483647 + x
-[-1 = add 2147483647 -2147483648]
-[2147483646 = add 2147483647 -1]
-[2147483647 = add 2147483647 0]
-#32bit
-[error? try [add 2147483647 1]]
-#64bit
-[2147483648 = add 2147483647 1]
-#32bit
-[error? try [add 2147483647 2147483647]]
-#64bit
-[4294967294 = add 2147483647 2147483647]
-#64bit
-; integer 9223372036854775806 + x tests
-[-2 = add 9223372036854775806 -9223372036854775808]
-#64bit
-[-1 = add 9223372036854775806 -9223372036854775807]
-#64bit
-[9223372036854775805 = add 9223372036854775806 -1]
-#64bit
-[9223372036854775806 = add 9223372036854775806 0]
-#64bit
-[9223372036854775807 = add 9223372036854775806 1]
-#64bit
-[error? try [add 9223372036854775806 9223372036854775806]]
-#64bit
-[error? try [add 9223372036854775806 9223372036854775807]]
-#64bit
-; integer 9223372036854775807 + x tests
-[-1 = add 9223372036854775807 -9223372036854775808]
-#64bit
-[0 = add 9223372036854775807 -9223372036854775807]
-#64bit
-[9223372036854775806 = add 9223372036854775807 -1]
-#64bit
-[9223372036854775807 = add 9223372036854775807 0]
-#64bit
-[error? try [add 9223372036854775807 1]]
-#64bit
-[error? try [add 9223372036854775807 9223372036854775806]]
-#64bit
-[error? try [add 9223372036854775807 9223372036854775807]]
-; decimal + integer
-[2.1 = add 1.1 1]
-[2147483648.0 = add 1.0 2147483647]
-[-2147483649.0 = add -1.0 -2147483648]
-; integer + decimal
-[2.1 = add 1 1.1]
-[2147483648.0 = add 2147483647 1.0]
-[-2147483649.0 = add -2147483648 -1.0]
-; -1.7976931348623157e308 + decimal
-[error? try [add -1.7976931348623157e308 -1.7976931348623157e308]]
-[-1.7976931348623157e308 = add -1.7976931348623157e308 -1.0]
-[-1.7976931348623157e308 = add -1.7976931348623157e308 -4.94065645841247E-324]
-[-1.7976931348623157e308 = add -1.7976931348623157e308 0.0]
-[-1.7976931348623157e308 = add -1.7976931348623157e308 4.94065645841247E-324]
-[-1.7976931348623157e308 = add -1.7976931348623157e308 1.0]
-[0.0 = add -1.7976931348623157e308 1.7976931348623157e308]
-; -1.0 + decimal
-[-1.7976931348623157e308 = add -1.0 -1.7976931348623157e308]
-[-2.0 = add -1.0 -1.0]
-[-1.0 = add -1.0 -4.94065645841247E-324]
-[-1.0 = add -1.0 0.0]
-[-1.0 = add -1.0 4.94065645841247E-324]
-[0.0 = add -1.0 1.0]
-[1.7976931348623157e308 = add -1.0 1.7976931348623157e308]
-; -4.94065645841247E-324 + decimal
-[-1.7976931348623157e308 = add -4.94065645841247E-324 -1.7976931348623157e308]
-[-1.0 = add -4.94065645841247E-324 -1.0]
-[-9.88131291682493e-324 = add -4.94065645841247E-324 -4.94065645841247E-324]
-[-4.94065645841247E-324 = add -4.94065645841247E-324 0.0]
-[0.0 = add -4.94065645841247E-324 4.94065645841247E-324]
-[1.0 = add -4.94065645841247E-324 1.0]
-[1.7976931348623157e308 = add -4.94065645841247E-324 1.7976931348623157e308]
-; 0.0 + decimal
-[-1.7976931348623157e308 = add 0.0 -1.7976931348623157e308]
-[-1.0 = add 0.0 -1.0]
-[-4.94065645841247E-324 = add 0.0 -4.94065645841247E-324]
-[0.0 = add 0.0 0.0]
-[4.94065645841247E-324 = add 0.0 4.94065645841247E-324]
-[1.0 = add 0.0 1.0]
-[1.7976931348623157e308 = add 0.0 1.7976931348623157e308]
-; 4.94065645841247E-324 + decimal
-[-1.7976931348623157e308 = add 4.94065645841247E-324 -1.7976931348623157e308]
-[-1.0 = add 4.94065645841247E-324 -1.0]
-[0.0 = add 4.94065645841247E-324 -4.94065645841247E-324]
-[4.94065645841247E-324 = add 4.94065645841247E-324 0.0]
-[9.88131291682493e-324 = add 4.94065645841247E-324 4.94065645841247E-324]
-[1.0 = add 4.94065645841247E-324 1.0]
-[1.7976931348623157e308 = add 4.94065645841247E-324 1.7976931348623157e308]
-; 1.0 + decimal
-[-1.7976931348623157e308 = add 1.0 -1.7976931348623157e308]
-[0.0 = add 1.0 -1.0]
-[1.0 = add 1.0 4.94065645841247E-324]
-[1.0 = add 1.0 0.0]
-[1.0 = add 1.0 -4.94065645841247E-324]
-[2.0 = add 1.0 1.0]
-[1.7976931348623157e308 = add 1.0 1.7976931348623157e308]
-; 1.7976931348623157e308 + decimal
-[0.0 = add 1.7976931348623157e308 -1.7976931348623157e308]
-[1.7976931348623157e308 = add 1.7976931348623157e308 -1.0]
-[1.7976931348623157e308 = add 1.7976931348623157e308 -4.94065645841247E-324]
-[1.7976931348623157e308 = add 1.7976931348623157e308 0.0]
-[1.7976931348623157e308 = add 1.7976931348623157e308 4.94065645841247E-324]
-[1.7976931348623157e308 = add 1.7976931348623157e308 1.0]
-[error? try [add 1.7976931348623157e308 1.7976931348623157e308]]
-; pair
-#r2only
-[0x0 = add -2147483648x-2147483648 -2147483648x-2147483648]
-#r2only
-[2147483647x2147483647 = add -2147483648x-2147483648 -1x-1]
-[-2147483648x-2147483648 = add -2147483648x-2147483648 0x0]
-#r2only
-[-2147483647x-2147483647 = add -2147483648x-2147483648 1x1]
-#r2only
-[-1x-1 = add -2147483648x-2147483648 2147483647x2147483647]
-#r2only
-[2147483647x2147483647 = add -1x-1 -2147483648x-2147483648]
-[-2x-2 = add -1x-1 -1x-1]
-[-1x-1 = add -1x-1 0x0]
-[0x0 = add -1x-1 1x1]
-#r2only
-[2147483646x2147483646 = add -1x-1 2147483647x2147483647]
-[-2147483648x-2147483648 = add 0x0 -2147483648x-2147483648]
-[-1x-1 = add 0x0 -1x-1]
-[0x0 = add 0x0 0x0]
-[1x1 = add 0x0 1x1]
-[2147483647x2147483647 = add 0x0 2147483647x2147483647]
-#r2only
-[-2147483647x-2147483647 = add 1x1 -2147483648x-2147483648]
-[0x0 = add 1x1 -1x-1]
-[1x1 = add 1x1 0x0]
-[2x2 = add 1x1 1x1]
-#r2only
-[-2147483648x-2147483648 = add 1x1 2147483647x2147483647]
-#r2only
-[-1x-1 = add 2147483647x2147483647 -2147483648x-2147483648]
-#r2only
-[2147483646x2147483646 = add 2147483647x2147483647 -1x-1]
-[2147483647x2147483647 = add 2147483647x2147483647 0x0]
-#r2only
-[-2147483648x-2147483648 = add 2147483647x2147483647 1x1]
-#r2only
-[-2x-2 = add 2147483647x2147483647 2147483647x2147483647]
-; pair + ...
-[error? try [0x0 + none]]
-[error? try [0x0 + ""]]
-; char
-[#"^(00)" = add #"^(00)" #"^(00)"]
-[#"^(01)" = add #"^(00)" #"^(01)"]
-[#"^(ff)" = add #"^(00)" #"^(ff)"]
-[#"^(01)" = add #"^(01)" #"^(00)"]
-[#"^(02)" = add #"^(01)" #"^(01)"]
-#r2only
-[#"^(00)" = add #"^(01)" #"^(ff)"]
-[#"^(ff)" = add #"^(ff)" #"^(00)"]
-#r2only
-[#"^(00)" = add #"^(ff)" #"^(01)"]
-#r2only
-[#"^(fe)" = add #"^(ff)" #"^(ff)"]
-; tuple
-[0.0.0 = add 0.0.0 0.0.0]
-[0.0.1 = add 0.0.0 0.0.1]
-[0.0.255 = add 0.0.0 0.0.255]
-[0.0.1 = add 0.0.1 0.0.0]
-[0.0.2 = add 0.0.1 0.0.1]
-[0.0.255 = add 0.0.1 0.0.255]
-[0.0.255 = add 0.0.255 0.0.0]
-[0.0.255 = add 0.0.255 0.0.1]
-[0.0.255 = add 0.0.255 0.0.255]
-; functions/math/and.r
-[true and true = true]
-[true and false = false]
-[false and true = false]
-[false and false = false]
-; integer
-[1 and 1 = 1]
-[1 and 0 = 0]
-[0 and 1 = 0]
-[0 and 0 = 0]
-[1 and 2 = 0]
-[2 and 1 = 0]
-[2 and 2 = 2]
-; char
-[#"^(00)" and #"^(00)" = #"^(00)"]
-[#"^(01)" and #"^(00)" = #"^(00)"]
-[#"^(00)" and #"^(01)" = #"^(00)"]
-[#"^(01)" and #"^(01)" = #"^(01)"]
-[#"^(01)" and #"^(02)" = #"^(00)"]
-[#"^(02)" and #"^(02)" = #"^(02)"]
-; tuple
-[0.0.0 and 0.0.0 = 0.0.0]
-[1.0.0 and 1.0.0 = 1.0.0]
-[2.0.0 and 2.0.0 = 2.0.0]
-[255.255.255 and 255.255.255 = 255.255.255]
-; binary
-[#{030000} and #{020000} = #{020000}]
-#r2only
-; string
-["^(03)^(00)" and "^(02)^(00)" = "^(02)^(00)"]
-; functions/math/arccosine.r
-[0 = arccosine 1]
-[0 = arccosine/radians 1]
-[30 = arccosine (square-root 3) / 2]
-[pi / 6 = arccosine/radians (square-root 3) / 2]
-[45 = arccosine (square-root 2) / 2]
-[pi / 4 = arccosine/radians (square-root 2) / 2]
-[60 = arccosine 0.5]
-[pi / 3 = arccosine/radians 0.5]
-[90 = arccosine 0]
-[pi / 2 = arccosine/radians 0]
-[180 = arccosine -1]
-[pi = arccosine/radians -1]
-[150 = arccosine (square-root 3) / -2]
-[pi * 5 / 6 = arccosine/radians (square-root 3) / -2]
-[135 = arccosine (square-root 2) / -2]
-[pi * 3 / 4 = arccosine/radians (square-root 2) / -2]
-[120 = arccosine -0.5]
-[pi * 2 / 3 = arccosine/radians -0.5]
-[error? try [arccosine 1.1]]
-[error? try [arccosine -1.1]]
-; functions/math/arcsine.r
-[0 = arcsine 0]
-[0 = arcsine/radians 0]
-[30 = arcsine 0.5]
-[pi / 6 = arcsine/radians 0.5]
-[45 = arcsine (square-root 2) / 2]
-[pi / 4 = arcsine/radians (square-root 2) / 2]
-[60 = arcsine (square-root 3) / 2]
-[pi / 3 = arcsine/radians (square-root 3) / 2]
-[90 = arcsine 1]
-[pi / 2 = arcsine/radians 1]
-[-30 = arcsine -0.5]
-[pi / -6 = arcsine/radians -0.5]
-[-45 = arcsine (square-root 2) / -2]
-[pi / -4 = arcsine/radians (square-root 2) / -2]
-[-60 = arcsine (square-root 3) / -2]
-[pi / -3 = arcsine/radians (square-root 3) / -2]
-[-90 = arcsine -1]
-[pi / -2 = arcsine/radians -1]
-[1e-12 / (arcsine 1e-12) = (pi / 180)]
-[1e-9 / (arcsine/radians 1e-9) = 1.0]
-[error? try [arcsine 1.1]]
-[error? try [arcsine -1.1]]
-; functions/math/arctangent.r
-[-90 = arctangent -1e16]
-[pi / -2 = arctangent/radians -1e16]
-[-60 = arctangent negate square-root 3]
-[pi / -3 = arctangent/radians negate square-root 3]
-[-45 = arctangent -1]
-[pi / -4 = arctangent/radians -1]
-[-30 = arctangent (square-root 3) / -3]
-[pi / -6 = arctangent/radians (square-root 3) / -3]
-[0 = arctangent 0]
-[0 = arctangent/radians 0]
-[30 = arctangent (square-root 3) / 3]
-[pi / 6 = arctangent/radians (square-root 3) / 3]
-[45 = arctangent 1]
-[pi / 4 = arctangent/radians 1]
-[60 = arctangent square-root 3]
-[pi / 3 = arctangent/radians square-root 3]
-[90 = arctangent 1e16]
-[pi / 2 = arctangent/radians 1e16]
-; functions/math/complement.r
-; bug#849
-[false = complement true]
-[true = complement false]
-; integer
-[-1 = complement 0]
-[0 = complement -1]
-[2147483647 = complement -2147483648]
-[-2147483648 = complement 2147483647]
-#r2only
-; char
-[#"^(ff)" = complement #"^@"]
-#r2only
-[#"^@" = complement #"^(ff)"]
-#r2only
-[#"^(fe)" = complement #"^(01)"]
-#r2only
-[#"^(01)" = complement #"^(fe)"]
-; tuple
-[255.255.255 = complement 0.0.0]
-[0.0.0 = complement 255.255.255]
-; binary
-[#{ffffffffff} = complement #{0000000000}]
-[#{0000000000} = complement #{ffffffffff}]
-#r2only
-; string
-["^(ff)" = complement "^@"]
-#r2only
-["^@" = complement "^(ff)"]
-#r2only
-["^(fe)" = complement "^(01)"]
-#r2only
-["^(01)" = complement "^(fe)"]
-; bitset
-#r2only
+; bug#1549
+; BIND works 'as expected' in function body
 [
-	(make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF})
-		= complement make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
+	b1: [self]
+	f: func [/local b2] [
+	    b2: [self]
+	    same? first b2 first bind/copy b1 'b2
+	]
+	f
 ]
-#r2only
+; bug#1549
+; BIND works 'as expected' in closure body
 [
-	(make bitset! #{0000000000000000000000000000000000000000000000000000000000000000})
-		= complement make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+	b1: [self]
+	f: closure [/local b2] [
+	    b2: [self]
+	    same? first b2 first bind/copy b1 'b2
+	]
+	f
 ]
-[not find complement charset "b" #"b"]
-[find complement charset "a" #"b"]
+; bug#1549
+; BIND works 'as expected' in REPEAT body
 [
-	a: make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
-	a == complement complement a
-]
-[
-	a: make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
-	a == complement complement a
-]
-; bug#1706
-; image
-[(make image! [1x1 #{000000} #{00}]) = complement make image! [1x1 #{ffffff} #{ff}]]
-[(make image! [1x1 #{ffffff} #{ff}]) = complement make image! [1x1 #{000000} #{00}]]
-; typeset
-; bug#799
-#r3only
-[typeset? complement make typeset! [unset!]]
-; functions/math/cosine.r
-[1 = cosine 0]
-[1 = cosine/radians 0]
-[(square-root 3) / 2 = cosine 30]
-[(square-root 3) / 2 = cosine/radians pi / 6]
-[(square-root 2) / 2 = cosine 45]
-[(square-root 2) / 2 = cosine/radians pi / 4]
-[0.5 = cosine 60]
-[0.5 = cosine/radians pi / 3]
-[0 = cosine 90]
-[0 = cosine/radians pi / 2]
-[-1 = cosine 180]
-[-1 = cosine/radians pi]
-[(square-root 3) / -2 = cosine 150]
-[(square-root 3) / -2 = cosine/radians pi * 5 / 6]
-[(square-root 2) / -2 = cosine 135]
-[(square-root 2) / -2 = cosine/radians pi * 3 / 4]
-[-0.5 = cosine 120]
-[-0.5 = cosine/radians pi * 2 / 3]
-; functions/math/difference.r
-[24:00 = difference 1/Jan/2007 31/Dec/2006]
-[0:00 = difference 1/Jan/2007 1/Jan/2007]
-; block
-[[1 2] = difference [1 3] [2 3]]
-[[] = difference [1 2] [1 2]]
-; bitset
-[(charset "a") = difference charset "a" charset ""]
-; bug#1822: DIFFERENCE on date!s problem
-[12:00 = difference 13/1/2011/12:00 13/1/2011]
-; functions/math/divide.r
-[1 == divide -2147483648 -2147483648]
-[2 == divide -2147483648 -1073741824]
-[1073741824 == divide -2147483648 -2]
-#32bit
-[error? try [divide -2147483648 -1]]
-[error? try [divide -2147483648 0]]
-[-2147483648 == divide -2147483648 1]
-[-1073741824 == divide -2147483648 2]
-[-2 == divide -2147483648 1073741824]
-[0.5 == divide -1073741824 -2147483648]
-[1 == divide -1073741824 -1073741824]
-[536870912 == divide -1073741824 -2]
-[1073741824 == divide -1073741824 -1]
-[error? try [divide -1073741824 0]]
-[-1073741824 == divide -1073741824 1]
-[-536870912 == divide -1073741824 2]
-[-1 == divide -1073741824 1073741824]
-[1 == divide -2 -2]
-[2 == divide -2 -1]
-[error? try [divide -2 0]]
-[-2 == divide -2 1]
-[-1 == divide -2 2]
-[0.5 == divide -1 -2]
-[1 == divide -1 -1]
-[error? try [divide -1 0]]
-[-1 == divide -1 1]
-[-0.5 == divide -1 2]
-[0 == divide 0 -2147483648]
-[0 == divide 0 -1073741824]
-[0 == divide 0 -2]
-[0 == divide 0 -1]
-[error? try [divide 0 0]]
-[0 == divide 0 1]
-[0 == divide 0 2]
-[0 == divide 0 1073741824]
-[0 == divide 0 2147483647]
-[-0.5 == divide 1 -2]
-[-1 == divide 1 -1]
-[error? try [divide 1 0]]
-[1 == divide 1 1]
-[0.5 == divide 1 2]
-[-1 == divide 2 -2]
-[-2 == divide 2 -1]
-[error? try [divide 2 0]]
-[2 == divide 2 1]
-[1 == divide 2 2]
-[-0.5 == divide 1073741824 -2147483648]
-[-1 == divide 1073741824 -1073741824]
-[-536870912 == divide 1073741824 -2]
-[-1073741824 == divide 1073741824 -1]
-[error? try [divide 1073741824 0]]
-[1073741824 == divide 1073741824 1]
-[536870912 == divide 1073741824 2]
-[1 == divide 1073741824 1073741824]
-[-1 == divide 2147483647 -2147483647]
-[-1073741823.5 == divide 2147483647 -2]
-[-2147483647 == divide 2147483647 -1]
-[error? try [divide 2147483647 0]]
-[2147483647 == divide 2147483647 1]
-[1073741823.5 == divide 2147483647 2]
-[1 == divide 2147483647 2147483647]
-[10.0 == divide 1 .1]
-[10.0 == divide 1.0 .1]
-[10x10 == divide 1x1 .1]
-; bug#1974
-[10.10.10 == divide 1.1.1 .1]
-; functions/math/evenq.r
-[even? 0]
-[not even? 1]
-[not even? -1]
-[not even? 2147483647]
-[even? -2147483648]
-#64bit
-[not even? 9223372036854775807]
-#64bit
-[even? -9223372036854775808]
-; decimal
-[even? 0.0]
-[not even? 1.0]
-[even? 2.0]
-[not even? -1.0]
-[even? -2.0]
-; bug#1775
-[even? 1.7976931348623157e308]
-[even? -1.7976931348623157e308]
-; char
-[even? #"^@"]
-[not even? #"^a"]
-[even? #"^b"]
-[not even? #"^(ff)"]
-; money
-[even? $0]
-[not even? $1]
-[even? $2]
-[not even? -$1]
-[even? -$2]
-[not even? $999999999999999]
-[not even? -$999999999999999]
-; time
-[even? 0:00]
-[even? 0:1:00]
-[even? -0:1:00]
-[not even? 0:0:01]
-[even? 0:0:02]
-[not even? -0:0:01]
-[even? -0:0:02]
-; functions/math/exp.r
-[1 = exp 0]
-[2.718281828459045 = exp 1]
-[2.718281828459045 * 2.718281828459045 = exp 2]
-[(square-root 2.718281828459045) = exp 0.5]
-[1 / 2.718281828459045 = exp -1]
-; functions/math/log-10.r
-[0 = log-10 1]
-[0.5 = log-10 square-root 10]
-[1 = log-10 10]
-[-1 = log-10 0.1]
-[2 = log-10 100]
-[-2 = log-10 0.01]
-[3 = log-10 1000]
-[-3 = log-10 0.001]
-[error? try [log-10 0]]
-[error? try [log-10 -1]]
-; functions/math/log-2.r
-[0 = log-2 1]
-[1 = log-2 2]
-[-1 = log-2 0.5]
-[2 = log-2 4]
-[-2 = log-2 0.25]
-[3 = log-2 8]
-[-3 = log-2 0.125]
-[error? try [log-2 0]]
-[error? try [log-2 -1]]
-; functions/math/log-e.r
-[0 = log-e 1]
-[0.5 = log-e square-root 2.718281828459045]
-[1 = log-e 2.718281828459045]
-[-1 = log-e 1 / 2.718281828459045]
-[2 = log-e 2.718281828459045 * 2.718281828459045]
-[error? try [log-e 0]]
-[error? try [log-e -1]]
-; functions/math/mod.r
-[0.0 == mod 1E15 1]
-[0.0 == mod -1E15 1]
-[0.0 == mod 1E14 1]
-[0.0 == mod -1E14 1]
-[0 == mod -1 1]
-[0.75 == mod -1.25 1]
-[0.5 == mod -1.5 1]
-[0.25 == mod -1.75 1]
-; these have small error; due to binary approximation of decimal numbers
-[not negative? 1e-8 - abs 0.9 - mod 99'999'999.9 1]
-[not negative? 1e-8 - abs 0.99 - mod 99'999'999.99 1]
-[not negative? 1e-8 - abs 0.999 - mod 99'999'999.999 1]
-[not negative? 1e-8 - abs 0.9999 - mod 99'999'999.9999 1]
-[not negative? 1e-8 - abs 0.99999 - mod 99'999'999.99999 1]
-[not negative? 1e-8 - abs 0.999999 - mod 99'999'999.999999 1]
-[$0 == mod $999'999'999'999'999 1]
-[$0 == mod $999'999'999'999'999 $1]
-[0.0 == mod 9'999'999'999'999'999 1.0]
-[0.0 == mod 999'999'999'999'999 1.0]
-[0.0 == mod 562'949'953'421'311.0 1]
-[0.0 == mod -562'949'953'421'311.0 1]
-[0.25 == mod 562'949'953'421'311.25 1]
-[0.5 == mod 562'949'953'421'311.5 1]
-[0.5 == mod -562'949'953'421'311.5 1]
-[0.25 == mod -562'949'953'421'311.75 1]
-[0.0 == mod 562'949'953'421'312.0 1]
-[0.0 == mod -562'949'953'421'312.0 1]
-[0.25 == mod 562'949'953'421'312.25 1]
-[0.5 == mod -562'949'953'421'312.5 1]
-[0.5 == mod 562'949'953'421'312.5 1]
-[0.25 == mod -562'949'953'421'312.75 1]
-[0.0 == mod 562'949'953'421'313.0 1.0]
-[0.0 == mod -562'949'953'421'313.0 1.0]
-[0.5 == mod -562'949'953'421'313.5 1]
-[0.5 == mod 562'949'953'421'313.5 1]
-[0.0 == mod -562'949'953'421'314.0 1]
-[0.5 == mod -562'949'953'421'314.5 1]
-[0.5 == mod 562'949'953'421'314.5 1]
-[not negative? 1e-16 - abs mod 0.15 - 0.05 - 0.1 0.1]
-[not negative? 1e-16 - abs mod 0.1 + 0.1 + 0.1 0.3]
-[not negative? 1e-16 - abs mod 0.3 0.1 + 0.1 + 0.1]
-[not negative? 1e-16 - abs mod to money! 0.1 + 0.1 + 0.1 0.3]
-; functions/math/modulo.r
-[0.0 == modulo 0.1 + 0.1 + 0.1 0.3]
-[0.0 == modulo 0.3 0.1 + 0.1 + 0.1]
-[$0.0 == modulo $0.1 + $0.1 + $0.1 $0.3]
-[$0.0 == modulo $0.3 $0.1 + $0.1 + $0.1]
-[0.0 == modulo 1 0.1]
-[0.0 == modulo 0.15 - 0.05 - 0.1 0.1]
-; functions/math/multiply.r
-#32bit
-[error? try [multiply -2147483648 -2147483648]]
-#32bit
-[error? try [multiply -2147483648 -1073741824]]
-#32bit
-[error? try [multiply -2147483648 -2]]
-#32bit
-[error? try [multiply -2147483648 -1]]
-[0 = multiply -2147483648 0]
-[-2147483648 = multiply -2147483648 1]
-#32bit
-[error? try [multiply -2147483648 2]]
-#32bit
-[error? try [multiply -2147483648 1073741824]]
-#32bit
-[error? try [multiply -2147483648 2147483647]]
-#32bit
-[error? try [multiply -1073741824 -2147483648]]
-#32bit
-[error? try [multiply -1073741824 -1073741824]]
-#32bit
-[error? try [multiply -1073741824 -2]]
-[1073741824 = multiply -1073741824 -1]
-[0 = multiply -1073741824 0]
-[-1073741824 = multiply -1073741824 1]
-[-2147483648 = multiply -1073741824 2]
-#32bit
-[error? try [multiply -1073741824 1073741824]]
-#32bit
-[error? try [multiply -1073741824 2147483647]]
-#32bit
-[error? try [multiply -2 -2147483648]]
-#32bit
-[error? try [multiply -2 -1073741824]]
-[4 = multiply -2 -2]
-[2 = multiply -2 -1]
-[0 = multiply -2 0]
-[-2 = multiply -2 1]
-[-4 = multiply -2 2]
-[-2147483648 = multiply -2 1073741824]
-#32bit
-[error? try [multiply -2 2147483647]]
-#32bit
-[error? try [multiply -1 -2147483648]]
-[1073741824 = multiply -1 -1073741824]
-[2 = multiply -1 -2]
-[1 = multiply -1 -1]
-[0 = multiply -1 0]
-[-1 = multiply -1 1]
-[-2 = multiply -1 2]
-[-1073741824 = multiply -1 1073741824]
-[-2147483647 = multiply -1 2147483647]
-[0 = multiply 0 -2147483648]
-[0 = multiply 0 -1073741824]
-[0 = multiply 0 -2]
-[0 = multiply 0 -1]
-[0 = multiply 0 0]
-[0 = multiply 0 1]
-[0 = multiply 0 2]
-[0 = multiply 0 1073741824]
-[0 = multiply 0 2147483647]
-[-2147483648 = multiply 1 -2147483648]
-[-1073741824 = multiply 1 -1073741824]
-[-2 = multiply 1 -2]
-[-1 = multiply 1 -1]
-[0 = multiply 1 0]
-[1 = multiply 1 1]
-[2 = multiply 1 2]
-[1073741824 = multiply 1 1073741824]
-[2147483647 = multiply 1 2147483647]
-#32bit
-[error? try [multiply 2 -2147483648]]
-[-2147483648 = multiply 2 -1073741824]
-[-4 = multiply 2 -2]
-[-2 = multiply 2 -1]
-[0 = multiply 2 0]
-[2 = multiply 2 1]
-#32bit
-[error? try [multiply 2 1073741824]]
-#32bit
-[error? try [multiply 2 2147483647]]
-#32bit
-[error? try [multiply 1073741824 -2147483648]]
-#32bit
-[error? try [multiply 1073741824 -1073741824]]
-[-2147483648 = multiply 1073741824 -2]
-[-1073741824 = multiply 1073741824 -1]
-[0 = multiply 1073741824 0]
-[1073741824 = multiply 1073741824 1]
-#32bit
-[error? try [multiply 1073741824 2]]
-#32bit
-[error? try [multiply 1073741824 1073741824]]
-#32bit
-[error? try [multiply 1073741824 2147483647]]
-#32bit
-[error? try [multiply 2147483647 -2147483648]]
-#32bit
-[error? try [multiply 2147483647 -1073741824]]
-#32bit
-[error? try [multiply 2147483647 -2]]
-[-2147483647 = multiply 2147483647 -1]
-[0 = multiply 2147483647 0]
-[2147483647 = multiply 2147483647 1]
-#32bit
-[error? try [multiply 2147483647 2]]
-#32bit
-[error? try [multiply 2147483647 1073741824]]
-#32bit
-[error? try [multiply 2147483647 2147483647]]
-#64bit
-[error? try [multiply -1 -9223372036854775808]]
-#64bit
-[error? try [multiply -9223372036854775808 -1]]
-[0:0:1 == multiply 0:0:2 0.5]
-; functions/math/negate.r
-[0 = negate 0]
-[-1 = negate 1]
-[1 = negate -1]
-#32bit
-[error? try [negate -2147483648]]
-; decimal
-[0.0 == negate 0.0]
-[-1.0 == negate 1.0]
-[1.0 == negate -1.0]
-[1.7976931348623157e308 = negate -1.7976931348623157e308]
-[-1.7976931348623157e308 = negate 1.7976931348623157e308]
-[4.94065645841247E-324 = negate -4.94065645841247E-324]
-[-4.94065645841247E-324 = negate 4.94065645841247E-324]
-; pair
-[0x0 = negate 0x0]
-[-1x-1 = negate 1x1]
-[1x1 = negate -1x-1]
-[-1x1 = negate 1x-1]
-#r2only
-[-2147483648x-2147483648 = negate -2147483648x-2147483648]
-; money
-[$0 = negate $0]
-[-$1 = negate $1]
-[$1 = negate -$1]
-; time
-[0:00 = negate 0:00]
-[-1:01 = negate 1:01]
-[1:01 = negate -1:01]
-; bitset
-#r2only
-[
-	(make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF})
-		= negate make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
-]
-#r2only
-[
-	(make bitset! #{0000000000000000000000000000000000000000000000000000000000000000})
-		= negate make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
-]
-[
-	a: make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
-	a == negate negate a
-]
-[
-	a: make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
-	a == negate negate a
-]
-; functions/math/negativeq.r
-[not negative? 0]
-[not negative? 1]
-[negative? -1]
-[not negative? 2147483647]
-[negative? -2147483648]
-#64bit
-[not negative? 9223372036854775807]
-#64bit
-[negative? -9223372036854775808]
-; decimal
-[not negative? 0.0]
-[not negative? 4.94065645841247E-324]
-[negative? -4.94065645841247E-324]
-[not negative? 1.7976931348623157e308]
-[negative? -1.7976931348623157e308]
-#r2only
-; char
-[not negative? #"^@"]
-#r2only
-[not negative? #"^a"]
-#r2only
-[not negative? #"^(ff)"]
-; money
-[not negative? $0]
-[not negative? $0.01]
-[negative? -$0.01]
-[not negative? $999999999999999.87]
-[negative? -$999999999999999.87]
-; time
-[not negative? 0:00]
-[not negative? 0:00:0.000000001]
-[negative? -0:00:0.000000001]
-; functions/math/not.r
-[false = not :abs]
-[false = not #{}]
-[false = not charset ""]
-[false = not []]
-[false = not #"a"]
-[false = not datatype!]
-[false = not 1/1/2007]
-[false = not 0.0]
-[false = not me@mydomain.com]
-[false = not %myfile]
-[false = not func [] []]
-[false = not first [:a]]
-#r2only
-[false = not make hash! []]
-[false = not make image! 0x0]
-[false = not 0]
-[false = not #1444]
-#r2only
-[false = not make list! []]
-[false = not first ['a/b]]
-[false = not first ['a]]
-[false = not true]
-[true = not false]
-#r3only
-[false = not make map! []]
-[false = not $0.00]
-[false = not :type?]
-[true = not none]
-[false = not make object! []]
-[false = not type? get '+]
-[false = not 0x0]
-[false = not first [()]]
-[false = not first [a/b]]
-[false = not make port! http://]
-[false = not /refinement]
-[false = not first [a/b:]]
-[false = not first [a:]]
-[false = not ""]
-[false = not <tag>]
-[false = not 1:00]
-[false = not 1.2.3]
-#r3only
-[false = not http://]
-[false = not 'a]
-; functions/math/oddq.r
-[not odd? 0]
-[odd? 1]
-[odd? -1]
-[odd? 2147483647]
-[not odd? -2147483648]
-#64bit
-[odd? 9223372036854775807]
-#64bit
-[not odd? -9223372036854775808]
-; decimal
-[not odd? 0.0]
-[odd? 1.0]
-[not odd? 2.0]
-[odd? -1.0]
-[not odd? -2.0]
-[not odd? 1.7976931348623157e308]
-[not odd? -1.7976931348623157e308]
-; char
-[not odd? #"^@"]
-[odd? #"^a"]
-[not odd? #"^b"]
-[odd? #"^(ff)"]
-; money
-[not odd? $0]
-[odd? $1]
-[not odd? $2]
-[odd? -$1]
-[not odd? -$2]
-[odd? $999999999999999]
-[odd? -$999999999999999]
-; time
-[not odd? 0:00]
-[not odd? 0:1:00]
-[not odd? -0:1:00]
-[odd? 0:0:01]
-[not odd? 0:0:02]
-[odd? -0:0:01]
-[not odd? -0:0:02]
-; functions/math/positiveq.r
-[not positive? 0]
-[positive? 1]
-[not positive? -1]
-[positive? 2147483647]
-[not positive? -2147483648]
-#64bit
-[positive? 9223372036854775807]
-#64bit
-[not positive? -9223372036854775808]
-; decimal
-[not positive? 0.0]
-[positive? 4.94065645841247E-324]
-[not positive? -4.94065645841247E-324]
-[positive? 1.7976931348623157e308]
-[not positive? -1.7976931348623157e308]
-#r2only
-; char
-[not positive? #"^@"]
-#r2only
-[positive? #"^a"]
-#r2only
-[positive? #"^(ff)"]
-; money
-[not positive? $0]
-[positive? $0.01]
-[not positive? -$0.01]
-[positive? $999999999999999.87]
-[not positive? -$999999999999999.87]
-; time
-[not positive? 0:00]
-[positive? 0:00:0.000000001]
-[not positive? -0:00:0.000000001]
-; functions/math/power.r
-[1 = power 1 1000]
-[1 = power 1000 0]
-[4 = power 2 2]
-[0.5 = power 2 -1]
-[0.1 = power 10 -1]
-; functions/math/random.r
-; bug#1084
-#r3only
-[
-	random/seed 0
-	not any [
-		negative? random 1.0
-		negative? random 1.0
+	b1: [self]
+	repeat i 1 [
+	    b2: [self]
+	    same? first b2 first bind/copy b1 'i
 	]
 ]
-; bug#1875
+; bug#1655
+[not head? bind next [1] 'rebol]
+; bug#892, bug#216
+[y: 'x do has [x] [x: true get bind y 'x]]
+; bug#1893
 [
-	random/seed 0
-	2 = random/only next [1 2]
+	word: do func [x] ['x] 1
+	same? word bind 'x word
 ]
-; bug#932
+; functions/context/boundq.r
+; also, functions/context/bindq.r
 [
-	s: "aa"
-	random/seed s
-	a: random 10000
-	random/seed s
-	a = random 10000
+	o: make object! [a: none]
+	same? o bound? in o 'a
 ]
-; functions/math/remainder.r
-#64bit
-; integer! tests
-[0 = remainder -9223372036854775808 -1]
-; integer! tests
-[0 == remainder -2147483648 -1]
-; time! tests
-[-1:00 == remainder -1:00 -3:00]
-[1:00 == remainder 1:00 -3:00]
-; functions/math/round.r
-[0 == round 0]
-[1 == round 1]
-[-1 == round -1]
-[zero? 2 - round 1.5]
-[zero? 3 - round 2.5]
-[zero? -2 - round -1.5]
-[zero? -3 - round -2.5]
-; REBOL rounds to 2.0 beyond this
-[zero? 1 - round 1.499999999999995]
-[zero? 2 - round 1.500000000000001]
-[zero? -1 - round -1.499999999999995]
-[zero? -2 - round -1.500000000000001]
-[1:03:01 == round 1:03:01.1]
-[1:03:02 == round 1:03:01.5]
-[1:03:02 == round 1:03:01.9]
-[zero? round 0.00001]
-[zero? round 0.49999999]
-[zero? 1 - round 0.5]
-[zero? 1 - round 1.49999999]
-[2 == round 2]
-[zero? 2 - round 2.49999999]
-[zero? round -0.00001]
-[zero? round -0.49999999]
-[zero? -1 - round -0.5]
-[zero? -1 - round -1.49999999]
-[-2 == round -2]
+; functions/context/resolve.r
 #r3only
-[1E20 == round 1E20]
-#r3only
-[2147483648.0 == round 2147483648.0]
-#r3only
-[9223372036854775808.0 == round 9223372036854775808.0]
-[$101 == round $100.5]
-[-$101 = round -$100.5]
-; REBOL2 rounds to $100.5 beyond this
-[$100 == round $100.4999999999998]
-; REBOL2 rounds to $100.5 beyond this
-[-$100 == round -$100.4999999999998]
-; REBOL2 rounds to $1000.5 beyond this
-[$1000 == round $1000.499999999999]
-; REBOL2 rounds to $1000.5 beyond this
-[-$1000 == round -$1000.499999999999]
-[0:0:1 == round 0:0:1.4999]
-[0:1:0 == round 0:1:0.4999]
-[1:0:0 == round 1:0:0.4999]
-[-0:0:1 == round -0:0:1.4999]
-[-0:1:0 == round -0:1:0.4999]
-[-1:0:0 == round -1:0:0.4999]
-[0:0:2 == round 0:0:1.5]
-[0:1:1 == round 0:1:0.5]
-[1:0:1 == round 1:0:0.5]
-[-0:0:2 == round -0:0:1.5]
-[-0:1:1 == round -0:1:0.5]
-[-1:0:1 == round -1:0:0.5]
-; round/to tests
-[100 == round/to 108 25]
-[zero? 100 - round/to 100.000001 25]
-[zero? 100 - round/to 112.499999 25]
-[zero? 125 - round/to 112.5 25]
-[zero? -100 - round/to -100.000001 25]
-[zero? -100 - round/to -112.499999 25]
-[zero? -125 - round/to -112.5 25]
-[zero? -125 - round/to -112.500001 25]
-[125 == round/to 133 25]
-[1.00 == round/to 1.08 0.25]
-[1.25 == round/to 1.33 0.25]
-[1:00 == round/to 1:03 0:15]
-[1:15 == round/to 1:08 0:15]
-[1:15 == round/to 1:18 0:15]
-[1:30 == round/to 1:22:31 0:15]
-[1:02 == round/to 1:02:03 0:01]
-[562'949'953'421'312.0 == round/to 562'949'953'421'312.0 1.0]
-[-562'949'953'421'312.0 == round/to -562'949'953'421'312.0 1.0]
-[562'949'953'421'313.0 == round/to 562'949'953'421'313.0 1.0]
-[-562'949'953'421'313.0 == round/to -562'949'953'421'313.0 1.0]
-[562'949'953'421'314.0 == round/to 562'949'953'421'314.0 1.0]
-[-562'949'953'421'314.0 == round/to -562'949'953'421'314.0 1.0]
-[zero? $100.2 - round/to 100.15 $0.1]
-[$100.2 == round/to $100.15 $0.1]
-[1:1:1.2 == round/to 1:1:1.15 0:0:0.1]
-[$100 == round/to $100.15 $2]
-[1:1:2 == round/to 1:1:1.15 0:0:2]
-[0 == round/even 0]
-[1 == round/even 1]
-[-1 == round/even -1]
-[zero? 2 - round/even 1.5]
-[zero? 2 - round/even 2.5]
-[zero? -2 - round/even -1.5]
-[zero? -2 - round/even -2.5]
-; REBOL2 rounds to 2.0 beyond this
-[zero? 1 - round/even 1.49999999999995]
-[zero? 1 - round/even 1.499999999999995]
-[zero? 2 - round/even 1.500000000000001]
-[zero? -1 - round/even -1.499999999999995]
-[zero? -2 - round/even -1.500000000000001]
-[2147483647 == round/even 2147483647]
-[-2147483648 == round/even -2147483648]
-#r2only
-[error? try [round/even 2147483648.0]]
-#r2only
-[error? try [round/even 9.2233720368547799e18]]
-#r3only
-[9223372036854780000.0 == round/even 9223372036854780000.0]
-[1:03:01 == round/even 1:03:01.1]
-[1:03:02 == round/even 1:03:01.5]
-[1:03:02 == round/even 1:03:01.9]
-[$100 == round/even $100.25]
-[-$100 == round/even -$100.25]
-; round/even/to; divide by 0
-[error? try [round/even/to 0.1 0]]
-[zero? round/even/to 0.1 -1.0]
-[zero? round/even/to 0.1 -1]
-[zero? round/even/to 0.5 -1.0]
-[zero? round/even/to 0.5 -1]
-[zero? 2 - round/even/to 1.5 -1.0]
-[zero? 2 - round/even/to 1.5 -1]
-[zero? round/even/to -0.1 -1.0]
-[zero? round/even/to -0.1 -1]
-[0.0 == round/even/to -0.5 -1.0]
-[zero? round/even/to -0.5 -1]
-[-2.0 == round/even/to -1.5 -1.0]
-[zero? -2 - round/even/to -1.5 -1]
-[0.0 == round/even/to 0.1 1.0]
-[0.0 == round/even/to 0.1 1E-0]
-[0.0 == round/even/to -0.1 1E-0]
-[0.1 == round/even/to 0.12 1E-1]
-[-0.1 == round/even/to -0.12 1E-1]
-[0.12 == round/even/to 0.123 1E-2]
-[-0.12 == round/even/to -0.123 1e-2]
-[0.123 == round/even/to 0.1234 1E-3]
-[-0.123 == round/even/to -0.1234 1E-3]
-[0.1234 = round/even/to 0.12345 1E-4]
-[-0.1234 = round/even/to -0.12345 1E-4]
-; bug#1470
-[2.6 == round/even/to $2.55 0.1]
-; bug#1470
-[$2.6 == round/even/to 2.55 $0.1]
-; round-up breakpoint
-[0.12346 = round/even/to 0.123456 1E-5]
-[-0.12346 = round/even/to -0.123456 1E-5]
-[1.0 == round/even/to 0.9 1E-0]
-[-1.0 == round/even/to -0.9 1E-0]
-[0.6 = round/even/to 0.55 1E-1]
-[-0.6 = round/even/to -0.55 1E-1]
-[0.56 == round/even/to 0.555 1E-2]
-[-0.56 == round/even/to -0.555 1E-2]
-[2.0 == round/even/to 1.5 1E-0]
-[1.6 == round/even/to 1.55 1E-1]
-[1.56 == round/even/to 1.555 1E-2]
-[1.556 == round/even/to 1.5555  1E-3]
-[1.5556 == round/even/to 1.55555 1E-4]
-[1.55556 = round/even/to 1.555555 1E-5]
-[1.555556 == round/even/to 1.5555555 1E-6]
-[1.5555556 == round/even/to 1.55555555 1E-7]
-[1.55555556 == round/even/to 1.555555555 1E-8]
-[1.555555556 = round/even/to 1.5555555555 1E-9]
-[0.2 == round/even/to 0.15 1E-1]
-[-0.2 == round/even/to -0.15 1E-1]
-[0.4 == round/even/to 0.35 1E-1]
-[1.0 == round/even/to 0.95 1E-1]
-[1.2 = round/even/to 1.15 1E-1]
-[2.2 == round/even/to 2.15 1E-1]
-[2.6 == round/even/to 2.55 1E-1]
-[10.0 == round/even/to 10 1E-1]
-[zero? 110 - round/even/to 107.5 5]
-[zero? 110 - round/even/to 112.5 5]
-[zero? 120 - round/even/to 115 10]
-[zero? 100 - round/even/to 100.000001 25]
-[zero? 100 - round/even/to 112.499999 25]
-[zero? 100 - round/even/to 112.5 25]
-[zero? 150 - round/even/to 137.5 25]
-[zero? -100 - round/even/to -100.000001 25]
-[zero? -100 - round/even/to -112.499999 25]
-[zero? -100 - round/even/to -112.5 25]
-[zero? -125 - round/even/to -112.500001 25]
-[zero? -150 - round/even/to -137.5 25]
-[1:02:3.1 == round/even/to 1:02:3.14999 0:0:0.1]
-[1:02:3.2 == round/even/to 1:02:3.15 0:0:0.1]
-[1:02:3.2 == round/even/to 1:02:3.25 0:0:0.1]
-[1:02:3.3 == round/even/to 1:02:3.25001 0:0:0.1]
-[1:15 == round/even/to 1:22:29.9999 0:15]
-[1:30 == round/even/to 1:22:30 0:15]
-[0.0 == (562'949'953'421'312.0 - round/even/to 562'949'953'421'312.0 1.0)]
-[0.0 == (-562'949'953'421'312.0 - round/even/to -562'949'953'421'312.0 1.0)]
-[0.0 == (562'949'953'421'313.0 - round/even/to 562'949'953'421'313.0 1.0)]
-[0.0 == (-562'949'953'421'313.0 - round/even/to -562'949'953'421'313.0 1.0)]
-[562'949'953'421'314.0 == round/even/to 562'949'953'421'314.0 1.0]
-[-562'949'953'421'314.0 == round/even/to -562'949'953'421'314.0 1.0]
-; bug#1116
-[$1.15 == round/even/to 1.15 $0.01]
-; this fails, by design
-[0:0:1.15 == round/even/to 0:0:1.15 0:0:0.01]
-[1.15 == round/even/to $1.15 0.01]
-[-0:0:2.6 == round/even/to -0:0:2.55 0:0:0.1]
-[-$2.6 == round/even/to -$2.55 $0.1]
-[0.0 == (1e-15 - round/even/to 1.1e-15 1e-15)]
-#r2only
-[$0.0 == ($0.000'000'000'000'001 - round/even/to $0.000'000'000'000'001'1 1e-15)]
-#r3only
-[$0.0 == ($0.000'000'000'000'001 - round/even/to $0.000'000'000'000'001'1 $1e-15)]
-[not negative? 1e-31 - abs 26e-17 - round/even/to 25.5e-17 1e-17]
-#r2only
-[not negative? 1e-31 - abs (to money! 26e-17) - round/even/to $0.000'000'000'000'000'255 to money! 1e-17]
-#r3only
-[not negative? ($1e-31) - abs $26e-17 - round/even/to $0.000'000'000'000'000'255 $1e-17]
-[0:0:2.6 == round/even/to 0:0:2.55 0:0:0.1]
-#r2only
-[$2.6 == round/even/to $2.55 1E-1]
-#r3only
-[$2.6 == round/even/to $2.55 $0.1]
-[not negative? 1e-31 - abs -26e-17 - round/even/to -25.5e-17 1e-17]
-#r2only
-[not negative? (to money! 1e-31) - abs (to money! -26e-17) - round/even/to -$0.000'000'000'000'000'255 to money! 1e-17]
-#r3only
-[not negative? $1e-31 - abs -$26e-17 - round/even/to -$0.000'000'000'000'000'255 $1e-17]
-[$1 == round/even/to $1.23456789 $1]
-[$1.2 == round/even/to $1.23456789 $0.1]
-[$1.23 == round/even/to $1.23456789 $0.01]
-[$1.235 == round/even/to $1.23456789 $0.001]
-[$1.2346 == round/even/to $1.23456789 $0.0001]
-[$1.23457 == round/even/to $1.23456789 $0.00001]
-[$1.234568 == round/even/to $1.23456789 $0.000001]
-[$1.2345679 == round/even/to $1.23456789 $0.0000001]
-[$1.23456789 == round/even/to $1.23456789 $0.00000001]
-; round/ceiling
-[0 == round/ceiling 0]
-[1 == round/ceiling 1]
-[-1 == round/ceiling -1]
-[zero? 2 - round/ceiling 1.1]
-[zero? 1 - round/ceiling 0.00000000000001]
-[zero? round/ceiling -0.00000000000001]
-[zero? 1 - round/ceiling 0.99999999999995]
-[zero? -1 - round/ceiling -1.00000000000001]
-[zero? -1 - round/ceiling -1.99999999999995]
-[zero? 1 - round/ceiling 0.00001]
-[zero? 1 - round/ceiling 0.49999999]
-[zero? 1 - round/ceiling 0.5]
-[zero? 2 - round/ceiling 1.49999999]
-[zero? 2 - round/ceiling 1.5]
-[2 == round/ceiling 2]
-[zero? 3 - round/ceiling 2.49999999]
-[zero? 3 - round/ceiling 2.5]
-[zero? round/ceiling -0.00001]
-[zero? round/ceiling -0.49999999]
-[zero? round/ceiling -0.5]
-[zero? -1 - round/ceiling -1.49999999]
-[zero? -1 - round/ceiling -1.5]
-[-2 == round/ceiling -2]
-; round/ceiling/to
-[562'949'953'421'312.0 == round/ceiling/to 562'949'953'421'312.0 1.0]
-[-562'949'953'421'312.0 == round/ceiling/to -562'949'953'421'312.0 1.0]
-[562'949'953'421'313.0 == round/ceiling/to 562'949'953'421'313.0 1.0]
-[-562'949'953'421'313.0 == round/ceiling/to -562'949'953'421'313.0 1.0]
-[562'949'953'421'314.0 == round/ceiling/to 562'949'953'421'314.0 1.0]
-[-562'949'953'421'314.0 == round/ceiling/to -562'949'953'421'314.0 1.0]
-; round/floor
-[-1 == round/floor -1]
-[zero? 1 - round/floor 1.1]
-[zero? round/floor 0.00000000000001]
-[zero? -1 - round/floor -0.00000000000001]
-[zero? round/floor 0.99999999999995]
-[zero? -2 - round/floor -1.00000000000001]
-[zero? -2 - round/floor -1.99999999999995]
-; round/floor/to
-[zero? 100 - round/floor/to 112.499999 25]
-[zero? 100 - round/floor/to 112.5 25]
-[zero? -125 - round/floor/to -112.000001 25]
-[zero? -125 - round/floor/to -112.5 25]
-[zero? -125 - round/floor/to -112.500001 25]
-[562'949'953'421'312.0 == round/floor/to 562'949'953'421'312.0 1.0]
-[-562'949'953'421'312.0 == round/floor/to -562'949'953'421'312.0 1.0]
-[562'949'953'421'313.0 == round/floor/to 562'949'953'421'313.0 1.0]
-[-562'949'953'421'313.0 == round/floor/to -562'949'953'421'313.0 1.0]
-[562'949'953'421'314.0 == round/floor/to 562'949'953'421'314.0 1.0]
-[-562'949'953'421'314.0 == round/floor/to -562'949'953'421'314.0 1.0]
-; round/down
-[0 == round/down 0]
-[1 == round/down 1]
-[-1 == round/down -1]
-[zero? 1 - round/down 1.1]
-[zero? round/down 0.00000000000001]
-[zero? round/down -0.00000000000001]
-[zero? round/down 0.99999999999995]
-[zero? -1 - round/down -1.00000000000001]
-[zero? -1 - round/down -1.99999999999995]
-[1:02:03 == round/down 1:02:03]
-[1:02:03 == round/down 1:02:03.00000000001]
-[1:02:03 == round/down 1:02:03.999999999]
-; round/down/to
-[9.6 == round/down/to 10.0 0.96]
-[9.6 == round/down/to 10.55 0.96]
-[562'949'953'421'312.0 == round/down/to 562'949'953'421'312.0 1.0]
-[-562'949'953'421'312.0 == round/down/to -562'949'953'421'312.0 1.0]
-[562'949'953'421'313.0 == round/down/to 562'949'953'421'313.0 1.0]
-[-562'949'953'421'313.0 == round/down/to -562'949'953'421'313.0 1.0]
-[562'949'953'421'314.0 == round/down/to 562'949'953'421'314.0 1.0]
-[-562'949'953'421'314.0 == round/down/to -562'949'953'421'314.0 1.0]
-[1.1 == round/down/to 1.123456789 1E-1]
-[1.12 == round/down/to 1.123456789 1E-2]
-[1.123 == round/down/to 1.123456789 1E-3]
-[1.1234 == round/down/to 1.123456789 1E-4]
-[1.12345 == round/down/to 1.123456789 1E-5]
-[1.123456 == round/down/to 1.123456789 1E-6]
-[1.1234567 == round/down/to 1.123456789 1E-7]
-[1.12345678 == round/down/to 1.123456789 1E-8]
-[1:0:0 == round/down/to 1:02:3.456789 0:5:0]
-[1:0:0 == round/down/to 1:02:3.456789 0:3:0]
-[1:2:0 == round/down/to 1:02:3.456789 0:2:0]
-[1:2:0 == round/down/to 1:02:3.456789 0:1:0]
-[1:2:0 == round/down/to 1:02:3.456789 0:0:5]
-[1:2:0 == round/down/to 1:02:3.456789 0:0:4]
-[1:02:3 == round/down/to 1:02:3.456789 0:0:3]
-[1:2:2 == round/down/to 1:02:3.456789 0:0:2]
-[1:2:3 == round/down/to 1:02:3.456789 0:0:1]
-[1:2:3.4 == round/down/to 1:02:3.456789 0:0:0.1]
-[1:2:3.45 == round/down/to 1:02:3.456789 0:0:0.01]
-[1:2:3.456 == round/down/to 1:02:3.456789 0:0:0.001]
-[1:2:3.4567 == round/down/to 1:02:3.456789 0:0:0.0001]
-[1:2:3.45678 == round/down/to 1:02:3.456789 0:0:0.00001]
-; round/half-ceiling
-[0 == round/half-ceiling 0]
-[1 == round/half-ceiling 1]
-[-1 == round/half-ceiling -1]
-[zero? 2 - round/half-ceiling 1.5]
-[zero? 3 - round/half-ceiling 2.5]
-[zero? -1 - round/half-ceiling -1.5]
-[zero? -2 - round/half-ceiling -2.5]
-; REBOL2 rounds to 1.5 beyond this
-[zero? 1 - round/half-ceiling 1.499999999999995]
-[zero? 2 - round/half-ceiling 1.50000000000001]
-[zero? -1 - round/half-ceiling -1.49999999999995]
-[zero? -2 - round/half-ceiling -1.50000000000001]
-[1:03:01 == round/half-ceiling 1:03:01.1]
-[1:03:02 == round/half-ceiling 1:03:01.5]
-[1:03:02 == round/half-ceiling 1:03:01.9]
-[-1:03:01 == round/half-ceiling -1:03:01]
-[-1:03:01 == round/half-ceiling -1:03:01.5]
-[-1:03:02 == round/half-ceiling -1:03:01.50001]
-[$100 == round/half-ceiling $100]
-[$101 == round/half-ceiling $100.5]
-[$101 == round/half-ceiling $100.5000000001]
-[-$100 == round/half-ceiling -$100]
-[-$100 == round/half-ceiling -$100.5]
-; bug#1471
-[-$101 == round/half-ceiling -$100.5000000001]
-; round/half-ceiling/to
-[0.0 == round/half-ceiling/to 0.1 -1.0]
-[zero? round/half-ceiling/to 0.1 -1]
-[1.0 == round/half-ceiling/to 0.5 -1.0]
-[zero? 1 - round/half-ceiling/to 0.5 -1]
-[2.0 == round/half-ceiling/to 1.5 -1.0]
-[zero? 2 - round/half-ceiling/to 1.5 -1]
-[0.0 == round/half-ceiling/to -0.1 -1.0]
-[zero? round/half-ceiling/to -0.1 -1]
-[0.0 == round/half-ceiling/to -0.5 -1.0]
-[zero? round/half-ceiling/to -0.5 -1]
-[-1.0 == round/half-ceiling/to -1.5 -1.0]
-[zero? -1 - round/half-ceiling/to -1.5 -1]
-; round/half-down
-[0 == round/half-down 0]
-[1 == round/half-down 1]
-[-1 == round/half-down -1]
-[zero? 1 - round/half-down 1.5]
-[zero? 2 - round/half-down 1.50000000001]
-[zero? 2 - round/half-down 2.5]
-[zero? 3 - round/half-down 2.50000000001]
-[zero? -1 - round/half-down -1.5]
-[zero? -2 - round/half-down -1.50000000001]
-[zero? -2 - round/half-down -2.5]
-[zero? -3 - round/half-down -2.50000000001]
-[1:03:01 == round/half-down 1:03:01.1]
-[1:03:01 == round/half-down 1:03:01.5]
-[1:03:02 == round/half-down 1:03:01.9]
-[-1:03:01 == round/half-down -1:03:01]
-[-1:03:01 == round/half-down -1:03:01.5]
-[-1:03:02 == round/half-down -1:03:01.50001]
-[$100 == round/half-down $100]
-[$100 == round/half-down $100.5]
-[$101 == round/half-down $100.5000000001]
-[-$100 == round/half-down -$100]
-[-$100 == round/half-down -$100.5]
-[-$101 == round/half-down -$100.5000000001]
-; round/half-down/to
-[0.1 == round/half-down/to 0.15 0.1]
-[0.2 == round/half-down/to 0.15001 0.1]
-[0.5 == round/half-down/to 0.55 0.1]
-[0.6 == round/half-down/to 0.55001 0.1]
-[0.5 == round/half-down/to 0.75 0.5]
-[1.0 == round/half-down/to 0.75001 0.5]
-[-0.1 == round/half-down/to -0.15 0.1]
-[-0.2 == round/half-down/to -0.15001 0.1]
-[-0.5 == round/half-down/to -0.55 0.1]
-[-0.6 == round/half-down/to -0.55001 0.1]
-[-0.5 == round/half-down/to -0.75 0.5]
-[-1.0 == round/half-down/to -0.75001 0.5]
-; functions/math/signq.r
-[0 = sign? 0]
-[1 = sign? 1]
-[-1 = sign? -1]
-[1 = sign? 2147483647]
-[-1 = sign? -2147483648]
-; decimal
-[0 = sign? 0.0]
-[1 = sign? 4.94065645841247E-324]
-[-1 = sign? -4.94065645841247E-324]
-[1 = sign? 1.7976931348623157e308]
-[-1 = sign? -1.7976931348623157e308]
-; money
-[0 = sign? $0]
-[0 = sign? USD$0]
-[1 = sign? $0.000000000000001]
-[-1 = sign? -$0.000000000000001]
-; time
-[0 = sign? 0:00]
-[1 = sign? 0:00:0.000000001]
-[-1 = sign? -0:00:0.000000001]
-; functions/math/sine.r
-[0 = sine 0]
-[0 = sine/radians 0]
-[0.5 = sine 30]
-[0.5 = sine/radians pi / 6]
-[(square-root 2) / 2 = sine 45]
-[(square-root 2) / 2 = sine/radians pi / 4]
-[(square-root 3) / 2 = sine 60]
-[(square-root 3) / 2 = sine/radians pi / 3]
-[1 = sine 90]
-[1 = sine/radians pi / 2]
-[0 = sine 180]
-[0 = sine/radians pi]
-[-0.5 = sine -30]
-[-0.5 = sine/radians pi / -6]
-[(square-root 2) / -2 = sine -45]
-[(square-root 2) / -2 = sine/radians pi / -4]
-[(square-root 3) / -2 = sine -60]
-[(square-root 3) / -2 = sine/radians pi / -3]
-[-1 = sine -90]
-[-1 = sine/radians pi / -2]
-[0 = sine -180]
-[0 = sine/radians negate pi]
-[(sine 1e-12) / 1e-12 = (pi / 180)]
-[(sine/radians 1e-9) / 1e-9 = 1.0]
-; #bug#852
-; Flint Hills test
+; bug#2017: crash in RESOLVE/extend/only
+[get in resolve/extend/only context [] context [a: true] [a] 'a]
+; functions/context/set.r
+; bug#1745
+[equal? error? try [set /a 1] error? try [set [/a] 1]]
+; bug#1745
+[equal? error? try [set #a 1] error? try [set [#a] 1]]
+; bug#1763
+[a: 1 all [error? try [set [a] reduce [()]] a = 1]]
+[a: 1 set [a] reduce [2 ()] a = 2]
+[a: 1 attempt [set [a b] reduce [2 ()]] a = 1]
+[x: construct [a: 1] all [error? try [set x reduce [()]] x/a = 1]]
+[x: construct [a: 1] set x reduce [2 ()] x/a = 2]
+[x: construct [a: 1 b: 2] all [error? try [set x reduce [3 ()]] x/a = 1]]
+[a: 1 set/any [a] reduce [()] unset? get/any 'a]
+[a: 1 b: 2 set/any [a b] reduce [3 ()] all [a = 3 unset? get/any 'b]]
+[x: construct [a: 1] set/any x reduce [()] unset? get/any in x 'a]
+[x: construct [a: 1 b: 2] set/any x reduce [3 ()] all [a = 3 unset? get/any in x 'b]]
+; set [:get-word] [word]
+[a: 1 b: none set [:b] [a] b =? 1]
+[unset 'a b: none all [error? try [set [:b] [a]] none? b]]
+[unset 'a b: none set/any [:b] [a] unset? get/any 'b]
+; functions/context/unset.r
 [
-	n: 25000
-	s4: 0.0
-	repeat l n [
-		k: to decimal! l
-		ks: sine/radians k
-		s4: 1.0 / (k * k * k * ks * ks) + s4
+	a: none
+	unset 'a
+	not value? 'a
+]
+[
+	a: none
+	unset 'a
+	unset 'a
+	not value? 'a
+]
+; functions/context/use.r
+; local word test
+[
+	a: 1
+	use [a] [a: 2]
+	a = 1
+]
+[
+	a: 1
+	error? try [use 'a [a: 2]]
+	a = 1
+]
+; initialization
+#r2only
+[use [a] [unset? get/any 'a]]
+#r3only
+[use [a] [none? :a]]
+; BREAK out of USE
+[
+	1 = loop 1 [
+		use [a] [break/return 1]
+		2
 	]
-	30.314520404 = round/to s4 1e-9
 ]
-; functions/math/square-root.r
-[0 = square-root 0]
-[error? try [square-root -1]]
-[1 = square-root 1]
-[0.5 = square-root 0.25]
-[2 = square-root 4]
-[3 = square-root 9]
-[1.1 = square-root 1.21]
-; functions/math/subtract.r
-[1 == subtract 3 2]
-#64bit
-; integer -9223372036854775808 - x tests
-[0 == subtract -9223372036854775808 -9223372036854775808]
-#64bit
-[-1 == subtract -9223372036854775808 -9223372036854775807]
-#64bit
-[-9223372036854775807 == subtract -9223372036854775808 -1]
-#64bit
-[-9223372036854775808 = subtract -9223372036854775808 0]
-#64bit
-[error? try [subtract -9223372036854775808 1]]
-#64bit
-[error? try [subtract -9223372036854775808 9223372036854775806]]
-#64bit
-[error? try [subtract -9223372036854775808 9223372036854775807]]
-#64bit
-; integer -9223372036854775807 - x tests
-[1 = subtract -9223372036854775807 -9223372036854775808]
-#64bit
-[0 = subtract -9223372036854775807 -9223372036854775807]
-#64bit
-[-9223372036854775806 = subtract -9223372036854775807 -1]
-#64bit
-[-9223372036854775807 = subtract -9223372036854775807 0]
-#64bit
-[-9223372036854775808 = subtract -9223372036854775807 1]
-#64bit
-[error? try [subtract -9223372036854775807 9223372036854775806]]
-#64bit
-[error? try [subtract -9223372036854775807 9223372036854775807]]
-; integer -2147483648 - x tests
-[0 = subtract -2147483648 -2147483648]
-[-2147483647 = subtract -2147483648 -1]
-[-2147483648 = subtract -2147483648 0]
-#32bit
-[error? try [subtract -2147483648 1]]
-#64bit
-[-2147483649 = subtract -2147483648 1]
-#32bit
-[error? try [subtract -2147483648 2147483647]]
-#64bit
-[-4294967295 = subtract -2147483648 2147483647]
-#64bit
-; integer -1 - x tests
-[9223372036854775807 = subtract -1 -9223372036854775808]
-#64bit
-[9223372036854775806 = subtract -1 -9223372036854775807]
-[0 = subtract -1 -1]
-[-1 = subtract -1 0]
-[-2 = subtract -1 1]
-#64bit
-[-9223372036854775807 = subtract -1 9223372036854775806]
-#64bit
-[-9223372036854775808 = subtract -1 9223372036854775807]
-#64bit
-; integer 0 - x tests
-[error? try [subtract 0 -9223372036854775808]]
-#32bit
-[error? try [subtract 0 -2147483648]]
-#64bit
-[2147483648 = subtract 0 -2147483648]
-#64bit
-[9223372036854775807 = subtract 0 -9223372036854775807]
-[1 = subtract 0 -1]
-[0 = subtract 0 0]
-[-1 = subtract 0 1]
-#64bit
-[-9223372036854775806 = subtract 0 9223372036854775806]
-#64bit
-[-9223372036854775807 = subtract 0 9223372036854775807]
-#64bit
-; integer 1 - x tests
-[error? try [subtract 1 -9223372036854775808]]
-#64bit
-[error? try [subtract 1 -9223372036854775807]]
-[2 = subtract 1 -1]
-[1 = subtract 1 0]
-[0 = subtract 1 1]
-#64bit
-[-9223372036854775805 = subtract 1 9223372036854775806]
-#64bit
-[-9223372036854775806 = subtract 1 9223372036854775807]
-#32bit
-; integer 2147483647 + x
-[error? try [subtract 2147483647 -2147483648]]
-#64bit
-[4294967295 = subtract 2147483647 -2147483648]
-#32bit
-[error? try [subtract 2147483647 -1]]
-#64bit
-[2147483648 = subtract 2147483647 -1]
-[2147483647 = subtract 2147483647 0]
-#32bit
-[2147483646 = subtract 2147483647 1]
-#32bit
-[0 = subtract 2147483647 2147483647]
-#64bit
-; integer 9223372036854775806 - x tests
-[error? try [subtract 9223372036854775806 -9223372036854775808]]
-#64bit
-[error? try [subtract 9223372036854775806 -9223372036854775807]]
-#64bit
-[9223372036854775807 = subtract 9223372036854775806 -1]
-#64bit
-[9223372036854775806 = subtract 9223372036854775806 0]
-#64bit
-[9223372036854775805 = subtract 9223372036854775806 1]
-#64bit
-[0 = subtract 9223372036854775806 9223372036854775806]
-#64bit
-[-1 = subtract 9223372036854775806 9223372036854775807]
-#64bit
-; integer 9223372036854775807 - x tests
-[error? try [subtract 9223372036854775807 -9223372036854775808]]
-#64bit
-[error? try [subtract  9223372036854775807 -9223372036854775807]]
-#64bit
-[error? try [subtract 9223372036854775807 -1]]
-#64bit
-[9223372036854775807 = subtract 9223372036854775807 0]
-#64bit
-[9223372036854775806 = subtract 9223372036854775807 1]
-#64bit
-[1 = subtract 9223372036854775807 9223372036854775806]
-#64bit
-[0 = subtract 9223372036854775807 9223372036854775807]
-; decimal - integer
-[0.1 = subtract 1.1 1]
-[-2147483648.0 = subtract -1.0 2147483647]
-[2147483649.0 = subtract 1.0 -2147483648]
-; integer - decimal
-[-0.1 = subtract 1 1.1]
-[2147483648.0 = subtract 2147483647 -1.0]
-[-2147483649.0 = subtract -2147483648 1.0]
-; -1.7976931348623157e308 - decimal
-[0.0 = subtract -1.7976931348623157e308 -1.7976931348623157e308]
-[-1.7976931348623157e308 = subtract -1.7976931348623157e308 -1.0]
-[-1.7976931348623157e308 = subtract -1.7976931348623157e308 -4.94065645841247E-324]
-[-1.7976931348623157e308 = subtract -1.7976931348623157e308 0.0]
-[-1.7976931348623157e308 = subtract -1.7976931348623157e308 4.94065645841247E-324]
-[-1.7976931348623157e308 = subtract -1.7976931348623157e308 1.0]
-[error? try [subtract -1.7976931348623157e308 1.7976931348623157e308]]
-; -1.0 + decimal
-[1.7976931348623157e308 = subtract -1.0 -1.7976931348623157e308]
-[0.0 = subtract -1.0 -1.0]
-[-1.0 = subtract -1.0 -4.94065645841247E-324]
-[-1.0 = subtract -1.0 0.0]
-[-1.0 = subtract -1.0 4.94065645841247E-324]
-[-2.0 = subtract -1.0 1.0]
-[-1.7976931348623157e308 = subtract -1.0 1.7976931348623157e308]
-; -4.94065645841247E-324 + decimal
-[1.7976931348623157e308 = subtract -4.94065645841247E-324 -1.7976931348623157e308]
-[1.0 = subtract -4.94065645841247E-324 -1.0]
-[0.0 = subtract -4.94065645841247E-324 -4.94065645841247E-324]
-[-4.94065645841247E-324 = subtract -4.94065645841247E-324 0.0]
-[-9.88131291682493E-324 = subtract -4.94065645841247E-324 4.94065645841247E-324]
-[-1.0 = subtract -4.94065645841247E-324 1.0]
-[-1.7976931348623157e308 = subtract -4.94065645841247E-324 1.7976931348623157e308]
-; 0.0 + decimal
-[1.7976931348623157e308 = subtract 0.0 -1.7976931348623157e308]
-[1.0 = subtract 0.0 -1.0]
-[4.94065645841247E-324 = subtract 0.0 -4.94065645841247E-324]
-[0.0 = subtract 0.0 0.0]
-[-4.94065645841247E-324 = subtract 0.0 4.94065645841247E-324]
-[-1.0 = subtract 0.0 1.0]
-[-1.7976931348623157e308 = subtract 0.0 1.7976931348623157e308]
-; 4.94065645841247E-324 + decimal
-[1.7976931348623157e308 = subtract 4.94065645841247E-324 -1.7976931348623157e308]
-[1.0 = subtract 4.94065645841247E-324 -1.0]
-[9.88131291682493E-324 = subtract 4.94065645841247E-324 -4.94065645841247E-324]
-[4.94065645841247E-324 = subtract 4.94065645841247E-324 0.0]
-[0.0 = subtract 4.94065645841247E-324 4.94065645841247E-324]
-[-1.0 = subtract 4.94065645841247E-324 1.0]
-[-1.7976931348623157e308 = subtract 4.94065645841247E-324 1.7976931348623157e308]
-; 1.0 + decimal
-[1.7976931348623157e308 = subtract 1.0 -1.7976931348623157e308]
-[2.0 = subtract 1.0 -1.0]
-[1.0 = subtract 1.0 4.94065645841247E-324]
-[1.0 = subtract 1.0 0.0]
-[1.0 = subtract 1.0 -4.94065645841247E-324]
-[0.0 = subtract 1.0 1.0]
-[-1.7976931348623157e308 = subtract 1.0 1.7976931348623157e308]
-; 1.7976931348623157e308 + decimal
-[error? try [subtract 1.7976931348623157e308 -1.7976931348623157e308]]
-[1.7976931348623157e308 = subtract 1.7976931348623157e308 -1.0]
-[1.7976931348623157e308 = subtract 1.7976931348623157e308 -4.94065645841247E-324]
-[1.7976931348623157e308 = subtract 1.7976931348623157e308 0.0]
-[1.7976931348623157e308 = subtract 1.7976931348623157e308 4.94065645841247E-324]
-[1.7976931348623157e308 = subtract 1.7976931348623157e308 1.0]
-[0.0 = subtract 1.7976931348623157e308 1.7976931348623157e308]
-; pair
-[0x0 = subtract -2147483648x-2147483648 -2147483648x-2147483648]
-[-2147483647x-2147483647 = subtract -2147483648x-2147483648 -1x-1]
-[-2147483648x-2147483648 = subtract -2147483648x-2147483648 0x0]
-#r2only
-[2147483647x2147483647 = subtract -2147483648x-2147483648 1x1]
-#r2only
-[1x1 = subtract -2147483648x-2147483648 2147483647x2147483647]
-#r2only
-[2147483647x2147483647 = subtract -1x-1 -2147483648x-2147483648]
-[0x0 = subtract -1x-1 -1x-1]
-[-1x-1 = subtract -1x-1 0x0]
-[-2x-2 = subtract -1x-1 1x1]
-#r2only
-[-2147483648x-2147483648 = subtract -1x-1 2147483647x2147483647]
-#r2only
-[-2147483648x-2147483648 = subtract 0x0 -2147483648x-2147483648]
-#r3only
-[2147483648x2147483648 = subtract 0x0 -2147483648x-2147483648]
-[1x1 = subtract 0x0 -1x-1]
-[0x0 = subtract 0x0 0x0]
-[-1x-1 = subtract 0x0 1x1]
-[-2147483647x-2147483647 = subtract 0x0 2147483647x2147483647]
-#r2only
-[-2147483647x-2147483647 = subtract 1x1 -2147483648x-2147483648]
-[2x2 = subtract 1x1 -1x-1]
-[1x1 = subtract 1x1 0x0]
-[0x0 = subtract 1x1 1x1]
-#r2only
-[-2147483646x-2147483646 = subtract 1x1 2147483647x2147483647]
-#r2only
-[-1x-1 = subtract 2147483647x2147483647 -2147483648x-2147483648]
-#r2only
-[-2147483648x-2147483648 = subtract 2147483647x2147483647 -1x-1]
-[2147483647x2147483647 = subtract 2147483647x2147483647 0x0]
-#r2only
-[2147483646x2147483646 = subtract 2147483647x2147483647 1x1]
-[0x0 = subtract 2147483647x2147483647 2147483647x2147483647]
-; char
-#r2only
-[#"^(00)" = subtract #"^(00)" #"^(00)"]
-#r2only
-[#"^(ff)" = subtract #"^(00)" #"^(01)"]
-#r2only
-[#"^(01)" = subtract #"^(00)" #"^(ff)"]
-#r2only
-[#"^(01)" = subtract #"^(01)" #"^(00)"]
-#r2only
-[#"^(00)" = subtract #"^(01)" #"^(01)"]
-#r2only
-[#"^(02)" = subtract #"^(01)" #"^(ff)"]
-#r2only
-[#"^(ff)" = subtract #"^(ff)" #"^(00)"]
-#r2only
-[#"^(fe)" = subtract #"^(ff)" #"^(01)"]
-#r2only
-[#"^(00)" = subtract #"^(ff)" #"^(ff)"]
-; tuple
-[0.0.0 = subtract 0.0.0 0.0.0]
-[0.0.0 = subtract 0.0.0 0.0.1]
-[0.0.0 = subtract 0.0.0 0.0.255]
-[0.0.1 = subtract 0.0.1 0.0.0]
-[0.0.0 = subtract 0.0.1 0.0.1]
-[0.0.0 = subtract 0.0.1 0.0.255]
-[0.0.255 = subtract 0.0.255 0.0.0]
-[0.0.254 = subtract 0.0.255 0.0.1]
-[0.0.0 = subtract 0.0.255 0.0.255]
-; functions/math/tangent.r
-[error? try [tangent -90]]
-[error? try [tangent/radians pi / -2]]
-[(negate square-root 3) = tangent -60]
-[(negate square-root 3) = tangent/radians pi / -3]
-[-1 = tangent -45]
-[-1 = tangent/radians pi / -4]
-[(square-root 3) / -3 = tangent -30]
-[(square-root 3) / -3 = tangent/radians pi / -6]
-[0 = tangent 0]
-[0 = tangent/radians 0]
-[(square-root 3) / 3 = tangent 30]
-[(square-root 3) / 3 = tangent/radians pi / 6]
-[1 = tangent 45]
-[1 = tangent/radians pi / 4]
-[(square-root 3) = tangent 60]
-[(square-root 3) = tangent/radians pi / 3]
-[error? try [tangent 90]]
-[error? try [tangent/radians pi / 2]]
-; Flint Hills test
+; THROW out of USE
 [
-	n: 25000
-	s4t: 0.0
-	repeat l n [
-		k: to decimal! l
-		kt: tangent/radians k
-		s4t: 1.0 / (kt * kt) + 1.0 / (k * k * k) + s4t
+	1 = catch [
+		use [a] [throw 1]
+		2
 	]
-	30.314520404 = round/to s4t 1e-9
 ]
-; functions/math/zeroq.r
-[zero? 0]
-[not zero? 1]
-[not zero? -1]
-[not zero? 2147483647]
-[not zero? -2147483648]
-#64bit
-[not zero? 9223372036854775807]
-#64bit
-[not zero? -9223372036854775808]
-; decimal
-[zero? 0.0]
-[not zero? 1.7976931348623157e308]
-[not zero? -1.7976931348623157e308]
-; pair
-[zero? 0x0]
-[not zero? 1x0]
-[not zero? -1x0]
-[not zero? 2147483647x0]
-[not zero? -2147483648x0]
-[not zero? 0x1]
-[not zero? 0x-1]
-[not zero? 0x2147483647]
-[not zero? 0x-2147483648]
-; char
-[zero? #"^@"]
-[not zero? #"^a"]
-[not zero? #"^(ff)"]
-; money
-[zero? $0]
-[not zero? $0.01]
-[not zero? -$0.01]
-[not zero? $999999999999999.87]
-[not zero? -$999999999999999.87]
-[zero? negate $0]
-; time
-[zero? 0:00]
-[not zero? 0:00:0.000000001]
-[not zero? -0:00:0.000000001]
-; tuple
-[zero? 0.0.0]
-[not zero? 1.0.0]
-[not zero? 255.0.0]
-[not zero? 0.1.0]
-[not zero? 0.255.0]
-[not zero? 0.0.1]
-[not zero? 0.0.255]
+; "error out" of USE
+[
+	error? try [
+		use [a] [1 / 0]
+		2
+	]
+]
+; bug#539
+; RETURN out of USE
+[
+	f: func [] [
+		use [a] [return 1]
+		2
+	]
+	1 = f
+]
+; bug#539
+; EXIT out of USE
+[
+	f: func [] [
+		use [] [exit]
+		42
+	]
+	unset? f
+]
+; functions/context/valueq.r
+[false == value? 'nonsense]
+[true == value? 'value?]
+#r3only
+; bug#1914
+[false == value? do func [x] ['x] none]
 ; functions/control/all.r
 ; zero values
 [true == all []]
@@ -9942,6 +8282,120 @@
 	]
 	10 = num3
 ]
+; functions/convert/as-binary.r
+#r2only
+[
+	a: "a"
+	b: as-binary a
+	b == to binary! a
+	change a "b"
+	b == to binary! a
+]
+; functions/convert/as-string.r
+#r2only
+[
+	a: #{00}
+	b: as-string a
+	b == to string! a
+	change a #{01}
+	b == to string! a
+]
+; functions/convert/load.r
+; bug#20
+[block? load/all "1"]
+; bug#22a
+[error? try [load "':a"]]
+; bug#22b
+[error? try [load "':a:"]]
+; bug#858
+[
+	a: [ < ]
+	a = load mold a
+]
+[error? try [load "1xyz#"]]
+; load/next
+#r2only
+[block? load/next "1"]
+; bug#1703  bug#1711
+#r3only
+[error? try [load/next "1"]]
+; bug#1122
+[
+	any [
+		error? try [load "9999999999999999999"]
+		greater? load "9999999999999999999" load "9223372036854775807"
+	]
+]
+; R2 bug
+[
+	 x: 1
+	 error? try [x: load/header ""]
+	 not error? x
+]
+; functions/convert/mold.r
+; bug#860
+; bug#6
+; cyclic block
+[
+	a: copy []
+	insert/only a a
+	string? mold a
+]
+; cyclic paren
+[
+	a: first [()]
+	insert/only a a
+	string? mold a
+]
+; cyclic object
+; bug#69
+[
+	a: make object! [a: self]
+	string? mold a
+]
+; closure mold
+; bug#23
+#r3only
+[
+	c: closure [a] [print a]
+	equal? "make closure! [[a] [print a]]" mold :c
+]
+; deep nested block mold
+; bug#876
+[
+	n: 1
+	forever [
+		a: copy []
+		if error? try [
+			loop n [a: append/only copy [] a]
+			mold a
+		] [break/return true]
+		n: n * 2
+	]
+]
+; bug#719
+["()" = mold quote ()]
+; bug#77
+["#[block! [1 2] 2]" == mold/all next [1 2]]
+; bug#77
+[none? find mold/flat make object! [a: 1] "    "]
+; bug#84
+[equal? mold make bitset! "^(00)" "make bitset! #{80}"]
+[equal? mold/all make bitset! "^(00)" "#[bitset! #{80}]"]
+; functions/convert/to.r
+; bug#12
+[image? to image! make gob! []]
+; bug#38
+['logic! = to word! logic!]
+#r3only
+['percent! = to word! percent!]
+['money! = to word! money!]
+; bug#1967
+[not same? to binary! [1] to binary! [2]]
+; functions/datatype/as-pair.r
+#r3only
+; bug#1624
+[native? :as-pair]
 ; functions/define/func.r
 ; recursive safety
 [
@@ -9955,84 +8409,1853 @@
 	]
 	do f 1
 ]
-; functions/context/resolve.r
-#r3only
-; bug#2017: crash in RESOLVE/extend/only
-[get in resolve/extend/only context [] context [a: true] [a] 'a]
-; functions/context/unset.r
-[
-	a: none
-	unset 'a
-	not value? 'a
-]
-[
-	a: none
-	unset 'a
-	unset 'a
-	not value? 'a
-]
-; functions/context/use.r
-; local word test
-[
-	a: 1
-	use [a] [a: 2]
-	a = 1
-]
-[
-	a: 1
-	error? try [use 'a [a: 2]]
-	a = 1
-]
-; initialization
+; functions/file/clean-path.r
+; bug#35
+[any-function? :clean-path]
+; functions/file/existsq.r
+; bug#1613
+[exists? http://www.rebol.com/index.html]
+; functions/file/make-dir.r
+; bug#1674
 #r2only
-[use [a] [unset? get/any 'a]]
+[
+	any [
+		not error? e: try [make-dir %/folder-to-save-test-files]
+		(e: disarm e e/type = 'access)
+	]
+]
 #r3only
-[use [a] [none? :a]]
-; BREAK out of USE
 [
-	1 = loop 1 [
-		use [a] [break/return 1]
-		2
+	any [
+		not error? e: try [make-dir %/folder-to-save-test-files]
+		e/type = 'access
 	]
 ]
-; THROW out of USE
-[
-	1 = catch [
-		use [a] [throw 1]
-		2
-	]
-]
-; "error out" of USE
-[
-	error? try [
-		use [a] [1 / 0]
-		2
-	]
-]
-; bug#539
-; RETURN out of USE
-[
-	f: func [] [
-		use [a] [return 1]
-		2
-	]
-	1 = f
-]
-; bug#539
-; EXIT out of USE
-[
-	f: func [] [
-		use [] [exit]
-		42
-	]
-	unset? f
-]
-; functions/context/valueq.r
-[false == value? 'nonsense]
-[true == value? 'value?]
+; functions/file/open.r
+; bug#1422: "Rebol crashes when opening the 128th port"
+[error? try [repeat n 200 [try [close open open join tcp://localhost: n]]] true]
+; functions/file/file-typeq.r
+; bug#1651: "FILE-TYPE? should return NONE for unknown types"
 #r3only
-; bug#1914
-[false == value? do func [x] ['x] none]
+[none? file-type? %foo.0123456789bar0123456789]
+; functions/math/absolute.r
+[:abs = :absolute]
+[0 = abs 0]
+[1 = abs 1]
+[1 = abs -1]
+[2147483647 = abs 2147483647]
+[2147483647 = abs -2147483647]
+[0.0 = abs 0.0]
+[zero? 1.0 - abs 1.0]
+[zero? 1.0 - abs -1.0]
+#64bit
+; simple tests verify correct args and refinements; integer tests
+[9223372036854775807 = abs 9223372036854775807]
+#64bit
+[9223372036854775807 = abs -9223372036854775807]
+; pair! tests
+[0x0 = abs 0x0]
+[0x1 = abs 0x1]
+[1x0 = abs 1x0]
+[1x1 = abs 1x1]
+[0x1 = abs 0x-1]
+[1x0 = abs -1x0]
+[1x1 = abs -1x-1]
+[2147483647x2147483647 = abs 2147483647x2147483647]
+[2147483647x2147483647 = abs 2147483647x-2147483647]
+[2147483647x2147483647 = abs -2147483647x2147483647]
+[2147483647x2147483647 = abs -2147483647x-2147483647]
+#64bit
+; bug#833
+[
+	a: try [abs to integer! #{8000000000000000}]
+	any [error? a not negative? a]
+]
+; functions/math/add.r
+[3 = add 1 2]
+#64bit
+; integer -9223372036854775808 + x tests
+[error? try [add -9223372036854775808 -9223372036854775808]]
+#64bit
+[error? try [add -9223372036854775808 -9223372036854775807]]
+#64bit
+[error? try [add -9223372036854775808 -2147483648]]
+#64bit
+[error? try [add -9223372036854775808 -1]]
+#64bit
+[-9223372036854775808 = add -9223372036854775808 0]
+#64bit
+[-9223372036854775807 = add -9223372036854775808 1]
+#64bit
+[-2 = add -9223372036854775808 9223372036854775806]
+#64bit
+[-1 = add -9223372036854775808 9223372036854775807]
+#64bit
+; integer -9223372036854775807 + x tests
+[error? try [add -9223372036854775807 -9223372036854775808]]
+#64bit
+[error? try [add -9223372036854775807 -9223372036854775807]]
+#64bit
+[-9223372036854775808 = add -9223372036854775807 -1]
+#64bit
+[-9223372036854775807 = add -9223372036854775807 0]
+#64bit
+[-9223372036854775806 = add -9223372036854775807 1]
+#64bit
+[-1 = add -9223372036854775807 9223372036854775806]
+#64bit
+[0 = add -9223372036854775807 9223372036854775807]
+#32bit
+; integer -2147483648 + x tests
+[error? try [add -2147483648 -2147483648]]
+#64bit
+[-4294967296 = add -2147483648 -2147483648]
+#32bit
+[error? try [add -2147483648 -1]]
+#64bit
+[-2147483649 = add -2147483648 -1]
+[-2147483648 = add -2147483648 0]
+[-2147483647 = add -2147483648 1]
+[-1 = add -2147483648 2147483647]
+#64bit
+; integer -1 + x tests
+[error? try [add -1 -9223372036854775808]]
+#64bit
+[-9223372036854775808 = add -1 -9223372036854775807]
+[-2 = add -1 -1]
+[-1 = add -1 0]
+[0 = add -1 1]
+#64bit
+[9223372036854775805 = add -1 9223372036854775806]
+#64bit
+[9223372036854775806 = add -1 9223372036854775807]
+#64bit
+; integer 0 + x tests
+[-9223372036854775808 = add 0 -9223372036854775808]
+#64bit
+[-9223372036854775807 = add 0 -9223372036854775807]
+[-1 = add 0 -1]
+; bug#28
+[0 = add 0 0]
+[1 = add 0 1]
+#64bit
+[9223372036854775806 = add 0 9223372036854775806]
+#64bit
+[9223372036854775807 = add 0 9223372036854775807]
+#64bit
+; integer 1 + x tests
+[-9223372036854775807 = add 1 -9223372036854775808]
+#64bit
+[-9223372036854775806 = add 1 -9223372036854775807]
+[0 = add 1 -1]
+[1 = add 1 0]
+[2 = add 1 1]
+#64bit
+[9223372036854775807 = add 1 9223372036854775806]
+#64bit
+[error? try [add 1 9223372036854775807]]
+; integer 2147483647 + x
+[-1 = add 2147483647 -2147483648]
+[2147483646 = add 2147483647 -1]
+[2147483647 = add 2147483647 0]
+#32bit
+[error? try [add 2147483647 1]]
+#64bit
+[2147483648 = add 2147483647 1]
+#32bit
+[error? try [add 2147483647 2147483647]]
+#64bit
+[4294967294 = add 2147483647 2147483647]
+#64bit
+; integer 9223372036854775806 + x tests
+[-2 = add 9223372036854775806 -9223372036854775808]
+#64bit
+[-1 = add 9223372036854775806 -9223372036854775807]
+#64bit
+[9223372036854775805 = add 9223372036854775806 -1]
+#64bit
+[9223372036854775806 = add 9223372036854775806 0]
+#64bit
+[9223372036854775807 = add 9223372036854775806 1]
+#64bit
+[error? try [add 9223372036854775806 9223372036854775806]]
+#64bit
+[error? try [add 9223372036854775806 9223372036854775807]]
+#64bit
+; integer 9223372036854775807 + x tests
+[-1 = add 9223372036854775807 -9223372036854775808]
+#64bit
+[0 = add 9223372036854775807 -9223372036854775807]
+#64bit
+[9223372036854775806 = add 9223372036854775807 -1]
+#64bit
+[9223372036854775807 = add 9223372036854775807 0]
+#64bit
+[error? try [add 9223372036854775807 1]]
+#64bit
+[error? try [add 9223372036854775807 9223372036854775806]]
+#64bit
+[error? try [add 9223372036854775807 9223372036854775807]]
+; decimal + integer
+[2.1 = add 1.1 1]
+[2147483648.0 = add 1.0 2147483647]
+[-2147483649.0 = add -1.0 -2147483648]
+; integer + decimal
+[2.1 = add 1 1.1]
+[2147483648.0 = add 2147483647 1.0]
+[-2147483649.0 = add -2147483648 -1.0]
+; -1.7976931348623157e308 + decimal
+[error? try [add -1.7976931348623157e308 -1.7976931348623157e308]]
+[-1.7976931348623157e308 = add -1.7976931348623157e308 -1.0]
+[-1.7976931348623157e308 = add -1.7976931348623157e308 -4.94065645841247E-324]
+[-1.7976931348623157e308 = add -1.7976931348623157e308 0.0]
+[-1.7976931348623157e308 = add -1.7976931348623157e308 4.94065645841247E-324]
+[-1.7976931348623157e308 = add -1.7976931348623157e308 1.0]
+[0.0 = add -1.7976931348623157e308 1.7976931348623157e308]
+; -1.0 + decimal
+[-1.7976931348623157e308 = add -1.0 -1.7976931348623157e308]
+[-2.0 = add -1.0 -1.0]
+[-1.0 = add -1.0 -4.94065645841247E-324]
+[-1.0 = add -1.0 0.0]
+[-1.0 = add -1.0 4.94065645841247E-324]
+[0.0 = add -1.0 1.0]
+[1.7976931348623157e308 = add -1.0 1.7976931348623157e308]
+; -4.94065645841247E-324 + decimal
+[-1.7976931348623157e308 = add -4.94065645841247E-324 -1.7976931348623157e308]
+[-1.0 = add -4.94065645841247E-324 -1.0]
+[-9.88131291682493e-324 = add -4.94065645841247E-324 -4.94065645841247E-324]
+[-4.94065645841247E-324 = add -4.94065645841247E-324 0.0]
+[0.0 = add -4.94065645841247E-324 4.94065645841247E-324]
+[1.0 = add -4.94065645841247E-324 1.0]
+[1.7976931348623157e308 = add -4.94065645841247E-324 1.7976931348623157e308]
+; 0.0 + decimal
+[-1.7976931348623157e308 = add 0.0 -1.7976931348623157e308]
+[-1.0 = add 0.0 -1.0]
+[-4.94065645841247E-324 = add 0.0 -4.94065645841247E-324]
+[0.0 = add 0.0 0.0]
+[4.94065645841247E-324 = add 0.0 4.94065645841247E-324]
+[1.0 = add 0.0 1.0]
+[1.7976931348623157e308 = add 0.0 1.7976931348623157e308]
+; 4.94065645841247E-324 + decimal
+[-1.7976931348623157e308 = add 4.94065645841247E-324 -1.7976931348623157e308]
+[-1.0 = add 4.94065645841247E-324 -1.0]
+[0.0 = add 4.94065645841247E-324 -4.94065645841247E-324]
+[4.94065645841247E-324 = add 4.94065645841247E-324 0.0]
+[9.88131291682493e-324 = add 4.94065645841247E-324 4.94065645841247E-324]
+[1.0 = add 4.94065645841247E-324 1.0]
+[1.7976931348623157e308 = add 4.94065645841247E-324 1.7976931348623157e308]
+; 1.0 + decimal
+[-1.7976931348623157e308 = add 1.0 -1.7976931348623157e308]
+[0.0 = add 1.0 -1.0]
+[1.0 = add 1.0 4.94065645841247E-324]
+[1.0 = add 1.0 0.0]
+[1.0 = add 1.0 -4.94065645841247E-324]
+[2.0 = add 1.0 1.0]
+[1.7976931348623157e308 = add 1.0 1.7976931348623157e308]
+; 1.7976931348623157e308 + decimal
+[0.0 = add 1.7976931348623157e308 -1.7976931348623157e308]
+[1.7976931348623157e308 = add 1.7976931348623157e308 -1.0]
+[1.7976931348623157e308 = add 1.7976931348623157e308 -4.94065645841247E-324]
+[1.7976931348623157e308 = add 1.7976931348623157e308 0.0]
+[1.7976931348623157e308 = add 1.7976931348623157e308 4.94065645841247E-324]
+[1.7976931348623157e308 = add 1.7976931348623157e308 1.0]
+[error? try [add 1.7976931348623157e308 1.7976931348623157e308]]
+; pair
+#r2only
+[0x0 = add -2147483648x-2147483648 -2147483648x-2147483648]
+#r2only
+[2147483647x2147483647 = add -2147483648x-2147483648 -1x-1]
+[-2147483648x-2147483648 = add -2147483648x-2147483648 0x0]
+#r2only
+[-2147483647x-2147483647 = add -2147483648x-2147483648 1x1]
+#r2only
+[-1x-1 = add -2147483648x-2147483648 2147483647x2147483647]
+#r2only
+[2147483647x2147483647 = add -1x-1 -2147483648x-2147483648]
+[-2x-2 = add -1x-1 -1x-1]
+[-1x-1 = add -1x-1 0x0]
+[0x0 = add -1x-1 1x1]
+#r2only
+[2147483646x2147483646 = add -1x-1 2147483647x2147483647]
+[-2147483648x-2147483648 = add 0x0 -2147483648x-2147483648]
+[-1x-1 = add 0x0 -1x-1]
+[0x0 = add 0x0 0x0]
+[1x1 = add 0x0 1x1]
+[2147483647x2147483647 = add 0x0 2147483647x2147483647]
+#r2only
+[-2147483647x-2147483647 = add 1x1 -2147483648x-2147483648]
+[0x0 = add 1x1 -1x-1]
+[1x1 = add 1x1 0x0]
+[2x2 = add 1x1 1x1]
+#r2only
+[-2147483648x-2147483648 = add 1x1 2147483647x2147483647]
+#r2only
+[-1x-1 = add 2147483647x2147483647 -2147483648x-2147483648]
+#r2only
+[2147483646x2147483646 = add 2147483647x2147483647 -1x-1]
+[2147483647x2147483647 = add 2147483647x2147483647 0x0]
+#r2only
+[-2147483648x-2147483648 = add 2147483647x2147483647 1x1]
+#r2only
+[-2x-2 = add 2147483647x2147483647 2147483647x2147483647]
+; pair + ...
+[error? try [0x0 + none]]
+[error? try [0x0 + ""]]
+; char
+[#"^(00)" = add #"^(00)" #"^(00)"]
+[#"^(01)" = add #"^(00)" #"^(01)"]
+[#"^(ff)" = add #"^(00)" #"^(ff)"]
+[#"^(01)" = add #"^(01)" #"^(00)"]
+[#"^(02)" = add #"^(01)" #"^(01)"]
+#r2only
+[#"^(00)" = add #"^(01)" #"^(ff)"]
+[#"^(ff)" = add #"^(ff)" #"^(00)"]
+#r2only
+[#"^(00)" = add #"^(ff)" #"^(01)"]
+#r2only
+[#"^(fe)" = add #"^(ff)" #"^(ff)"]
+; tuple
+[0.0.0 = add 0.0.0 0.0.0]
+[0.0.1 = add 0.0.0 0.0.1]
+[0.0.255 = add 0.0.0 0.0.255]
+[0.0.1 = add 0.0.1 0.0.0]
+[0.0.2 = add 0.0.1 0.0.1]
+[0.0.255 = add 0.0.1 0.0.255]
+[0.0.255 = add 0.0.255 0.0.0]
+[0.0.255 = add 0.0.255 0.0.1]
+[0.0.255 = add 0.0.255 0.0.255]
+; functions/math/and.r
+[true and true = true]
+[true and false = false]
+[false and true = false]
+[false and false = false]
+; integer
+[1 and 1 = 1]
+[1 and 0 = 0]
+[0 and 1 = 0]
+[0 and 0 = 0]
+[1 and 2 = 0]
+[2 and 1 = 0]
+[2 and 2 = 2]
+; char
+[#"^(00)" and #"^(00)" = #"^(00)"]
+[#"^(01)" and #"^(00)" = #"^(00)"]
+[#"^(00)" and #"^(01)" = #"^(00)"]
+[#"^(01)" and #"^(01)" = #"^(01)"]
+[#"^(01)" and #"^(02)" = #"^(00)"]
+[#"^(02)" and #"^(02)" = #"^(02)"]
+; tuple
+[0.0.0 and 0.0.0 = 0.0.0]
+[1.0.0 and 1.0.0 = 1.0.0]
+[2.0.0 and 2.0.0 = 2.0.0]
+[255.255.255 and 255.255.255 = 255.255.255]
+; binary
+[#{030000} and #{020000} = #{020000}]
+#r2only
+; string
+["^(03)^(00)" and "^(02)^(00)" = "^(02)^(00)"]
+; functions/math/arccosine.r
+[0 = arccosine 1]
+[0 = arccosine/radians 1]
+[30 = arccosine (square-root 3) / 2]
+[pi / 6 = arccosine/radians (square-root 3) / 2]
+[45 = arccosine (square-root 2) / 2]
+[pi / 4 = arccosine/radians (square-root 2) / 2]
+[60 = arccosine 0.5]
+[pi / 3 = arccosine/radians 0.5]
+[90 = arccosine 0]
+[pi / 2 = arccosine/radians 0]
+[180 = arccosine -1]
+[pi = arccosine/radians -1]
+[150 = arccosine (square-root 3) / -2]
+[pi * 5 / 6 = arccosine/radians (square-root 3) / -2]
+[135 = arccosine (square-root 2) / -2]
+[pi * 3 / 4 = arccosine/radians (square-root 2) / -2]
+[120 = arccosine -0.5]
+[pi * 2 / 3 = arccosine/radians -0.5]
+[error? try [arccosine 1.1]]
+[error? try [arccosine -1.1]]
+; functions/math/arcsine.r
+[0 = arcsine 0]
+[0 = arcsine/radians 0]
+[30 = arcsine 0.5]
+[pi / 6 = arcsine/radians 0.5]
+[45 = arcsine (square-root 2) / 2]
+[pi / 4 = arcsine/radians (square-root 2) / 2]
+[60 = arcsine (square-root 3) / 2]
+[pi / 3 = arcsine/radians (square-root 3) / 2]
+[90 = arcsine 1]
+[pi / 2 = arcsine/radians 1]
+[-30 = arcsine -0.5]
+[pi / -6 = arcsine/radians -0.5]
+[-45 = arcsine (square-root 2) / -2]
+[pi / -4 = arcsine/radians (square-root 2) / -2]
+[-60 = arcsine (square-root 3) / -2]
+[pi / -3 = arcsine/radians (square-root 3) / -2]
+[-90 = arcsine -1]
+[pi / -2 = arcsine/radians -1]
+[1e-12 / (arcsine 1e-12) = (pi / 180)]
+[1e-9 / (arcsine/radians 1e-9) = 1.0]
+[error? try [arcsine 1.1]]
+[error? try [arcsine -1.1]]
+; functions/math/arctangent.r
+[-90 = arctangent -1e16]
+[pi / -2 = arctangent/radians -1e16]
+[-60 = arctangent negate square-root 3]
+[pi / -3 = arctangent/radians negate square-root 3]
+[-45 = arctangent -1]
+[pi / -4 = arctangent/radians -1]
+[-30 = arctangent (square-root 3) / -3]
+[pi / -6 = arctangent/radians (square-root 3) / -3]
+[0 = arctangent 0]
+[0 = arctangent/radians 0]
+[30 = arctangent (square-root 3) / 3]
+[pi / 6 = arctangent/radians (square-root 3) / 3]
+[45 = arctangent 1]
+[pi / 4 = arctangent/radians 1]
+[60 = arctangent square-root 3]
+[pi / 3 = arctangent/radians square-root 3]
+[90 = arctangent 1e16]
+[pi / 2 = arctangent/radians 1e16]
+; functions/math/complement.r
+; bug#849
+[false = complement true]
+[true = complement false]
+; integer
+[-1 = complement 0]
+[0 = complement -1]
+[2147483647 = complement -2147483648]
+[-2147483648 = complement 2147483647]
+#r2only
+; char
+[#"^(ff)" = complement #"^@"]
+#r2only
+[#"^@" = complement #"^(ff)"]
+#r2only
+[#"^(fe)" = complement #"^(01)"]
+#r2only
+[#"^(01)" = complement #"^(fe)"]
+; tuple
+[255.255.255 = complement 0.0.0]
+[0.0.0 = complement 255.255.255]
+; binary
+[#{ffffffffff} = complement #{0000000000}]
+[#{0000000000} = complement #{ffffffffff}]
+#r2only
+; string
+["^(ff)" = complement "^@"]
+#r2only
+["^@" = complement "^(ff)"]
+#r2only
+["^(fe)" = complement "^(01)"]
+#r2only
+["^(01)" = complement "^(fe)"]
+; bitset
+#r2only
+[
+	(make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF})
+		= complement make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
+]
+#r2only
+[
+	(make bitset! #{0000000000000000000000000000000000000000000000000000000000000000})
+		= complement make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+]
+[not find complement charset "b" #"b"]
+[find complement charset "a" #"b"]
+[
+	a: make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
+	a == complement complement a
+]
+[
+	a: make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+	a == complement complement a
+]
+; bug#1706
+; image
+[(make image! [1x1 #{000000} #{00}]) = complement make image! [1x1 #{ffffff} #{ff}]]
+[(make image! [1x1 #{ffffff} #{ff}]) = complement make image! [1x1 #{000000} #{00}]]
+; typeset
+; bug#799
+#r3only
+[typeset? complement make typeset! [unset!]]
+; functions/math/cosine.r
+[1 = cosine 0]
+[1 = cosine/radians 0]
+[(square-root 3) / 2 = cosine 30]
+[(square-root 3) / 2 = cosine/radians pi / 6]
+[(square-root 2) / 2 = cosine 45]
+[(square-root 2) / 2 = cosine/radians pi / 4]
+[0.5 = cosine 60]
+[0.5 = cosine/radians pi / 3]
+[0 = cosine 90]
+[0 = cosine/radians pi / 2]
+[-1 = cosine 180]
+[-1 = cosine/radians pi]
+[(square-root 3) / -2 = cosine 150]
+[(square-root 3) / -2 = cosine/radians pi * 5 / 6]
+[(square-root 2) / -2 = cosine 135]
+[(square-root 2) / -2 = cosine/radians pi * 3 / 4]
+[-0.5 = cosine 120]
+[-0.5 = cosine/radians pi * 2 / 3]
+; functions/math/difference.r
+[24:00 = difference 1/Jan/2007 31/Dec/2006]
+[0:00 = difference 1/Jan/2007 1/Jan/2007]
+; block
+[[1 2] = difference [1 3] [2 3]]
+[[] = difference [1 2] [1 2]]
+; bitset
+[(charset "a") = difference charset "a" charset ""]
+; bug#1822: DIFFERENCE on date!s problem
+[12:00 = difference 13/1/2011/12:00 13/1/2011]
+; functions/math/divide.r
+[1 == divide -2147483648 -2147483648]
+[2 == divide -2147483648 -1073741824]
+[1073741824 == divide -2147483648 -2]
+#32bit
+[error? try [divide -2147483648 -1]]
+[error? try [divide -2147483648 0]]
+[-2147483648 == divide -2147483648 1]
+[-1073741824 == divide -2147483648 2]
+[-2 == divide -2147483648 1073741824]
+[0.5 == divide -1073741824 -2147483648]
+[1 == divide -1073741824 -1073741824]
+[536870912 == divide -1073741824 -2]
+[1073741824 == divide -1073741824 -1]
+[error? try [divide -1073741824 0]]
+[-1073741824 == divide -1073741824 1]
+[-536870912 == divide -1073741824 2]
+[-1 == divide -1073741824 1073741824]
+[1 == divide -2 -2]
+[2 == divide -2 -1]
+[error? try [divide -2 0]]
+[-2 == divide -2 1]
+[-1 == divide -2 2]
+[0.5 == divide -1 -2]
+[1 == divide -1 -1]
+[error? try [divide -1 0]]
+[-1 == divide -1 1]
+[-0.5 == divide -1 2]
+[0 == divide 0 -2147483648]
+[0 == divide 0 -1073741824]
+[0 == divide 0 -2]
+[0 == divide 0 -1]
+[error? try [divide 0 0]]
+[0 == divide 0 1]
+[0 == divide 0 2]
+[0 == divide 0 1073741824]
+[0 == divide 0 2147483647]
+[-0.5 == divide 1 -2]
+[-1 == divide 1 -1]
+[error? try [divide 1 0]]
+[1 == divide 1 1]
+[0.5 == divide 1 2]
+[-1 == divide 2 -2]
+[-2 == divide 2 -1]
+[error? try [divide 2 0]]
+[2 == divide 2 1]
+[1 == divide 2 2]
+[-0.5 == divide 1073741824 -2147483648]
+[-1 == divide 1073741824 -1073741824]
+[-536870912 == divide 1073741824 -2]
+[-1073741824 == divide 1073741824 -1]
+[error? try [divide 1073741824 0]]
+[1073741824 == divide 1073741824 1]
+[536870912 == divide 1073741824 2]
+[1 == divide 1073741824 1073741824]
+[-1 == divide 2147483647 -2147483647]
+[-1073741823.5 == divide 2147483647 -2]
+[-2147483647 == divide 2147483647 -1]
+[error? try [divide 2147483647 0]]
+[2147483647 == divide 2147483647 1]
+[1073741823.5 == divide 2147483647 2]
+[1 == divide 2147483647 2147483647]
+[10.0 == divide 1 .1]
+[10.0 == divide 1.0 .1]
+[10x10 == divide 1x1 .1]
+; bug#1974
+[10.10.10 == divide 1.1.1 .1]
+; functions/math/evenq.r
+[even? 0]
+[not even? 1]
+[not even? -1]
+[not even? 2147483647]
+[even? -2147483648]
+#64bit
+[not even? 9223372036854775807]
+#64bit
+[even? -9223372036854775808]
+; decimal
+[even? 0.0]
+[not even? 1.0]
+[even? 2.0]
+[not even? -1.0]
+[even? -2.0]
+; bug#1775
+[even? 1.7976931348623157e308]
+[even? -1.7976931348623157e308]
+; char
+[even? #"^@"]
+[not even? #"^a"]
+[even? #"^b"]
+[not even? #"^(ff)"]
+; money
+[even? $0]
+[not even? $1]
+[even? $2]
+[not even? -$1]
+[even? -$2]
+[not even? $999999999999999]
+[not even? -$999999999999999]
+; time
+[even? 0:00]
+[even? 0:1:00]
+[even? -0:1:00]
+[not even? 0:0:01]
+[even? 0:0:02]
+[not even? -0:0:01]
+[even? -0:0:02]
+; functions/math/exp.r
+[1 = exp 0]
+[2.718281828459045 = exp 1]
+[2.718281828459045 * 2.718281828459045 = exp 2]
+[(square-root 2.718281828459045) = exp 0.5]
+[1 / 2.718281828459045 = exp -1]
+; functions/math/log-10.r
+[0 = log-10 1]
+[0.5 = log-10 square-root 10]
+[1 = log-10 10]
+[-1 = log-10 0.1]
+[2 = log-10 100]
+[-2 = log-10 0.01]
+[3 = log-10 1000]
+[-3 = log-10 0.001]
+[error? try [log-10 0]]
+[error? try [log-10 -1]]
+; functions/math/log-2.r
+[0 = log-2 1]
+[1 = log-2 2]
+[-1 = log-2 0.5]
+[2 = log-2 4]
+[-2 = log-2 0.25]
+[3 = log-2 8]
+[-3 = log-2 0.125]
+[error? try [log-2 0]]
+[error? try [log-2 -1]]
+; functions/math/log-e.r
+[0 = log-e 1]
+[0.5 = log-e square-root 2.718281828459045]
+[1 = log-e 2.718281828459045]
+[-1 = log-e 1 / 2.718281828459045]
+[2 = log-e 2.718281828459045 * 2.718281828459045]
+[error? try [log-e 0]]
+[error? try [log-e -1]]
+; functions/math/mod.r
+[0.0 == mod 1E15 1]
+[0.0 == mod -1E15 1]
+[0.0 == mod 1E14 1]
+[0.0 == mod -1E14 1]
+[0 == mod -1 1]
+[0.75 == mod -1.25 1]
+[0.5 == mod -1.5 1]
+[0.25 == mod -1.75 1]
+; these have small error; due to binary approximation of decimal numbers
+[not negative? 1e-8 - abs 0.9 - mod 99'999'999.9 1]
+[not negative? 1e-8 - abs 0.99 - mod 99'999'999.99 1]
+[not negative? 1e-8 - abs 0.999 - mod 99'999'999.999 1]
+[not negative? 1e-8 - abs 0.9999 - mod 99'999'999.9999 1]
+[not negative? 1e-8 - abs 0.99999 - mod 99'999'999.99999 1]
+[not negative? 1e-8 - abs 0.999999 - mod 99'999'999.999999 1]
+[$0 == mod $999'999'999'999'999 1]
+[$0 == mod $999'999'999'999'999 $1]
+[0.0 == mod 9'999'999'999'999'999 1.0]
+[0.0 == mod 999'999'999'999'999 1.0]
+[0.0 == mod 562'949'953'421'311.0 1]
+[0.0 == mod -562'949'953'421'311.0 1]
+[0.25 == mod 562'949'953'421'311.25 1]
+[0.5 == mod 562'949'953'421'311.5 1]
+[0.5 == mod -562'949'953'421'311.5 1]
+[0.25 == mod -562'949'953'421'311.75 1]
+[0.0 == mod 562'949'953'421'312.0 1]
+[0.0 == mod -562'949'953'421'312.0 1]
+[0.25 == mod 562'949'953'421'312.25 1]
+[0.5 == mod -562'949'953'421'312.5 1]
+[0.5 == mod 562'949'953'421'312.5 1]
+[0.25 == mod -562'949'953'421'312.75 1]
+[0.0 == mod 562'949'953'421'313.0 1.0]
+[0.0 == mod -562'949'953'421'313.0 1.0]
+[0.5 == mod -562'949'953'421'313.5 1]
+[0.5 == mod 562'949'953'421'313.5 1]
+[0.0 == mod -562'949'953'421'314.0 1]
+[0.5 == mod -562'949'953'421'314.5 1]
+[0.5 == mod 562'949'953'421'314.5 1]
+[not negative? 1e-16 - abs mod 0.15 - 0.05 - 0.1 0.1]
+[not negative? 1e-16 - abs mod 0.1 + 0.1 + 0.1 0.3]
+[not negative? 1e-16 - abs mod 0.3 0.1 + 0.1 + 0.1]
+[not negative? 1e-16 - abs mod to money! 0.1 + 0.1 + 0.1 0.3]
+; functions/math/modulo.r
+[0.0 == modulo 0.1 + 0.1 + 0.1 0.3]
+[0.0 == modulo 0.3 0.1 + 0.1 + 0.1]
+[$0.0 == modulo $0.1 + $0.1 + $0.1 $0.3]
+[$0.0 == modulo $0.3 $0.1 + $0.1 + $0.1]
+[0.0 == modulo 1 0.1]
+[0.0 == modulo 0.15 - 0.05 - 0.1 0.1]
+; functions/math/multiply.r
+#32bit
+[error? try [multiply -2147483648 -2147483648]]
+#32bit
+[error? try [multiply -2147483648 -1073741824]]
+#32bit
+[error? try [multiply -2147483648 -2]]
+#32bit
+[error? try [multiply -2147483648 -1]]
+[0 = multiply -2147483648 0]
+[-2147483648 = multiply -2147483648 1]
+#32bit
+[error? try [multiply -2147483648 2]]
+#32bit
+[error? try [multiply -2147483648 1073741824]]
+#32bit
+[error? try [multiply -2147483648 2147483647]]
+#32bit
+[error? try [multiply -1073741824 -2147483648]]
+#32bit
+[error? try [multiply -1073741824 -1073741824]]
+#32bit
+[error? try [multiply -1073741824 -2]]
+[1073741824 = multiply -1073741824 -1]
+[0 = multiply -1073741824 0]
+[-1073741824 = multiply -1073741824 1]
+[-2147483648 = multiply -1073741824 2]
+#32bit
+[error? try [multiply -1073741824 1073741824]]
+#32bit
+[error? try [multiply -1073741824 2147483647]]
+#32bit
+[error? try [multiply -2 -2147483648]]
+#32bit
+[error? try [multiply -2 -1073741824]]
+[4 = multiply -2 -2]
+[2 = multiply -2 -1]
+[0 = multiply -2 0]
+[-2 = multiply -2 1]
+[-4 = multiply -2 2]
+[-2147483648 = multiply -2 1073741824]
+#32bit
+[error? try [multiply -2 2147483647]]
+#32bit
+[error? try [multiply -1 -2147483648]]
+[1073741824 = multiply -1 -1073741824]
+[2 = multiply -1 -2]
+[1 = multiply -1 -1]
+[0 = multiply -1 0]
+[-1 = multiply -1 1]
+[-2 = multiply -1 2]
+[-1073741824 = multiply -1 1073741824]
+[-2147483647 = multiply -1 2147483647]
+[0 = multiply 0 -2147483648]
+[0 = multiply 0 -1073741824]
+[0 = multiply 0 -2]
+[0 = multiply 0 -1]
+[0 = multiply 0 0]
+[0 = multiply 0 1]
+[0 = multiply 0 2]
+[0 = multiply 0 1073741824]
+[0 = multiply 0 2147483647]
+[-2147483648 = multiply 1 -2147483648]
+[-1073741824 = multiply 1 -1073741824]
+[-2 = multiply 1 -2]
+[-1 = multiply 1 -1]
+[0 = multiply 1 0]
+[1 = multiply 1 1]
+[2 = multiply 1 2]
+[1073741824 = multiply 1 1073741824]
+[2147483647 = multiply 1 2147483647]
+#32bit
+[error? try [multiply 2 -2147483648]]
+[-2147483648 = multiply 2 -1073741824]
+[-4 = multiply 2 -2]
+[-2 = multiply 2 -1]
+[0 = multiply 2 0]
+[2 = multiply 2 1]
+#32bit
+[error? try [multiply 2 1073741824]]
+#32bit
+[error? try [multiply 2 2147483647]]
+#32bit
+[error? try [multiply 1073741824 -2147483648]]
+#32bit
+[error? try [multiply 1073741824 -1073741824]]
+[-2147483648 = multiply 1073741824 -2]
+[-1073741824 = multiply 1073741824 -1]
+[0 = multiply 1073741824 0]
+[1073741824 = multiply 1073741824 1]
+#32bit
+[error? try [multiply 1073741824 2]]
+#32bit
+[error? try [multiply 1073741824 1073741824]]
+#32bit
+[error? try [multiply 1073741824 2147483647]]
+#32bit
+[error? try [multiply 2147483647 -2147483648]]
+#32bit
+[error? try [multiply 2147483647 -1073741824]]
+#32bit
+[error? try [multiply 2147483647 -2]]
+[-2147483647 = multiply 2147483647 -1]
+[0 = multiply 2147483647 0]
+[2147483647 = multiply 2147483647 1]
+#32bit
+[error? try [multiply 2147483647 2]]
+#32bit
+[error? try [multiply 2147483647 1073741824]]
+#32bit
+[error? try [multiply 2147483647 2147483647]]
+#64bit
+[error? try [multiply -1 -9223372036854775808]]
+#64bit
+[error? try [multiply -9223372036854775808 -1]]
+[0:0:1 == multiply 0:0:2 0.5]
+; functions/math/negate.r
+[0 = negate 0]
+[-1 = negate 1]
+[1 = negate -1]
+#32bit
+[error? try [negate -2147483648]]
+; decimal
+[0.0 == negate 0.0]
+[-1.0 == negate 1.0]
+[1.0 == negate -1.0]
+[1.7976931348623157e308 = negate -1.7976931348623157e308]
+[-1.7976931348623157e308 = negate 1.7976931348623157e308]
+[4.94065645841247E-324 = negate -4.94065645841247E-324]
+[-4.94065645841247E-324 = negate 4.94065645841247E-324]
+; pair
+[0x0 = negate 0x0]
+[-1x-1 = negate 1x1]
+[1x1 = negate -1x-1]
+[-1x1 = negate 1x-1]
+#r2only
+[-2147483648x-2147483648 = negate -2147483648x-2147483648]
+; money
+[$0 = negate $0]
+[-$1 = negate $1]
+[$1 = negate -$1]
+; time
+[0:00 = negate 0:00]
+[-1:01 = negate 1:01]
+[1:01 = negate -1:01]
+; bitset
+#r2only
+[
+	(make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF})
+		= negate make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
+]
+#r2only
+[
+	(make bitset! #{0000000000000000000000000000000000000000000000000000000000000000})
+		= negate make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+]
+[
+	a: make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+	a == negate negate a
+]
+[
+	a: make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
+	a == negate negate a
+]
+; functions/math/negativeq.r
+[not negative? 0]
+[not negative? 1]
+[negative? -1]
+[not negative? 2147483647]
+[negative? -2147483648]
+#64bit
+[not negative? 9223372036854775807]
+#64bit
+[negative? -9223372036854775808]
+; decimal
+[not negative? 0.0]
+[not negative? 4.94065645841247E-324]
+[negative? -4.94065645841247E-324]
+[not negative? 1.7976931348623157e308]
+[negative? -1.7976931348623157e308]
+#r2only
+; char
+[not negative? #"^@"]
+#r2only
+[not negative? #"^a"]
+#r2only
+[not negative? #"^(ff)"]
+; money
+[not negative? $0]
+[not negative? $0.01]
+[negative? -$0.01]
+[not negative? $999999999999999.87]
+[negative? -$999999999999999.87]
+; time
+[not negative? 0:00]
+[not negative? 0:00:0.000000001]
+[negative? -0:00:0.000000001]
+; functions/math/not.r
+[false = not :abs]
+[false = not #{}]
+[false = not charset ""]
+[false = not []]
+[false = not #"a"]
+[false = not datatype!]
+[false = not 1/1/2007]
+[false = not 0.0]
+[false = not me@mydomain.com]
+[false = not %myfile]
+[false = not func [] []]
+[false = not first [:a]]
+#r2only
+[false = not make hash! []]
+[false = not make image! 0x0]
+[false = not 0]
+[false = not #1444]
+#r2only
+[false = not make list! []]
+[false = not first ['a/b]]
+[false = not first ['a]]
+[false = not true]
+[true = not false]
+#r3only
+[false = not make map! []]
+[false = not $0.00]
+[false = not :type?]
+[true = not none]
+[false = not make object! []]
+[false = not type? get '+]
+[false = not 0x0]
+[false = not first [()]]
+[false = not first [a/b]]
+[false = not make port! http://]
+[false = not /refinement]
+[false = not first [a/b:]]
+[false = not first [a:]]
+[false = not ""]
+[false = not <tag>]
+[false = not 1:00]
+[false = not 1.2.3]
+#r3only
+[false = not http://]
+[false = not 'a]
+; functions/math/oddq.r
+[not odd? 0]
+[odd? 1]
+[odd? -1]
+[odd? 2147483647]
+[not odd? -2147483648]
+#64bit
+[odd? 9223372036854775807]
+#64bit
+[not odd? -9223372036854775808]
+; decimal
+[not odd? 0.0]
+[odd? 1.0]
+[not odd? 2.0]
+[odd? -1.0]
+[not odd? -2.0]
+[not odd? 1.7976931348623157e308]
+[not odd? -1.7976931348623157e308]
+; char
+[not odd? #"^@"]
+[odd? #"^a"]
+[not odd? #"^b"]
+[odd? #"^(ff)"]
+; money
+[not odd? $0]
+[odd? $1]
+[not odd? $2]
+[odd? -$1]
+[not odd? -$2]
+[odd? $999999999999999]
+[odd? -$999999999999999]
+; time
+[not odd? 0:00]
+[not odd? 0:1:00]
+[not odd? -0:1:00]
+[odd? 0:0:01]
+[not odd? 0:0:02]
+[odd? -0:0:01]
+[not odd? -0:0:02]
+; functions/math/positiveq.r
+[not positive? 0]
+[positive? 1]
+[not positive? -1]
+[positive? 2147483647]
+[not positive? -2147483648]
+#64bit
+[positive? 9223372036854775807]
+#64bit
+[not positive? -9223372036854775808]
+; decimal
+[not positive? 0.0]
+[positive? 4.94065645841247E-324]
+[not positive? -4.94065645841247E-324]
+[positive? 1.7976931348623157e308]
+[not positive? -1.7976931348623157e308]
+#r2only
+; char
+[not positive? #"^@"]
+#r2only
+[positive? #"^a"]
+#r2only
+[positive? #"^(ff)"]
+; money
+[not positive? $0]
+[positive? $0.01]
+[not positive? -$0.01]
+[positive? $999999999999999.87]
+[not positive? -$999999999999999.87]
+; time
+[not positive? 0:00]
+[positive? 0:00:0.000000001]
+[not positive? -0:00:0.000000001]
+; functions/math/power.r
+[1 = power 1 1000]
+[1 = power 1000 0]
+[4 = power 2 2]
+[0.5 = power 2 -1]
+[0.1 = power 10 -1]
+; functions/math/random.r
+; bug#1084
+#r3only
+[
+	random/seed 0
+	not any [
+		negative? random 1.0
+		negative? random 1.0
+	]
+]
+; bug#1875
+[
+	random/seed 0
+	2 = random/only next [1 2]
+]
+; bug#932
+[
+	s: "aa"
+	random/seed s
+	a: random 10000
+	random/seed s
+	a = random 10000
+]
+; functions/math/remainder.r
+#64bit
+; integer! tests
+[0 = remainder -9223372036854775808 -1]
+; integer! tests
+[0 == remainder -2147483648 -1]
+; time! tests
+[-1:00 == remainder -1:00 -3:00]
+[1:00 == remainder 1:00 -3:00]
+; functions/math/round.r
+[0 == round 0]
+[1 == round 1]
+[-1 == round -1]
+[zero? 2 - round 1.5]
+[zero? 3 - round 2.5]
+[zero? -2 - round -1.5]
+[zero? -3 - round -2.5]
+; REBOL rounds to 2.0 beyond this
+[zero? 1 - round 1.499999999999995]
+[zero? 2 - round 1.500000000000001]
+[zero? -1 - round -1.499999999999995]
+[zero? -2 - round -1.500000000000001]
+[1:03:01 == round 1:03:01.1]
+[1:03:02 == round 1:03:01.5]
+[1:03:02 == round 1:03:01.9]
+[zero? round 0.00001]
+[zero? round 0.49999999]
+[zero? 1 - round 0.5]
+[zero? 1 - round 1.49999999]
+[2 == round 2]
+[zero? 2 - round 2.49999999]
+[zero? round -0.00001]
+[zero? round -0.49999999]
+[zero? -1 - round -0.5]
+[zero? -1 - round -1.49999999]
+[-2 == round -2]
+#r3only
+[1E20 == round 1E20]
+#r3only
+[2147483648.0 == round 2147483648.0]
+#r3only
+[9223372036854775808.0 == round 9223372036854775808.0]
+[$101 == round $100.5]
+[-$101 = round -$100.5]
+; REBOL2 rounds to $100.5 beyond this
+[$100 == round $100.4999999999998]
+; REBOL2 rounds to $100.5 beyond this
+[-$100 == round -$100.4999999999998]
+; REBOL2 rounds to $1000.5 beyond this
+[$1000 == round $1000.499999999999]
+; REBOL2 rounds to $1000.5 beyond this
+[-$1000 == round -$1000.499999999999]
+[0:0:1 == round 0:0:1.4999]
+[0:1:0 == round 0:1:0.4999]
+[1:0:0 == round 1:0:0.4999]
+[-0:0:1 == round -0:0:1.4999]
+[-0:1:0 == round -0:1:0.4999]
+[-1:0:0 == round -1:0:0.4999]
+[0:0:2 == round 0:0:1.5]
+[0:1:1 == round 0:1:0.5]
+[1:0:1 == round 1:0:0.5]
+[-0:0:2 == round -0:0:1.5]
+[-0:1:1 == round -0:1:0.5]
+[-1:0:1 == round -1:0:0.5]
+; round/to tests
+[100 == round/to 108 25]
+[zero? 100 - round/to 100.000001 25]
+[zero? 100 - round/to 112.499999 25]
+[zero? 125 - round/to 112.5 25]
+[zero? -100 - round/to -100.000001 25]
+[zero? -100 - round/to -112.499999 25]
+[zero? -125 - round/to -112.5 25]
+[zero? -125 - round/to -112.500001 25]
+[125 == round/to 133 25]
+[1.00 == round/to 1.08 0.25]
+[1.25 == round/to 1.33 0.25]
+[1:00 == round/to 1:03 0:15]
+[1:15 == round/to 1:08 0:15]
+[1:15 == round/to 1:18 0:15]
+[1:30 == round/to 1:22:31 0:15]
+[1:02 == round/to 1:02:03 0:01]
+[562'949'953'421'312.0 == round/to 562'949'953'421'312.0 1.0]
+[-562'949'953'421'312.0 == round/to -562'949'953'421'312.0 1.0]
+[562'949'953'421'313.0 == round/to 562'949'953'421'313.0 1.0]
+[-562'949'953'421'313.0 == round/to -562'949'953'421'313.0 1.0]
+[562'949'953'421'314.0 == round/to 562'949'953'421'314.0 1.0]
+[-562'949'953'421'314.0 == round/to -562'949'953'421'314.0 1.0]
+[zero? $100.2 - round/to 100.15 $0.1]
+[$100.2 == round/to $100.15 $0.1]
+[1:1:1.2 == round/to 1:1:1.15 0:0:0.1]
+[$100 == round/to $100.15 $2]
+[1:1:2 == round/to 1:1:1.15 0:0:2]
+[0 == round/even 0]
+[1 == round/even 1]
+[-1 == round/even -1]
+[zero? 2 - round/even 1.5]
+[zero? 2 - round/even 2.5]
+[zero? -2 - round/even -1.5]
+[zero? -2 - round/even -2.5]
+; REBOL2 rounds to 2.0 beyond this
+[zero? 1 - round/even 1.49999999999995]
+[zero? 1 - round/even 1.499999999999995]
+[zero? 2 - round/even 1.500000000000001]
+[zero? -1 - round/even -1.499999999999995]
+[zero? -2 - round/even -1.500000000000001]
+[2147483647 == round/even 2147483647]
+[-2147483648 == round/even -2147483648]
+#r2only
+[error? try [round/even 2147483648.0]]
+#r2only
+[error? try [round/even 9.2233720368547799e18]]
+#r3only
+[9223372036854780000.0 == round/even 9223372036854780000.0]
+[1:03:01 == round/even 1:03:01.1]
+[1:03:02 == round/even 1:03:01.5]
+[1:03:02 == round/even 1:03:01.9]
+[$100 == round/even $100.25]
+[-$100 == round/even -$100.25]
+; round/even/to; divide by 0
+[error? try [round/even/to 0.1 0]]
+[zero? round/even/to 0.1 -1.0]
+[zero? round/even/to 0.1 -1]
+[zero? round/even/to 0.5 -1.0]
+[zero? round/even/to 0.5 -1]
+[zero? 2 - round/even/to 1.5 -1.0]
+[zero? 2 - round/even/to 1.5 -1]
+[zero? round/even/to -0.1 -1.0]
+[zero? round/even/to -0.1 -1]
+[0.0 == round/even/to -0.5 -1.0]
+[zero? round/even/to -0.5 -1]
+[-2.0 == round/even/to -1.5 -1.0]
+[zero? -2 - round/even/to -1.5 -1]
+[0.0 == round/even/to 0.1 1.0]
+[0.0 == round/even/to 0.1 1E-0]
+[0.0 == round/even/to -0.1 1E-0]
+[0.1 == round/even/to 0.12 1E-1]
+[-0.1 == round/even/to -0.12 1E-1]
+[0.12 == round/even/to 0.123 1E-2]
+[-0.12 == round/even/to -0.123 1e-2]
+[0.123 == round/even/to 0.1234 1E-3]
+[-0.123 == round/even/to -0.1234 1E-3]
+[0.1234 = round/even/to 0.12345 1E-4]
+[-0.1234 = round/even/to -0.12345 1E-4]
+; bug#1470
+[2.6 == round/even/to $2.55 0.1]
+; bug#1470
+[$2.6 == round/even/to 2.55 $0.1]
+; round-up breakpoint
+[0.12346 = round/even/to 0.123456 1E-5]
+[-0.12346 = round/even/to -0.123456 1E-5]
+[1.0 == round/even/to 0.9 1E-0]
+[-1.0 == round/even/to -0.9 1E-0]
+[0.6 = round/even/to 0.55 1E-1]
+[-0.6 = round/even/to -0.55 1E-1]
+[0.56 == round/even/to 0.555 1E-2]
+[-0.56 == round/even/to -0.555 1E-2]
+[2.0 == round/even/to 1.5 1E-0]
+[1.6 == round/even/to 1.55 1E-1]
+[1.56 == round/even/to 1.555 1E-2]
+[1.556 == round/even/to 1.5555  1E-3]
+[1.5556 == round/even/to 1.55555 1E-4]
+[1.55556 = round/even/to 1.555555 1E-5]
+[1.555556 == round/even/to 1.5555555 1E-6]
+[1.5555556 == round/even/to 1.55555555 1E-7]
+[1.55555556 == round/even/to 1.555555555 1E-8]
+[1.555555556 = round/even/to 1.5555555555 1E-9]
+[0.2 == round/even/to 0.15 1E-1]
+[-0.2 == round/even/to -0.15 1E-1]
+[0.4 == round/even/to 0.35 1E-1]
+[1.0 == round/even/to 0.95 1E-1]
+[1.2 = round/even/to 1.15 1E-1]
+[2.2 == round/even/to 2.15 1E-1]
+[2.6 == round/even/to 2.55 1E-1]
+[10.0 == round/even/to 10 1E-1]
+[zero? 110 - round/even/to 107.5 5]
+[zero? 110 - round/even/to 112.5 5]
+[zero? 120 - round/even/to 115 10]
+[zero? 100 - round/even/to 100.000001 25]
+[zero? 100 - round/even/to 112.499999 25]
+[zero? 100 - round/even/to 112.5 25]
+[zero? 150 - round/even/to 137.5 25]
+[zero? -100 - round/even/to -100.000001 25]
+[zero? -100 - round/even/to -112.499999 25]
+[zero? -100 - round/even/to -112.5 25]
+[zero? -125 - round/even/to -112.500001 25]
+[zero? -150 - round/even/to -137.5 25]
+[1:02:3.1 == round/even/to 1:02:3.14999 0:0:0.1]
+[1:02:3.2 == round/even/to 1:02:3.15 0:0:0.1]
+[1:02:3.2 == round/even/to 1:02:3.25 0:0:0.1]
+[1:02:3.3 == round/even/to 1:02:3.25001 0:0:0.1]
+[1:15 == round/even/to 1:22:29.9999 0:15]
+[1:30 == round/even/to 1:22:30 0:15]
+[0.0 == (562'949'953'421'312.0 - round/even/to 562'949'953'421'312.0 1.0)]
+[0.0 == (-562'949'953'421'312.0 - round/even/to -562'949'953'421'312.0 1.0)]
+[0.0 == (562'949'953'421'313.0 - round/even/to 562'949'953'421'313.0 1.0)]
+[0.0 == (-562'949'953'421'313.0 - round/even/to -562'949'953'421'313.0 1.0)]
+[562'949'953'421'314.0 == round/even/to 562'949'953'421'314.0 1.0]
+[-562'949'953'421'314.0 == round/even/to -562'949'953'421'314.0 1.0]
+; bug#1116
+[$1.15 == round/even/to 1.15 $0.01]
+; this fails, by design
+[0:0:1.15 == round/even/to 0:0:1.15 0:0:0.01]
+[1.15 == round/even/to $1.15 0.01]
+[-0:0:2.6 == round/even/to -0:0:2.55 0:0:0.1]
+[-$2.6 == round/even/to -$2.55 $0.1]
+[0.0 == (1e-15 - round/even/to 1.1e-15 1e-15)]
+#r2only
+[$0.0 == ($0.000'000'000'000'001 - round/even/to $0.000'000'000'000'001'1 1e-15)]
+#r3only
+[$0.0 == ($0.000'000'000'000'001 - round/even/to $0.000'000'000'000'001'1 $1e-15)]
+[not negative? 1e-31 - abs 26e-17 - round/even/to 25.5e-17 1e-17]
+#r2only
+[not negative? 1e-31 - abs (to money! 26e-17) - round/even/to $0.000'000'000'000'000'255 to money! 1e-17]
+#r3only
+[not negative? ($1e-31) - abs $26e-17 - round/even/to $0.000'000'000'000'000'255 $1e-17]
+[0:0:2.6 == round/even/to 0:0:2.55 0:0:0.1]
+#r2only
+[$2.6 == round/even/to $2.55 1E-1]
+#r3only
+[$2.6 == round/even/to $2.55 $0.1]
+[not negative? 1e-31 - abs -26e-17 - round/even/to -25.5e-17 1e-17]
+#r2only
+[not negative? (to money! 1e-31) - abs (to money! -26e-17) - round/even/to -$0.000'000'000'000'000'255 to money! 1e-17]
+#r3only
+[not negative? $1e-31 - abs -$26e-17 - round/even/to -$0.000'000'000'000'000'255 $1e-17]
+[$1 == round/even/to $1.23456789 $1]
+[$1.2 == round/even/to $1.23456789 $0.1]
+[$1.23 == round/even/to $1.23456789 $0.01]
+[$1.235 == round/even/to $1.23456789 $0.001]
+[$1.2346 == round/even/to $1.23456789 $0.0001]
+[$1.23457 == round/even/to $1.23456789 $0.00001]
+[$1.234568 == round/even/to $1.23456789 $0.000001]
+[$1.2345679 == round/even/to $1.23456789 $0.0000001]
+[$1.23456789 == round/even/to $1.23456789 $0.00000001]
+; round/ceiling
+[0 == round/ceiling 0]
+[1 == round/ceiling 1]
+[-1 == round/ceiling -1]
+[zero? 2 - round/ceiling 1.1]
+[zero? 1 - round/ceiling 0.00000000000001]
+[zero? round/ceiling -0.00000000000001]
+[zero? 1 - round/ceiling 0.99999999999995]
+[zero? -1 - round/ceiling -1.00000000000001]
+[zero? -1 - round/ceiling -1.99999999999995]
+[zero? 1 - round/ceiling 0.00001]
+[zero? 1 - round/ceiling 0.49999999]
+[zero? 1 - round/ceiling 0.5]
+[zero? 2 - round/ceiling 1.49999999]
+[zero? 2 - round/ceiling 1.5]
+[2 == round/ceiling 2]
+[zero? 3 - round/ceiling 2.49999999]
+[zero? 3 - round/ceiling 2.5]
+[zero? round/ceiling -0.00001]
+[zero? round/ceiling -0.49999999]
+[zero? round/ceiling -0.5]
+[zero? -1 - round/ceiling -1.49999999]
+[zero? -1 - round/ceiling -1.5]
+[-2 == round/ceiling -2]
+; round/ceiling/to
+[562'949'953'421'312.0 == round/ceiling/to 562'949'953'421'312.0 1.0]
+[-562'949'953'421'312.0 == round/ceiling/to -562'949'953'421'312.0 1.0]
+[562'949'953'421'313.0 == round/ceiling/to 562'949'953'421'313.0 1.0]
+[-562'949'953'421'313.0 == round/ceiling/to -562'949'953'421'313.0 1.0]
+[562'949'953'421'314.0 == round/ceiling/to 562'949'953'421'314.0 1.0]
+[-562'949'953'421'314.0 == round/ceiling/to -562'949'953'421'314.0 1.0]
+; round/floor
+[-1 == round/floor -1]
+[zero? 1 - round/floor 1.1]
+[zero? round/floor 0.00000000000001]
+[zero? -1 - round/floor -0.00000000000001]
+[zero? round/floor 0.99999999999995]
+[zero? -2 - round/floor -1.00000000000001]
+[zero? -2 - round/floor -1.99999999999995]
+; round/floor/to
+[zero? 100 - round/floor/to 112.499999 25]
+[zero? 100 - round/floor/to 112.5 25]
+[zero? -125 - round/floor/to -112.000001 25]
+[zero? -125 - round/floor/to -112.5 25]
+[zero? -125 - round/floor/to -112.500001 25]
+[562'949'953'421'312.0 == round/floor/to 562'949'953'421'312.0 1.0]
+[-562'949'953'421'312.0 == round/floor/to -562'949'953'421'312.0 1.0]
+[562'949'953'421'313.0 == round/floor/to 562'949'953'421'313.0 1.0]
+[-562'949'953'421'313.0 == round/floor/to -562'949'953'421'313.0 1.0]
+[562'949'953'421'314.0 == round/floor/to 562'949'953'421'314.0 1.0]
+[-562'949'953'421'314.0 == round/floor/to -562'949'953'421'314.0 1.0]
+; round/down
+[0 == round/down 0]
+[1 == round/down 1]
+[-1 == round/down -1]
+[zero? 1 - round/down 1.1]
+[zero? round/down 0.00000000000001]
+[zero? round/down -0.00000000000001]
+[zero? round/down 0.99999999999995]
+[zero? -1 - round/down -1.00000000000001]
+[zero? -1 - round/down -1.99999999999995]
+[1:02:03 == round/down 1:02:03]
+[1:02:03 == round/down 1:02:03.00000000001]
+[1:02:03 == round/down 1:02:03.999999999]
+; round/down/to
+[9.6 == round/down/to 10.0 0.96]
+[9.6 == round/down/to 10.55 0.96]
+[562'949'953'421'312.0 == round/down/to 562'949'953'421'312.0 1.0]
+[-562'949'953'421'312.0 == round/down/to -562'949'953'421'312.0 1.0]
+[562'949'953'421'313.0 == round/down/to 562'949'953'421'313.0 1.0]
+[-562'949'953'421'313.0 == round/down/to -562'949'953'421'313.0 1.0]
+[562'949'953'421'314.0 == round/down/to 562'949'953'421'314.0 1.0]
+[-562'949'953'421'314.0 == round/down/to -562'949'953'421'314.0 1.0]
+[1.1 == round/down/to 1.123456789 1E-1]
+[1.12 == round/down/to 1.123456789 1E-2]
+[1.123 == round/down/to 1.123456789 1E-3]
+[1.1234 == round/down/to 1.123456789 1E-4]
+[1.12345 == round/down/to 1.123456789 1E-5]
+[1.123456 == round/down/to 1.123456789 1E-6]
+[1.1234567 == round/down/to 1.123456789 1E-7]
+[1.12345678 == round/down/to 1.123456789 1E-8]
+[1:0:0 == round/down/to 1:02:3.456789 0:5:0]
+[1:0:0 == round/down/to 1:02:3.456789 0:3:0]
+[1:2:0 == round/down/to 1:02:3.456789 0:2:0]
+[1:2:0 == round/down/to 1:02:3.456789 0:1:0]
+[1:2:0 == round/down/to 1:02:3.456789 0:0:5]
+[1:2:0 == round/down/to 1:02:3.456789 0:0:4]
+[1:02:3 == round/down/to 1:02:3.456789 0:0:3]
+[1:2:2 == round/down/to 1:02:3.456789 0:0:2]
+[1:2:3 == round/down/to 1:02:3.456789 0:0:1]
+[1:2:3.4 == round/down/to 1:02:3.456789 0:0:0.1]
+[1:2:3.45 == round/down/to 1:02:3.456789 0:0:0.01]
+[1:2:3.456 == round/down/to 1:02:3.456789 0:0:0.001]
+[1:2:3.4567 == round/down/to 1:02:3.456789 0:0:0.0001]
+[1:2:3.45678 == round/down/to 1:02:3.456789 0:0:0.00001]
+; round/half-ceiling
+[0 == round/half-ceiling 0]
+[1 == round/half-ceiling 1]
+[-1 == round/half-ceiling -1]
+[zero? 2 - round/half-ceiling 1.5]
+[zero? 3 - round/half-ceiling 2.5]
+[zero? -1 - round/half-ceiling -1.5]
+[zero? -2 - round/half-ceiling -2.5]
+; REBOL2 rounds to 1.5 beyond this
+[zero? 1 - round/half-ceiling 1.499999999999995]
+[zero? 2 - round/half-ceiling 1.50000000000001]
+[zero? -1 - round/half-ceiling -1.49999999999995]
+[zero? -2 - round/half-ceiling -1.50000000000001]
+[1:03:01 == round/half-ceiling 1:03:01.1]
+[1:03:02 == round/half-ceiling 1:03:01.5]
+[1:03:02 == round/half-ceiling 1:03:01.9]
+[-1:03:01 == round/half-ceiling -1:03:01]
+[-1:03:01 == round/half-ceiling -1:03:01.5]
+[-1:03:02 == round/half-ceiling -1:03:01.50001]
+[$100 == round/half-ceiling $100]
+[$101 == round/half-ceiling $100.5]
+[$101 == round/half-ceiling $100.5000000001]
+[-$100 == round/half-ceiling -$100]
+[-$100 == round/half-ceiling -$100.5]
+; bug#1471
+[-$101 == round/half-ceiling -$100.5000000001]
+; round/half-ceiling/to
+[0.0 == round/half-ceiling/to 0.1 -1.0]
+[zero? round/half-ceiling/to 0.1 -1]
+[1.0 == round/half-ceiling/to 0.5 -1.0]
+[zero? 1 - round/half-ceiling/to 0.5 -1]
+[2.0 == round/half-ceiling/to 1.5 -1.0]
+[zero? 2 - round/half-ceiling/to 1.5 -1]
+[0.0 == round/half-ceiling/to -0.1 -1.0]
+[zero? round/half-ceiling/to -0.1 -1]
+[0.0 == round/half-ceiling/to -0.5 -1.0]
+[zero? round/half-ceiling/to -0.5 -1]
+[-1.0 == round/half-ceiling/to -1.5 -1.0]
+[zero? -1 - round/half-ceiling/to -1.5 -1]
+; round/half-down
+[0 == round/half-down 0]
+[1 == round/half-down 1]
+[-1 == round/half-down -1]
+[zero? 1 - round/half-down 1.5]
+[zero? 2 - round/half-down 1.50000000001]
+[zero? 2 - round/half-down 2.5]
+[zero? 3 - round/half-down 2.50000000001]
+[zero? -1 - round/half-down -1.5]
+[zero? -2 - round/half-down -1.50000000001]
+[zero? -2 - round/half-down -2.5]
+[zero? -3 - round/half-down -2.50000000001]
+[1:03:01 == round/half-down 1:03:01.1]
+[1:03:01 == round/half-down 1:03:01.5]
+[1:03:02 == round/half-down 1:03:01.9]
+[-1:03:01 == round/half-down -1:03:01]
+[-1:03:01 == round/half-down -1:03:01.5]
+[-1:03:02 == round/half-down -1:03:01.50001]
+[$100 == round/half-down $100]
+[$100 == round/half-down $100.5]
+[$101 == round/half-down $100.5000000001]
+[-$100 == round/half-down -$100]
+[-$100 == round/half-down -$100.5]
+[-$101 == round/half-down -$100.5000000001]
+; round/half-down/to
+[0.1 == round/half-down/to 0.15 0.1]
+[0.2 == round/half-down/to 0.15001 0.1]
+[0.5 == round/half-down/to 0.55 0.1]
+[0.6 == round/half-down/to 0.55001 0.1]
+[0.5 == round/half-down/to 0.75 0.5]
+[1.0 == round/half-down/to 0.75001 0.5]
+[-0.1 == round/half-down/to -0.15 0.1]
+[-0.2 == round/half-down/to -0.15001 0.1]
+[-0.5 == round/half-down/to -0.55 0.1]
+[-0.6 == round/half-down/to -0.55001 0.1]
+[-0.5 == round/half-down/to -0.75 0.5]
+[-1.0 == round/half-down/to -0.75001 0.5]
+; functions/math/signq.r
+[0 = sign? 0]
+[1 = sign? 1]
+[-1 = sign? -1]
+[1 = sign? 2147483647]
+[-1 = sign? -2147483648]
+; decimal
+[0 = sign? 0.0]
+[1 = sign? 4.94065645841247E-324]
+[-1 = sign? -4.94065645841247E-324]
+[1 = sign? 1.7976931348623157e308]
+[-1 = sign? -1.7976931348623157e308]
+; money
+[0 = sign? $0]
+[0 = sign? USD$0]
+[1 = sign? $0.000000000000001]
+[-1 = sign? -$0.000000000000001]
+; time
+[0 = sign? 0:00]
+[1 = sign? 0:00:0.000000001]
+[-1 = sign? -0:00:0.000000001]
+; functions/math/sine.r
+[0 = sine 0]
+[0 = sine/radians 0]
+[0.5 = sine 30]
+[0.5 = sine/radians pi / 6]
+[(square-root 2) / 2 = sine 45]
+[(square-root 2) / 2 = sine/radians pi / 4]
+[(square-root 3) / 2 = sine 60]
+[(square-root 3) / 2 = sine/radians pi / 3]
+[1 = sine 90]
+[1 = sine/radians pi / 2]
+[0 = sine 180]
+[0 = sine/radians pi]
+[-0.5 = sine -30]
+[-0.5 = sine/radians pi / -6]
+[(square-root 2) / -2 = sine -45]
+[(square-root 2) / -2 = sine/radians pi / -4]
+[(square-root 3) / -2 = sine -60]
+[(square-root 3) / -2 = sine/radians pi / -3]
+[-1 = sine -90]
+[-1 = sine/radians pi / -2]
+[0 = sine -180]
+[0 = sine/radians negate pi]
+[(sine 1e-12) / 1e-12 = (pi / 180)]
+[(sine/radians 1e-9) / 1e-9 = 1.0]
+; #bug#852
+; Flint Hills test
+[
+	n: 25000
+	s4: 0.0
+	repeat l n [
+		k: to decimal! l
+		ks: sine/radians k
+		s4: 1.0 / (k * k * k * ks * ks) + s4
+	]
+	30.314520404 = round/to s4 1e-9
+]
+; functions/math/square-root.r
+[0 = square-root 0]
+[error? try [square-root -1]]
+[1 = square-root 1]
+[0.5 = square-root 0.25]
+[2 = square-root 4]
+[3 = square-root 9]
+[1.1 = square-root 1.21]
+; functions/math/subtract.r
+[1 == subtract 3 2]
+#64bit
+; integer -9223372036854775808 - x tests
+[0 == subtract -9223372036854775808 -9223372036854775808]
+#64bit
+[-1 == subtract -9223372036854775808 -9223372036854775807]
+#64bit
+[-9223372036854775807 == subtract -9223372036854775808 -1]
+#64bit
+[-9223372036854775808 = subtract -9223372036854775808 0]
+#64bit
+[error? try [subtract -9223372036854775808 1]]
+#64bit
+[error? try [subtract -9223372036854775808 9223372036854775806]]
+#64bit
+[error? try [subtract -9223372036854775808 9223372036854775807]]
+#64bit
+; integer -9223372036854775807 - x tests
+[1 = subtract -9223372036854775807 -9223372036854775808]
+#64bit
+[0 = subtract -9223372036854775807 -9223372036854775807]
+#64bit
+[-9223372036854775806 = subtract -9223372036854775807 -1]
+#64bit
+[-9223372036854775807 = subtract -9223372036854775807 0]
+#64bit
+[-9223372036854775808 = subtract -9223372036854775807 1]
+#64bit
+[error? try [subtract -9223372036854775807 9223372036854775806]]
+#64bit
+[error? try [subtract -9223372036854775807 9223372036854775807]]
+; integer -2147483648 - x tests
+[0 = subtract -2147483648 -2147483648]
+[-2147483647 = subtract -2147483648 -1]
+[-2147483648 = subtract -2147483648 0]
+#32bit
+[error? try [subtract -2147483648 1]]
+#64bit
+[-2147483649 = subtract -2147483648 1]
+#32bit
+[error? try [subtract -2147483648 2147483647]]
+#64bit
+[-4294967295 = subtract -2147483648 2147483647]
+#64bit
+; integer -1 - x tests
+[9223372036854775807 = subtract -1 -9223372036854775808]
+#64bit
+[9223372036854775806 = subtract -1 -9223372036854775807]
+[0 = subtract -1 -1]
+[-1 = subtract -1 0]
+[-2 = subtract -1 1]
+#64bit
+[-9223372036854775807 = subtract -1 9223372036854775806]
+#64bit
+[-9223372036854775808 = subtract -1 9223372036854775807]
+#64bit
+; integer 0 - x tests
+[error? try [subtract 0 -9223372036854775808]]
+#32bit
+[error? try [subtract 0 -2147483648]]
+#64bit
+[2147483648 = subtract 0 -2147483648]
+#64bit
+[9223372036854775807 = subtract 0 -9223372036854775807]
+[1 = subtract 0 -1]
+[0 = subtract 0 0]
+[-1 = subtract 0 1]
+#64bit
+[-9223372036854775806 = subtract 0 9223372036854775806]
+#64bit
+[-9223372036854775807 = subtract 0 9223372036854775807]
+#64bit
+; integer 1 - x tests
+[error? try [subtract 1 -9223372036854775808]]
+#64bit
+[error? try [subtract 1 -9223372036854775807]]
+[2 = subtract 1 -1]
+[1 = subtract 1 0]
+[0 = subtract 1 1]
+#64bit
+[-9223372036854775805 = subtract 1 9223372036854775806]
+#64bit
+[-9223372036854775806 = subtract 1 9223372036854775807]
+#32bit
+; integer 2147483647 + x
+[error? try [subtract 2147483647 -2147483648]]
+#64bit
+[4294967295 = subtract 2147483647 -2147483648]
+#32bit
+[error? try [subtract 2147483647 -1]]
+#64bit
+[2147483648 = subtract 2147483647 -1]
+[2147483647 = subtract 2147483647 0]
+#32bit
+[2147483646 = subtract 2147483647 1]
+#32bit
+[0 = subtract 2147483647 2147483647]
+#64bit
+; integer 9223372036854775806 - x tests
+[error? try [subtract 9223372036854775806 -9223372036854775808]]
+#64bit
+[error? try [subtract 9223372036854775806 -9223372036854775807]]
+#64bit
+[9223372036854775807 = subtract 9223372036854775806 -1]
+#64bit
+[9223372036854775806 = subtract 9223372036854775806 0]
+#64bit
+[9223372036854775805 = subtract 9223372036854775806 1]
+#64bit
+[0 = subtract 9223372036854775806 9223372036854775806]
+#64bit
+[-1 = subtract 9223372036854775806 9223372036854775807]
+#64bit
+; integer 9223372036854775807 - x tests
+[error? try [subtract 9223372036854775807 -9223372036854775808]]
+#64bit
+[error? try [subtract  9223372036854775807 -9223372036854775807]]
+#64bit
+[error? try [subtract 9223372036854775807 -1]]
+#64bit
+[9223372036854775807 = subtract 9223372036854775807 0]
+#64bit
+[9223372036854775806 = subtract 9223372036854775807 1]
+#64bit
+[1 = subtract 9223372036854775807 9223372036854775806]
+#64bit
+[0 = subtract 9223372036854775807 9223372036854775807]
+; decimal - integer
+[0.1 = subtract 1.1 1]
+[-2147483648.0 = subtract -1.0 2147483647]
+[2147483649.0 = subtract 1.0 -2147483648]
+; integer - decimal
+[-0.1 = subtract 1 1.1]
+[2147483648.0 = subtract 2147483647 -1.0]
+[-2147483649.0 = subtract -2147483648 1.0]
+; -1.7976931348623157e308 - decimal
+[0.0 = subtract -1.7976931348623157e308 -1.7976931348623157e308]
+[-1.7976931348623157e308 = subtract -1.7976931348623157e308 -1.0]
+[-1.7976931348623157e308 = subtract -1.7976931348623157e308 -4.94065645841247E-324]
+[-1.7976931348623157e308 = subtract -1.7976931348623157e308 0.0]
+[-1.7976931348623157e308 = subtract -1.7976931348623157e308 4.94065645841247E-324]
+[-1.7976931348623157e308 = subtract -1.7976931348623157e308 1.0]
+[error? try [subtract -1.7976931348623157e308 1.7976931348623157e308]]
+; -1.0 + decimal
+[1.7976931348623157e308 = subtract -1.0 -1.7976931348623157e308]
+[0.0 = subtract -1.0 -1.0]
+[-1.0 = subtract -1.0 -4.94065645841247E-324]
+[-1.0 = subtract -1.0 0.0]
+[-1.0 = subtract -1.0 4.94065645841247E-324]
+[-2.0 = subtract -1.0 1.0]
+[-1.7976931348623157e308 = subtract -1.0 1.7976931348623157e308]
+; -4.94065645841247E-324 + decimal
+[1.7976931348623157e308 = subtract -4.94065645841247E-324 -1.7976931348623157e308]
+[1.0 = subtract -4.94065645841247E-324 -1.0]
+[0.0 = subtract -4.94065645841247E-324 -4.94065645841247E-324]
+[-4.94065645841247E-324 = subtract -4.94065645841247E-324 0.0]
+[-9.88131291682493E-324 = subtract -4.94065645841247E-324 4.94065645841247E-324]
+[-1.0 = subtract -4.94065645841247E-324 1.0]
+[-1.7976931348623157e308 = subtract -4.94065645841247E-324 1.7976931348623157e308]
+; 0.0 + decimal
+[1.7976931348623157e308 = subtract 0.0 -1.7976931348623157e308]
+[1.0 = subtract 0.0 -1.0]
+[4.94065645841247E-324 = subtract 0.0 -4.94065645841247E-324]
+[0.0 = subtract 0.0 0.0]
+[-4.94065645841247E-324 = subtract 0.0 4.94065645841247E-324]
+[-1.0 = subtract 0.0 1.0]
+[-1.7976931348623157e308 = subtract 0.0 1.7976931348623157e308]
+; 4.94065645841247E-324 + decimal
+[1.7976931348623157e308 = subtract 4.94065645841247E-324 -1.7976931348623157e308]
+[1.0 = subtract 4.94065645841247E-324 -1.0]
+[9.88131291682493E-324 = subtract 4.94065645841247E-324 -4.94065645841247E-324]
+[4.94065645841247E-324 = subtract 4.94065645841247E-324 0.0]
+[0.0 = subtract 4.94065645841247E-324 4.94065645841247E-324]
+[-1.0 = subtract 4.94065645841247E-324 1.0]
+[-1.7976931348623157e308 = subtract 4.94065645841247E-324 1.7976931348623157e308]
+; 1.0 + decimal
+[1.7976931348623157e308 = subtract 1.0 -1.7976931348623157e308]
+[2.0 = subtract 1.0 -1.0]
+[1.0 = subtract 1.0 4.94065645841247E-324]
+[1.0 = subtract 1.0 0.0]
+[1.0 = subtract 1.0 -4.94065645841247E-324]
+[0.0 = subtract 1.0 1.0]
+[-1.7976931348623157e308 = subtract 1.0 1.7976931348623157e308]
+; 1.7976931348623157e308 + decimal
+[error? try [subtract 1.7976931348623157e308 -1.7976931348623157e308]]
+[1.7976931348623157e308 = subtract 1.7976931348623157e308 -1.0]
+[1.7976931348623157e308 = subtract 1.7976931348623157e308 -4.94065645841247E-324]
+[1.7976931348623157e308 = subtract 1.7976931348623157e308 0.0]
+[1.7976931348623157e308 = subtract 1.7976931348623157e308 4.94065645841247E-324]
+[1.7976931348623157e308 = subtract 1.7976931348623157e308 1.0]
+[0.0 = subtract 1.7976931348623157e308 1.7976931348623157e308]
+; pair
+[0x0 = subtract -2147483648x-2147483648 -2147483648x-2147483648]
+[-2147483647x-2147483647 = subtract -2147483648x-2147483648 -1x-1]
+[-2147483648x-2147483648 = subtract -2147483648x-2147483648 0x0]
+#r2only
+[2147483647x2147483647 = subtract -2147483648x-2147483648 1x1]
+#r2only
+[1x1 = subtract -2147483648x-2147483648 2147483647x2147483647]
+#r2only
+[2147483647x2147483647 = subtract -1x-1 -2147483648x-2147483648]
+[0x0 = subtract -1x-1 -1x-1]
+[-1x-1 = subtract -1x-1 0x0]
+[-2x-2 = subtract -1x-1 1x1]
+#r2only
+[-2147483648x-2147483648 = subtract -1x-1 2147483647x2147483647]
+#r2only
+[-2147483648x-2147483648 = subtract 0x0 -2147483648x-2147483648]
+#r3only
+[2147483648x2147483648 = subtract 0x0 -2147483648x-2147483648]
+[1x1 = subtract 0x0 -1x-1]
+[0x0 = subtract 0x0 0x0]
+[-1x-1 = subtract 0x0 1x1]
+[-2147483647x-2147483647 = subtract 0x0 2147483647x2147483647]
+#r2only
+[-2147483647x-2147483647 = subtract 1x1 -2147483648x-2147483648]
+[2x2 = subtract 1x1 -1x-1]
+[1x1 = subtract 1x1 0x0]
+[0x0 = subtract 1x1 1x1]
+#r2only
+[-2147483646x-2147483646 = subtract 1x1 2147483647x2147483647]
+#r2only
+[-1x-1 = subtract 2147483647x2147483647 -2147483648x-2147483648]
+#r2only
+[-2147483648x-2147483648 = subtract 2147483647x2147483647 -1x-1]
+[2147483647x2147483647 = subtract 2147483647x2147483647 0x0]
+#r2only
+[2147483646x2147483646 = subtract 2147483647x2147483647 1x1]
+[0x0 = subtract 2147483647x2147483647 2147483647x2147483647]
+; char
+#r2only
+[#"^(00)" = subtract #"^(00)" #"^(00)"]
+#r2only
+[#"^(ff)" = subtract #"^(00)" #"^(01)"]
+#r2only
+[#"^(01)" = subtract #"^(00)" #"^(ff)"]
+#r2only
+[#"^(01)" = subtract #"^(01)" #"^(00)"]
+#r2only
+[#"^(00)" = subtract #"^(01)" #"^(01)"]
+#r2only
+[#"^(02)" = subtract #"^(01)" #"^(ff)"]
+#r2only
+[#"^(ff)" = subtract #"^(ff)" #"^(00)"]
+#r2only
+[#"^(fe)" = subtract #"^(ff)" #"^(01)"]
+#r2only
+[#"^(00)" = subtract #"^(ff)" #"^(ff)"]
+; tuple
+[0.0.0 = subtract 0.0.0 0.0.0]
+[0.0.0 = subtract 0.0.0 0.0.1]
+[0.0.0 = subtract 0.0.0 0.0.255]
+[0.0.1 = subtract 0.0.1 0.0.0]
+[0.0.0 = subtract 0.0.1 0.0.1]
+[0.0.0 = subtract 0.0.1 0.0.255]
+[0.0.255 = subtract 0.0.255 0.0.0]
+[0.0.254 = subtract 0.0.255 0.0.1]
+[0.0.0 = subtract 0.0.255 0.0.255]
+; functions/math/tangent.r
+[error? try [tangent -90]]
+[error? try [tangent/radians pi / -2]]
+[(negate square-root 3) = tangent -60]
+[(negate square-root 3) = tangent/radians pi / -3]
+[-1 = tangent -45]
+[-1 = tangent/radians pi / -4]
+[(square-root 3) / -3 = tangent -30]
+[(square-root 3) / -3 = tangent/radians pi / -6]
+[0 = tangent 0]
+[0 = tangent/radians 0]
+[(square-root 3) / 3 = tangent 30]
+[(square-root 3) / 3 = tangent/radians pi / 6]
+[1 = tangent 45]
+[1 = tangent/radians pi / 4]
+[(square-root 3) = tangent 60]
+[(square-root 3) = tangent/radians pi / 3]
+[error? try [tangent 90]]
+[error? try [tangent/radians pi / 2]]
+; Flint Hills test
+[
+	n: 25000
+	s4t: 0.0
+	repeat l n [
+		k: to decimal! l
+		kt: tangent/radians k
+		s4t: 1.0 / (kt * kt) + 1.0 / (k * k * k) + s4t
+	]
+	30.314520404 = round/to s4t 1e-9
+]
+; functions/math/zeroq.r
+[zero? 0]
+[not zero? 1]
+[not zero? -1]
+[not zero? 2147483647]
+[not zero? -2147483648]
+#64bit
+[not zero? 9223372036854775807]
+#64bit
+[not zero? -9223372036854775808]
+; decimal
+[zero? 0.0]
+[not zero? 1.7976931348623157e308]
+[not zero? -1.7976931348623157e308]
+; pair
+[zero? 0x0]
+[not zero? 1x0]
+[not zero? -1x0]
+[not zero? 2147483647x0]
+[not zero? -2147483648x0]
+[not zero? 0x1]
+[not zero? 0x-1]
+[not zero? 0x2147483647]
+[not zero? 0x-2147483648]
+; char
+[zero? #"^@"]
+[not zero? #"^a"]
+[not zero? #"^(ff)"]
+; money
+[zero? $0]
+[not zero? $0.01]
+[not zero? -$0.01]
+[not zero? $999999999999999.87]
+[not zero? -$999999999999999.87]
+[zero? negate $0]
+; time
+[zero? 0:00]
+[not zero? 0:00:0.000000001]
+[not zero? -0:00:0.000000001]
+; tuple
+[zero? 0.0.0]
+[not zero? 1.0.0]
+[not zero? 255.0.0]
+[not zero? 0.1.0]
+[not zero? 0.255.0]
+[not zero? 0.0.1]
+[not zero? 0.0.255]
+; functions/reflectors/body-of.r
+; bug#49
+[
+	f: func [] []
+	not same? body-of :f body-of :f
+]
 ; functions/series/append.r
 ; bug#75
 #r3only
@@ -10875,13 +11098,6 @@
 	blk: next [1 2 3]
 	same? head blk skip blk -2147483648
 ]
-; functions/series/tailq.r
-[tail? []]
-[
-	blk: tail [1]
-	clear head blk
-	tail? blk
-]
 ; functions/series/sort.r
 ; bug#1152: SORT not stable (order not preserved)
 [strict-equal? ["A" "a"] sort ["A" "a"]]
@@ -10971,6 +11187,13 @@
 [["abc" "de" "fghi" "jk"] == split "abc^M^Jde^Mfghi^Jjk" [crlf | #"^M" | newline]]
 #r3
 [["abc" "de" "fghi" "jk"] == split "abc     de fghi  jk" [some #" "]]
+; functions/series/tailq.r
+[tail? []]
+[
+	blk: tail [1]
+	clear head blk
+	tail? blk
+]
 ; functions/series/trim.r
 ; bug#83
 ; refinement order
@@ -11010,223 +11233,6 @@
 ["foo" == to string! decompress/gzip #{1F8B0800EF46BE4C00034BCBCF07002165738C03000000}]
 ; bug#3
 [value? try [decompress #{AAAAAAAAAAAAAAAAAAAA}]]
-; functions/convert/as-binary.r
-#r2only
-[
-	a: "a"
-	b: as-binary a
-	b == to binary! a
-	change a "b"
-	b == to binary! a
-]
-; functions/convert/as-string.r
-#r2only
-[
-	a: #{00}
-	b: as-string a
-	b == to string! a
-	change a #{01}
-	b == to string! a
-]
-; functions/convert/load.r
-; bug#20
-[block? load/all "1"]
-; bug#22a
-[error? try [load "':a"]]
-; bug#22b
-[error? try [load "':a:"]]
-; bug#858
-[
-	a: [ < ]
-	a = load mold a
-]
-[error? try [load "1xyz#"]]
-; load/next
-#r2only
-[block? load/next "1"]
-; bug#1703  bug#1711
-#r3only
-[error? try [load/next "1"]]
-; bug#1122
-[
-	any [
-		error? try [load "9999999999999999999"]
-		greater? load "9999999999999999999" load "9223372036854775807"
-	]
-]
-; R2 bug
-[
-	 x: 1
-	 error? try [x: load/header ""]
-	 not error? x
-]
-; functions/convert/mold.r
-; bug#860
-; bug#6
-; cyclic block
-[
-	a: copy []
-	insert/only a a
-	string? mold a
-]
-; cyclic paren
-[
-	a: first [()]
-	insert/only a a
-	string? mold a
-]
-; cyclic object
-; bug#69
-[
-	a: make object! [a: self]
-	string? mold a
-]
-; closure mold
-; bug#23
-#r3only
-[
-	c: closure [a] [print a]
-	equal? "make closure! [[a] [print a]]" mold :c
-]
-; deep nested block mold
-; bug#876
-[
-	n: 1
-	forever [
-		a: copy []
-		if error? try [
-			loop n [a: append/only copy [] a]
-			mold a
-		] [break/return true]
-		n: n * 2
-	]
-]
-; bug#719
-["()" = mold quote ()]
-; bug#77
-["#[block! [1 2] 2]" == mold/all next [1 2]]
-; bug#77
-[none? find mold/flat make object! [a: 1] "    "]
-; bug#84
-[equal? mold make bitset! "^(00)" "make bitset! #{80}"]
-[equal? mold/all make bitset! "^(00)" "#[bitset! #{80}]"]
-; functions/convert/to.r
-; bug#12
-[image? to image! make gob! []]
-; bug#38
-['logic! = to word! logic!]
-#r3only
-['percent! = to word! percent!]
-['money! = to word! money!]
-; bug#1967
-[not same? to binary! [1] to binary! [2]]
-; functions/context/bind.r
-; bug#50
-#r3only
-[none? bind? to word! "zzz"]
-; BIND works 'as expected' in object spec
-; bug#1549
-[
-	b1: [self]
-	ob: make object! [
-	    b2: [self]
-	    set 'a same? first b2 first bind/copy b1 'b2
-	]
-	a
-]
-; bug#1549
-; BIND works 'as expected' in function body
-[
-	b1: [self]
-	f: func [/local b2] [
-	    b2: [self]
-	    same? first b2 first bind/copy b1 'b2
-	]
-	f
-]
-; bug#1549
-; BIND works 'as expected' in closure body
-[
-	b1: [self]
-	f: closure [/local b2] [
-	    b2: [self]
-	    same? first b2 first bind/copy b1 'b2
-	]
-	f
-]
-; bug#1549
-; BIND works 'as expected' in REPEAT body
-[
-	b1: [self]
-	repeat i 1 [
-	    b2: [self]
-	    same? first b2 first bind/copy b1 'i
-	]
-]
-; bug#1655
-[not head? bind next [1] 'rebol]
-; bug#892, bug#216
-[y: 'x do has [x] [x: true get bind y 'x]]
-; bug#1893
-[
-	word: do func [x] ['x] 1
-	same? word bind 'x word
-]
-; functions/context/set.r
-; bug#1745
-[equal? error? try [set /a 1] error? try [set [/a] 1]]
-; bug#1745
-[equal? error? try [set #a 1] error? try [set [#a] 1]]
-; bug#1763
-[a: 1 all [error? try [set [a] reduce [()]] a = 1]]
-[a: 1 set [a] reduce [2 ()] a = 2]
-[a: 1 attempt [set [a b] reduce [2 ()]] a = 1]
-[x: construct [a: 1] all [error? try [set x reduce [()]] x/a = 1]]
-[x: construct [a: 1] set x reduce [2 ()] x/a = 2]
-[x: construct [a: 1 b: 2] all [error? try [set x reduce [3 ()]] x/a = 1]]
-[a: 1 set/any [a] reduce [()] unset? get/any 'a]
-[a: 1 b: 2 set/any [a b] reduce [3 ()] all [a = 3 unset? get/any 'b]]
-[x: construct [a: 1] set/any x reduce [()] unset? get/any in x 'a]
-[x: construct [a: 1 b: 2] set/any x reduce [3 ()] all [a = 3 unset? get/any in x 'b]]
-; set [:get-word] [word]
-[a: 1 b: none set [:b] [a] b =? 1]
-[unset 'a b: none all [error? try [set [:b] [a]] none? b]]
-[unset 'a b: none set/any [:b] [a] unset? get/any 'b]
-; functions/file/clean-path.r
-; bug#35
-[any-function? :clean-path]
-; functions/file/existsq.r
-; bug#1613
-[exists? http://www.rebol.com/index.html]
-; functions/file/make-dir.r
-; bug#1674
-#r2only
-[
-	any [
-		not error? e: try [make-dir %/folder-to-save-test-files]
-		(e: disarm e e/type = 'access)
-	]
-]
-#r3only
-[
-	any [
-		not error? e: try [make-dir %/folder-to-save-test-files]
-		e/type = 'access
-	]
-]
-; functions/file/open.r
-; bug#1422: "Rebol crashes when opening the 128th port"
-[error? try [repeat n 200 [try [close open open join tcp://localhost: n]]] true]
-; functions/file/file-typeq.r
-; bug#1651: "FILE-TYPE? should return NONE for unknown types"
-#r3only
-[none? file-type? %foo.0123456789bar0123456789]
-; functions/reflectors/body-of.r
-; bug#49
-[
-	f: func [] []
-	not same? body-of :f body-of :f
-]
 ; system/system.r
 ; bug#76
 [date? system/build]
