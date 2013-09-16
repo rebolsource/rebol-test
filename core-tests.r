@@ -2168,10 +2168,10 @@
 ; multiple inheritance
 ; bug#1863
 [
-	o: make object! [a: 1 f: does [a]]
-	p: make object! [a: 2]
-	q: make o p
-	2 == q/f
+	o1: make object! [a: 1 f: does [a]]
+	o2: make object! [a: 2]
+	o3: make o1 o2
+	2 == o3/f
 ]
 ; object cloning
 ; bug#2049
