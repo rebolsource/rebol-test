@@ -3013,6 +3013,8 @@
 ["http://a%2520b" = mold http://a%2520b]
 [equal? mold/all #[url! ""] {#[url! ""]}]
 [equal? mold/all #[url! "a"] {#[url! "a"]}]
+; bug#2011
+[not equal? load "http://a.b.c/d?e=f%26" load "http://a.b.c/d?e=f&"]
 ; datatypes/word.r
 [word? 'a]
 [not word? 1]
