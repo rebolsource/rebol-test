@@ -703,6 +703,11 @@
 [same? 0.30000000000000004 load mold 0.30000000000000004]
 [zero? 9.9999999999999926e152 - load mold 9.9999999999999926e152]
 [same? 9.9999999999999926e152 load mold 9.9999999999999926e152]
+; bug#718
+[
+	a: 9.9999999999999926e152 * 1e-138
+	zero? a - load mold a
+]
 ; bug#897
 ; MOLD/ALL decimal accuracy tests
 ; 64-bit IEEE 754 maximum
