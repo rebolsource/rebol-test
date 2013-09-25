@@ -3599,6 +3599,7 @@
 	b-value: copy []
 	insert/only b-value b-value
 	equal? a-value b-value
+	true
 ]
 [not equal? [] none]
 [equal? equal? [] none equal? none []]
@@ -4339,6 +4340,7 @@
 	b-value: copy []
 	insert/only b-value b-value
 	equiv? a-value b-value
+	true
 ]
 #r3
 [not equiv? [] none]
@@ -4885,6 +4887,8 @@
 	parse :a-value [b-value:]
 	not same? :a-value :b-value
 ]
+; bug#1068
+; bug#1066
 #r3only
 [
 	a-value: first ['a/b]
@@ -4906,6 +4910,8 @@
 	parse a-value [b-value:]
 	not same? a-value b-value
 ]
+; bug#1068
+; bug#1066
 #r3only
 [
 	a-value: first [()]
@@ -4924,6 +4930,8 @@
 	parse a-value [b-value:]
 	not same? :a-value :b-value
 ]
+; bug#1068
+; bug#1066
 #r3only
 [
 	a-value: 'a/b
@@ -4942,6 +4950,8 @@
 	parse :a-value [b-value:]
 	not same? :a-value :b-value
 ]
+; bug#1068
+; bug#1066
 #r3only
 [
 	a-value: first [a/b:]
@@ -5337,7 +5347,7 @@
 	insert/only a-value a-value
 	strict-equal? a-value a-value
 ]
-; bug#1066
+; bug#1049
 ; comparison of cyclic blocks
 [
 	a-value: copy []
@@ -5345,6 +5355,7 @@
 	b-value: copy []
 	insert/only b-value b-value
 	strict-equal? a-value b-value
+	true
 ]
 #r2only
 [
@@ -5352,6 +5363,8 @@
 	parse :a-value [b-value:]
 	not strict-equal? :a-value :b-value
 ]
+; bug#1068
+; bug#1066
 #r3only
 [
 	a-value: first ['a/b]
@@ -5373,6 +5386,8 @@
 	parse a-value [b-value:]
 	not strict-equal? a-value b-value
 ]
+; bug#1068
+; bug#1066
 #r3only
 [
 	a-value: first [()]
@@ -5391,6 +5406,8 @@
 	parse a-value [b-value:]
 	not strict-equal? :a-value :b-value
 ]
+; bug#1068
+; bug#1066
 #r3only
 [
 	a-value: 'a/b
@@ -5409,6 +5426,8 @@
 	parse :a-value [b-value:]
 	not strict-equal? :a-value :b-value
 ]
+; bug#1068
+; bug#1066
 #r3only
 [
 	a-value: first [a/b:]
