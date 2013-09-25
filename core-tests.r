@@ -3598,7 +3598,7 @@
 	insert/only a-value a-value
 	b-value: copy []
 	insert/only b-value b-value
-	equal? a-value b-value
+	error? try [equal? a-value b-value]
 	true
 ]
 [not equal? [] none]
@@ -4339,7 +4339,7 @@
 	insert/only a-value a-value
 	b-value: copy []
 	insert/only b-value b-value
-	equiv? a-value b-value
+	error? try [equiv? a-value b-value]
 	true
 ]
 #r3
@@ -5354,7 +5354,7 @@
 	insert/only a-value a-value
 	b-value: copy []
 	insert/only b-value b-value
-	strict-equal? a-value b-value
+	error? try [strict-equal? a-value b-value]
 	true
 ]
 #r2only
