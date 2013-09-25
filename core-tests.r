@@ -59,6 +59,9 @@
 	b: #{0b}
 	b/1 == 11
 ]
+; case sensitivity
+; bug#1459
+[lesser? #{0141} #{0161}]
 ; datatypes/bitset.r
 [bitset? make bitset! "a"]
 [not bitset? 1]
@@ -3443,6 +3446,9 @@
 ; Empty binary! not none
 [not equal? #{} none]
 [equal? equal? #{} none equal? none #{}]
+; case sensitivity
+; bug#1459
+[not-equal? #{0141} #{0161}]
 #r3only
 ; email! vs. string!
 ; RAMBO #3518
@@ -4202,6 +4208,10 @@
 ; Empty binary! not none
 #r3
 [not equiv? #{} none]
+; case sensitivity
+; bug#1459
+#r3
+[not-equiv? #{0141} #{0161}]
 ; email versus string; RAMBO #3518
 #r3
 [
