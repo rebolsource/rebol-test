@@ -11082,12 +11082,12 @@
 ; bug#1118
 [[1] = copy/part tail [1] -2147483648]
 #64bit
-[error? try [copy/part tail [1] -9223372036854775808]]
+[[1] = copy/part tail [1] -9223372036854775808]
 [[] = copy/part [] 0]
 [[] = copy/part [] 1]
 [[] = copy/part [] 2147483647]
 #64bit
-[error? try [copy/part [] 9223372036854775807]]
+[[] = copy/part [] 9223372036854775807]
 [error? try [copy none]]
 ; bug#877
 [
