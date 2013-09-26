@@ -2188,6 +2188,14 @@
 	p: make o [n: 'p]
 	'p = p/f
 ]
+; appending to objects
+; bug#1979
+#r3only
+[
+	o: make object! []
+	append o [b: 1 b: 2]
+	1 == length? words-of o 
+]
 ; datatypes/op.r
 [op? get '+]
 [not op? 1]
