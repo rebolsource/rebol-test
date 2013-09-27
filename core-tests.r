@@ -2194,7 +2194,27 @@
 [
 	o: make object! []
 	append o [b: 1 b: 2]
-	1 == length? words-of o 
+	1 == length? words-of o
+]
+#r3only
+[
+	o: make object! [b: 0]
+	append o [b: 1 b: 2]
+	1 == length? words-of o
+]
+#r3only
+[
+	o: make object! []
+	c: "c"
+	append o compose [b: "b" b: (c)]
+	same? c o/b
+]
+#r3only
+[
+	o: make object! [b: "a"]
+	c: "c"
+	append o compose [b: "b" b: (c)]
+	same? c o/b
 ]
 ; datatypes/op.r
 [op? get '+]
