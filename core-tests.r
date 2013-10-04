@@ -8582,6 +8582,12 @@
 	change a #{01}
 	b == to string! a
 ]
+; functions/convert/encode.r
+#r3only
+[binary? encode 'bmp make image! 10x20]
+; bug#2040
+#r3only
+[binary? encode 'png make image! 10x20]
 ; functions/convert/load.r
 ; bug#20
 [block? load/all "1"]
