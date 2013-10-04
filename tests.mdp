@@ -232,4 +232,16 @@ Here are some tests cases for the closure! datatype, notice that only some of th
 	#r3only
 	[closure? first [#[closure! [[] []]]]]
 
+===How to contribute?
+
+The tests are in the core-tests.r file.
+
+To find out how to write new tests, you can consult the "Test dialect" section and have a look at actual tests in the core-tests.r file.
+
+When you write some new tests it is best to run the tests again to find out whether some dialect failures did not occur. The presence of dialect failures signals that the tests need corrections (balancing brackets or something else).
+
+After resolving dialect failures, it is best to run also log-diff.r to find out whether the new test log differs from the old one as intended.
+
+Test contributions are welcome.
+
 End of the article.
