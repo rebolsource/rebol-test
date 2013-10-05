@@ -2222,6 +2222,12 @@
 	o: bound? use [x] ['x]
 	2 == length? words-of append o 'self
 ]
+; bug#2076
+#r3only
+[
+	o: bound? use [x] ['x]
+	2 == length? words-of append o [self: 1]
+]
 ; datatypes/op.r
 [op? get '+]
 [not op? 1]
