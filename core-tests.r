@@ -2216,6 +2216,12 @@
 	append o compose [b: "b" b: (c)]
 	same? c o/b
 ]
+; bug#2076
+#r3only
+[
+	o: bound? use [x] ['x]
+	2 == length? words-of append o 'self
+]
 ; datatypes/op.r
 [op? get '+]
 [not op? 1]
