@@ -250,6 +250,10 @@ When you write some new tests it is best to run the tests again to find out whet
 
 After resolving dialect failures, it is best to run also log-diff.r to find out whether the new test log differs from the old one as intended.
 
-Test contributions are welcome.
+Test as well as documentation contributions are welcome.
+
+---This documentation
+
+This documentation is in the tests.mdp file. Any clarifications and improvements to it are welcome as well.
 
 End of the article.
