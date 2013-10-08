@@ -1,6 +1,14 @@
 Rebol [
 	Title: "Test parsing"
 	File: %test-parsing.r
+	Copyright: [2012 "Saphirion AG"]
+	License: {
+		Licensed under the Apache License, Version 2.0 (the "License");
+		you may not use this file except in compliance with the License.
+		You may obtain a copy of the License at
+
+		http://www.apache.org/licenses/LICENSE-2.0
+	}
 	Author: "Ladislav Mecir"
 	Purpose: "Test framework"
 ]
@@ -36,13 +44,20 @@ make object! [
 					[:position]
 				]
 			) success
-			|	["{" | {"}] :position break
-			|	"[" test-source-rule "]"
-			|	"(" test-source-rule ")"
-			|	";" [thru newline | to end]
-			|	"]" :position break
-			|	")" :position break
-			|	skip
+				|
+			["{" | {"}] :position break
+				|
+			"[" test-source-rule "]"
+				|
+			"(" test-source-rule ")"
+				|
+			";" [thru newline | to end]
+				|
+			"]" :position break
+				|
+			")" :position break
+				|
+			skip
 		]
 	]
 
@@ -74,35 +89,40 @@ make object! [
 		unless parse/all test-sources [
 			any [
 				some whitespace
-				|	";" [thru newline | to end]
-				|	copy vector ["[" test-source-rule "]"] (
-						append/only collected-tests flags
-						append collected-tests vector
-						flags: copy []
-					)
-				|	end break
-				|	position: (
-						case [
-							any [
-								error? try [
-									set/any [value next-position] transcode/next position
-								]
-								none? next-position
-							] [stop: [:position]]
-							issue? get/any 'value [
-								append flags value
-								stop: [end skip]
+					|
+				";" [thru newline | to end]
+					|
+				copy vector ["[" test-source-rule "]"] (
+					append/only collected-tests flags
+					append collected-tests vector
+					flags: copy []
+				)
+					|
+				end break
+					|
+				position: (
+					case [
+						any [
+							error? try [
+								set/any [value next-position] transcode/next position
 							]
-							file? get/any 'value [
-								collect-tests collected-tests value
-								print ["file:" mold test-file]
-								append collected-tests test-file
-								stop: [end skip]
-							]
-							'else [stop: [:position]]
+							none? next-position
+						] [stop: [:position]]
+						issue? get/any 'value [
+							append flags value
+							stop: [end skip]
 						]
-					) stop break
-				|	:next-position
+						file? get/any 'value [
+							collect-tests collected-tests value
+							print ["file:" mold test-file]
+							append collected-tests test-file
+							stop: [end skip]
+						]
+						'else [stop: [:position]]
+					]
+				) stop break
+					|
+				:next-position
 			]
 		] [
 			append collected-tests reduce [
@@ -129,42 +149,46 @@ make object! [
 					position: "%"
 					(set/any [value next-position] transcode/next position)
 					:next-position
-					|	; dialect failure?
-						some whitespace
-						{"} thru {"}
-					|	copy last-vector ["[" test-source-rule "]"]
-						any whitespace
-						[
-							end (
-								; crash found
-								do make error! "log incomplete!"
-							)
-							|	{"} copy value to {"} skip
-								; test result found
-								(
-									parse/all value [
-										"succeeded"
-										(value: 'succeeded)
-										|	"failed"
-											(value: 'failed)
-										|	"crashed"
-											(value: 'crashed)
-										|	"skipped"
-											(value: 'skipped)
-										|	(do make error! "invalid test result")
-									]
-									append collected-logs reduce [
-										last-vector
-										value
-									]
-								)
-						]
-					|	"system/version:"
-						to end
-						(stop: none)
-					| (do make error! "log file parsing problem")
+						|
+					; dialect failure?
+					some whitespace
+					{"} thru {"}
+						|
+					copy last-vector ["[" test-source-rule "]"]
+					any whitespace
+					[
+						end (
+							; crash found
+							do make error! "log incomplete!"
+						)
+							|
+						{"} copy value to {"} skip
+						; test result found
+						(
+							parse/all value [
+								"succeeded" (value: 'succeeded)
+									|
+								"failed" (value: 'failed)
+									|
+								"crashed" (value: 'crashed)
+									|
+								"skipped" (value: 'skipped)
+									|
+								(do make error! "invalid test result")
+							]
+							append collected-logs reduce [
+								last-vector
+								value
+							]
+						)
+					]
+						|
+					"system/version:" to end (stop: none)
+						|
+					(do make error! "log file parsing problem")
 				] position: stop break
-				|	:position
+					|
+				:position
 			]
 		]
 	]

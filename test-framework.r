@@ -1,6 +1,14 @@
 Rebol [
 	Title: "Test-framework"
 	File: %test-framework.r
+	Copyright: [2012 "Saphirion AG"]
+	License: {
+		Licensed under the Apache License, Version 2.0 (the "License");
+		you may not use this file except in compliance with the License.
+		You may obtain a copy of the License at
+
+		http://www.apache.org/licenses/LICENSE-2.0
+	}
 	Author: "Ladislav Mecir"
 	Purpose: "Test framework"
 ]
@@ -37,13 +45,14 @@ make object! compose [
 		source [string!]
 		/local test-block exception
 	] [
+		log [source]
+
 		unless empty? exclude flags allowed-flags [
 			skipped: skipped + 1
-			log [source { "skipped"^/}]
+			log [{ "skipped"^/}]
 			exit
 		]
 
-		log [source]
 		if error? try [test-block: load source] [
 			test-failures: test-failures + 1
 			log [{ "failed, cannot load test source"^/}]
@@ -51,12 +60,15 @@ make object! compose [
 		]
 
 		error? set/any 'test-block catch-any test-block 'exception
+
 		test-block: case [
 			exception [rejoin ["failed, " exceptions/:exception]]
 			not logic? get/any 'test-block ["failed, not a logic value"]
 			:test-block ["succeeded"]
 			true ["failed"]
 		]
+
+		recycle
 
 		either test-block = "succeeded" [
 			successes: successes + 1
@@ -79,11 +91,13 @@ make object! compose [
 				set flags block! set value skip (
 					emit-test flags to string! value
 				)
-				|	set value file! (log ["^/" mold value "^/^/"])
-				| 	'dialect set value string! (
-						log [value]
-						dialect-failures: dialect-failures + 1
-					)
+					|
+				set value file! (log ["^/" mold value "^/^/"])
+					|
+			 	'dialect set value string! (
+					log [value]
+					dialect-failures: dialect-failures + 1
+				)
 			]
 		]
 	]
@@ -134,41 +148,51 @@ make object! compose [
 							position: "%"
 							(set/any [value next-position] transcode/next position)
 							:next-position
-							|	; dialect failure?
-								some whitespace
-								{"} thru {"}
-								(dialect-failures: dialect-failures + 1)
-							|	copy last-vector ["[" test-source-rule "]"]
-								any whitespace
-								[
-									end (
-										; crash found
-										crashes: crashes + 1
-										log [{ "crashed"^/}]
-										stop: none
-									)
-									|	{"} copy value to {"} skip
-										; test result found
-										(
-											parse/all value [
-												"succeeded"
-												(successes: successes + 1)
-												|	"failed"
-													(test-failures: test-failures + 1)
-												|	"crashed"
-													(crashes: crashes + 1)
-												|	"skipped"
-													(skipped: skipped + 1)
-												|	(do make error! "invalid test result")
-											]
-										)
-								]
-							|	"system/version:"
-								to end
-								(last-vector: stop: none)
-							|	(do make error! "log file parsing problem")
+								|
+							; dialect failure?
+							some whitespace
+							{"} thru {"}
+							(dialect-failures: dialect-failures + 1)
+								|
+							copy last-vector ["[" test-source-rule "]"]
+							any whitespace
+							[
+								end (
+									; crash found
+									crashes: crashes + 1
+									log [{ "crashed"^/}]
+									stop: none
+								)
+									|
+								{"} copy value to {"} skip
+								; test result found
+								(
+									parse/all value [
+										"succeeded"
+										(successes: successes + 1)
+											|
+										"failed"
+										(test-failures: test-failures + 1)
+											|
+										"crashed"
+										(crashes: crashes + 1)
+											|
+										"skipped"
+										(skipped: skipped + 1)
+											|
+										(do make error! "invalid test result")
+									]
+								)
+							]
+								|
+							"system/version:"
+							to end
+							(last-vector: stop: none)
+								|
+							(do make error! "log file parsing problem")
 						] position: stop break
-						|	:position
+							|
+						:position
 					]
 				]
 				last-vector
