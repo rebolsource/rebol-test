@@ -11969,3 +11969,46 @@
 ; WRITE shall return a port in R3
 #r3only
 [equal? read write clipboard:// c: "test" c]
+; bug #1748
+[
+	block: copy [1 + 2 + 3]
+	string: copy {1 + 2 + 3}
+	result: true
+	modifying-codes: [
+		;; This code is run in two passes, once while the series is
+		;; protected and once after it has been unprotected.  Be sure
+		;; that when the operations are executed in order on a
+		;; legally modifiable series that there won't be any errors
+		[block! string!] [insert x 4]
+		[block! string!] [append x 4]
+		[block! string!] [change x 4]
+		[block!] [reduce/into [4 + 5] x]
+		[block!] [compose/into [(4 + 5)] x]
+		[block! string!] [poke x 1 4]
+		[block! string!] [remove/part x 1]
+		[block! string!] [take x]
+		[block! string!] [reverse x]
+		[block! string!] [clear x]
+	]
+	foreach series reduce [block string] [
+		original: copy series
+		protect series
+		foreach [types code] modifying-codes [
+			unless find types type?/word series [continue]
+			unless error? answer: try [do replace copy code 'x 'series] [
+				result: false
+			]
+		]
+		unless original == series [
+			result: false
+		]
+		unprotect series
+		foreach [types code] modifying-codes [
+			unless find types type?/word series [continue]
+			if error? answer: try [do replace copy code 'x 'series] [
+				result: false
+			]
+		]
+	]
+	result
+]
