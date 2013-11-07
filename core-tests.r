@@ -11669,6 +11669,9 @@
 	insert b a
 	a == b
 ]
+; bug#43
+#r3only
+[#FFFFFFFE = to-hex/size -2 8]
 #r2only
 ; binary
 [
