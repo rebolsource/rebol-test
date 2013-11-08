@@ -10985,6 +10985,7 @@
 		equal? value original
 	]
 ]
+#r3only
 [
 	value: copy original: [1 + 2 + 3]
 	protect value
@@ -10993,6 +10994,7 @@
 		equal? value original
 	]
 ]
+#r3only
 [
 	value: copy original: [1 + 2 + 3]
 	protect value
@@ -11135,12 +11137,14 @@
 	unprotect value
 	not error? try [change value 4]
 ]
+#r3only
 [
 	value: copy original: [1 + 2 + 3]
 	protect value
 	unprotect value
 	not error? try [reduce/into [4 + 5] value]
 ]
+#r3only
 [
 	value: copy original: [1 + 2 + 3]
 	protect value
