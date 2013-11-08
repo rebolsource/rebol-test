@@ -8709,6 +8709,10 @@
 	]
 	do f 1
 ]
+; functions/onvert/to-hex.r
+; bug#43
+#r3only
+[#FFFFFFFE = to-hex/size -2 8]
 ; functions/file/clean-path.r
 ; bug#35
 [any-function? :clean-path]
@@ -11669,10 +11673,7 @@
 	insert b a
 	a == b
 ]
-; bug#43
-#r3only
-[#FFFFFFFE = to-hex/size -2 8]
-#r2only
+r2only
 ; binary
 [
 	a: make binary! 0
