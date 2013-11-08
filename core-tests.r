@@ -11677,8 +11677,8 @@
 	insert b a
 	a == b
 ]
-r2only
 ; binary
+#r2only
 [
 	a: make binary! 0
 	insert a #"^(00)"
