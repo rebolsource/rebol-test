@@ -109,7 +109,7 @@ make object! compose [
 		code-checksum [binary!]
 		log-file-prefix [file!]
 		/local interpreter last-vector value position next-position
-		test-sources test-checksum
+		test-sources test-checksum guard
 	] [
 		allowed-flags: flags
 		
@@ -140,7 +140,7 @@ make object! compose [
 				parse/all read log-file [
 					(
 						last-vector: none
-						stop: [end skip]
+						guard: [end skip]
 					)
 					any [
 						any whitespace
@@ -161,7 +161,7 @@ make object! compose [
 									; crash found
 									crashes: crashes + 1
 									log [{ "crashed"^/}]
-									stop: none
+									guard: none
 								)
 									|
 								{"} copy value to {"} skip
@@ -187,10 +187,10 @@ make object! compose [
 								|
 							"system/version:"
 							to end
-							(last-vector: stop: none)
+							(last-vector: guard: none)
 								|
 							(do make error! "log file parsing problem")
-						] position: stop break
+						] position: guard break
 							|
 						:position
 					]
