@@ -2496,6 +2496,21 @@
 [1.1% = load mold 1.1%]
 #r3only
 [-1% = load mold -1.0%]
+; bug#57
+#r3only
+[-5% = negate 5%]
+; bug#57
+#r3only
+[10% = (5% + 5%)]
+; bug#57
+#r3only
+[6% = round 5.55%]
+; bug#97
+#r3only
+[$59.0 = (10% * $590)]
+; bug#97
+#r3only
+[$100.6 = ($100 + 60%)]
 #r3only
 ; 64-bit IEEE 754 maximum
 ; bug#1475
@@ -2953,6 +2968,12 @@
 [positive? 0:0:0.000000001]
 ; maximal time
 [time? 596523:14:07.999999999]
+; bug#96
+[
+    time: 1:23:45.6
+    1:23:45.7 = (time + 0.1)
+    0:41:52.8 = (time * .5)
+]
 ; datatypes/tuple.r
 [tuple? 1.2.3]
 [not tuple? 1]
@@ -3029,6 +3050,11 @@
 [typeset? to-typeset [integer! none!]]
 #r3only
 [typeset! = type? series!]
+; bug#92
+[
+    x: to typeset! []
+    not x = now
+]
 ; datatypes/unset.r
 [unset? ()]
 [unset! == type? ()]
@@ -9404,6 +9430,8 @@
 [$0.0 == modulo $0.3 $0.1 + $0.1 + $0.1]
 [0.0 == modulo 1 0.1]
 [0.0 == modulo 0.15 - 0.05 - 0.1 0.1]
+; bug#56
+[0 = modulo 1 1]
 ; functions/math/multiply.r
 #32bit
 [error? try [multiply -2147483648 -2147483648]]
@@ -11463,6 +11491,10 @@
 ]
 ; bug#66
 [none? find/skip [1 2 3 4 5 6] 2 3]
+; bug#88
+["c" = find "abc" charset ["c"]]
+; bug#88
+[none? find/part "ab" "b" 1]
 ; functions/series/indexq.r
 [1 == index? []]
 [2 == index? next [a]]
@@ -11950,6 +11982,9 @@
 ; empty string rule
 ; bug#1880
 [parse "12" ["" to end]]
+; bug#100
+#r3only
+[error? parse [] [(return 1)]]
 ; functions/series/pick.r
 #64bit
 [error? try [pick at [1 2 3 4 5] 3 -9223372036854775808]]
