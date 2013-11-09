@@ -238,6 +238,10 @@ Here are some tests cases for the closure! datatype, notice that only some of th
 
 The tests are in the core-tests.r file.
 
+---File format
+
+The test file is a text file in UNIX format (LF character used for line endings) and written using UTF-8 encoding.
+
 ---Organization of tests
 
 As you may have already noticed there are some "sections" in the core-tests.r file. It is advisable to follow the structure or ask when in doubt (the present author also asked a couple of times) where to put the new test or tests.
