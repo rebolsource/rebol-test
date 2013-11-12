@@ -5822,10 +5822,14 @@
 	same? word bind 'x word
 ]
 ; functions/context/boundq.r
-; also, functions/context/bindq.r
+; functions/context/bindq.r
 [
 	o: make object! [a: none]
 	same? o bound? in o 'a
+]
+[
+	o: make object! [a: none]
+	same? bound? in o 'self bound? in o 'a
 ]
 ; functions/context/resolve.r
 #r3only
