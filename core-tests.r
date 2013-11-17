@@ -5821,6 +5821,11 @@
 	word: do func [x] ['x] 1
 	same? word bind 'x word
 ]
+; bug#2086
+[
+	bind next block: [a a] use [a] ['a]
+	same? 'a first block
+]
 ; functions/context/boundq.r
 ; functions/context/bindq.r
 [
