@@ -11997,8 +11997,7 @@
 ; bug#1880
 [parse "12" ["" to end]]
 ; bug#100
-#r3only
-[error? parse [] [(return 1)]]
+[1 == do does [parse [] [(return 1)] 2]]
 ; functions/series/pick.r
 #64bit
 [error? try [pick at [1 2 3 4 5] 3 -9223372036854775808]]
