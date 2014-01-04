@@ -6778,8 +6778,16 @@
 [a: 1 loop 1 [set 'a break/return 2] :a =? 1]
 [a: 1 loop 1 [set/any 'a break/return 2] :a =? 1]
 ; the "result" of break should not be passable to functions, bug#1509
-[a: 1 loop 1 [a: error? break] :a =? 1]
+[a: 1 loop 1 [a: error? break] :a =? 1] ; error? function takes 1 arg
 [a: 1 loop 1 [a: error? break/return 2] :a =? 1]
+[a: 1 loop 1 [a: type? break] :a =? 1] ; type? function takes 1-2 args
+[foo: func [x y] [9] a: 1 loop 1 [a: foo break 5] :a =? 1] ; foo takes 2 args
+[foo: func [x y] [9] a: 1 loop 1 [a: foo 5 break] :a =? 1]
+[foo: func [x y] [9] a: 1 loop 1 [a: foo break break] :a =? 1]
+; check that BREAK is evaluated (and not CONTINUE):
+[foo: func [x y] [] a: 1 loop 2 [a: a + 1 foo break continue a: a + 10] :a =? 2]
+; check that BREAK is not evaluated (but CONTINUE is):
+[foo: func [x y] [] a: 1 loop 2 [a: a + 1 foo continue break a: a + 10] :a =? 3]
 ; bug#1535
 [loop 1 [words-of break] true]
 [loop 1 [values-of break] true]
