@@ -7034,9 +7034,15 @@
 	success
 ]
 [1 == do :abs -1]
+#r2only
 [
 	a-value: #{}
 	same? a-value do a-value
+]
+#r3only
+[
+	a-value: to binary! "1 + 1"
+	2 == do a-value
 ]
 [
 	a-value: charset ""
@@ -12322,3 +12328,11 @@
 ; WRITE shall return a port in R3
 #r3only
 [equal? read write clipboard:// c: "test" c]
+; system/gc.r
+; bug#2072
+[
+	a: copy []
+	loop 200000 [a: append/only copy [] a]
+	recycle
+	true
+]
