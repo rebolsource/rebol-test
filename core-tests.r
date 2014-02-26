@@ -12276,6 +12276,10 @@
 	b: encloak a "a"
 	equal? a decloak b "a"
 ]
+; functions/string/decode.r
+; https://github.com/rebol/rebol/pull/156#issuecomment-36171227
+#r3only
+["" == decode 'text #{}]
 ; functions/string/decompress.r
 ; bug#1679: "Native GZIP compress/decompress suport"
 #r3only
