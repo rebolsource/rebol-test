@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text eol=lf
+
+# Don't attempt end-of-line conversion for fixtures.
+fixtures/* -text
