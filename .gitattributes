@@ -1,5 +1,6 @@
-# Auto detect text files and perform LF normalization
-* text eol=lf
+# Normalise all files to LF on checkin, and prevent conversion to CRLF on
+# checkout.
+* eol=lf
 
 # Don't attempt end-of-line conversion for fixtures.
 fixtures/* -text
