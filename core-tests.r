@@ -12277,9 +12277,42 @@
 	equal? a decloak b "a"
 ]
 ; functions/string/decode.r
-; https://github.com/rebol/rebol/pull/156#issuecomment-36171227
-#r3only
+#r3
+[image? decode 'bmp read %fixtures/rebol-logo.bmp]
+#r3
+[image? decode 'gif read %fixtures/rebol-logo.gif]
+#r3
+[image? decode 'jpeg read %fixtures/rebol-logo.jpg]
+#r3
+[image? decode 'png read %fixtures/rebol-logo.png]
+#r3
+[
+	; The results of decoding lossless encodings should be identical.
+	bmp-img: decode 'bmp read %fixtures/rebol-logo.bmp
+	gif-img: decode 'gif read %fixtures/rebol-logo.gif
+	png-img: decode 'gif read %fixtures/rebol-logo.png
+	all [
+		bmp-img == gif-img
+		bmp-img == png-img
+	]
+]
+#r3
 ["" == decode 'text #{}]
+#r3
+["bar" == decode 'text #{626172}]
+#r3
+[[<b> "hello" </b>] == decode 'markup "<b>hello</b>"]
+; functions/string/encode.r
+#r3
+[out: encode 'bmp decode 'bmp src: read %fixtures/rebol-logo.bmp out == src]
+; GIF encoding is not yet implemented
+#r3
+[out: encode 'gif decode 'gif src: read %fixtures/rebol-logo.gif out == src]
+#r3
+[out: encode 'png decode 'png src: read %fixtures/rebol-logo.png out == src]
+; JPEG encoding is not yet implemented
+#r3
+[out: encode 'jpeg decode 'jpeg src: read %fixtures/rebol-logo.jpeg out == src]
 ; functions/string/decompress.r
 ; bug#1679: "Native GZIP compress/decompress suport"
 #r3only
