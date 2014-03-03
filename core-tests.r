@@ -990,8 +990,6 @@
 #r3only
 [error? make error! [type: 'note id: 'deprecated]]
 #r3only
-[error? make error! [type: 'note id: 'else-gone]]
-#r3only
 [error? make error! [type: 'syntax id: 'invalid]]
 #r3only
 [error? make error! [type: 'syntax id: 'missing]]
