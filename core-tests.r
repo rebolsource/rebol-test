@@ -2223,6 +2223,16 @@
 	append o compose [b: "b" b: (c)]
 	same? c o/b
 ]
+#r3only
+[
+	o: make object! []
+	error? try [append o 'self]
+]
+#r3only
+[
+	o: make object! []
+	error? try [append o [self: 1]]
+]
 ; bug#2076
 #r3only
 [
