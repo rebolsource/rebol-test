@@ -11935,6 +11935,20 @@
 [9 = ninth [1 2 3 4 5 6 7 8 9 10 11]]
 [10 = tenth [1 2 3 4 5 6 7 8 9 10 11]]
 ; functions/series/parse.r
+; SET-WORD! (store current input position)
+[res: parse ser: [x y] [pos: skip skip] all [res pos = ser]]
+[res: parse ser: [x y] [skip pos: skip] all [res pos = next ser]]
+[res: parse ser: [x y] [skip skip pos: end] all [res pos = tail ser]]
+; bug#2130
+[res: parse ser: [x] [set val pos: word!] all [res val = 'x pos = ser]]
+; bug#2130
+#r3only
+[res: parse ser: [x] [set val: pos: word!] all [res val = 'x pos = ser]]
+; bug#2130
+[res: parse ser: "foo" [copy val pos: skip] all [not res val = "f" pos = ser]]
+; bug#2130
+#r3only
+[res: parse ser: "foo" [copy val: pos: skip] all [not res val = "f" pos = ser]]
 ; TO/THRU integer!
 [parse "abcd" [to 3 "cd"]]
 [parse "abcd" [to 5]]
