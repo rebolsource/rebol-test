@@ -1522,6 +1522,9 @@
 ; bug#1528
 [function? func [self] []]
 #r3only
+; bug#1756
+[do does [reduce reduce [:self] true]]
+#r3only
 ; bug#2025
 [
 	body: [x + y]
