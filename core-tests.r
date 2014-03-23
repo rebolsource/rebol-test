@@ -11197,6 +11197,8 @@
 		equal? value original
 	]
 ]
+; bug#1764
+[unset 'blk protect/deep 'blk]
 ; functions/secure/unprotect.r
 ; bug #1748
 ; block
