@@ -11040,7 +11040,7 @@
 	not same? body-of :f body-of :f
 ]
 ; functions/secure/protect.r
-; bug #1748
+; bug#1748
 ; block
 [
 	value: copy original: [1 + 2 + 3]
@@ -11200,7 +11200,7 @@
 ; bug#1764
 [unset 'blk protect/deep 'blk]
 ; functions/secure/unprotect.r
-; bug #1748
+; bug#1748
 ; block
 [
 	value: copy original: [1 + 2 + 3]
