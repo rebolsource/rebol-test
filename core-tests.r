@@ -2470,6 +2470,9 @@
 	b: [user 1 _user 2]
 	1 = b/user
 ]
+#r3only
+; bug#1977
+[f: func [/r] [1] error? try [f/r/%]]
 ; datatypes/percent.r
 #r3only
 [percent? 0%]
