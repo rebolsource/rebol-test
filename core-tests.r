@@ -12224,7 +12224,7 @@
 [[1 2 3] = sort/compare [1 3 2] :<]
 [[3 2 1] = sort/compare [1 3 2] :>]
 ; bug#1516: SORT/compare ignores the typespec of its function argument
-[sort/compare [1 2 #[unset!]] :>]
+[error? try [sort/compare [1 2 #[unset!]] :>]]
 ; functions/series/split.r
 ; Tests taken from bug#1886.
 #r3
