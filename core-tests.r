@@ -12387,6 +12387,13 @@
 ; WRITE shall return a port in R3
 #r3only
 [equal? read write clipboard:// c: "test" c]
+; system/file.r
+; bug#1675
+[block? read %.]
+[block? read %./]
+; bug#1675
+[block? read %fixtures]
+[block? read %fixtures/]
 ; system/gc.r
 ; bug#2072
 [
