@@ -8481,6 +8481,15 @@
 [error? try/except [make error! ""] [0]]
 #r3only
 [try/except [do make error! ""] [true]]
+#r3only
+[try/except [1 / 0] :error?]
+#r3only
+[try/except [1 / 0] func [e] [error? e]]
+#r3only
+[try/except [true] func [e] [false]]
+#r3only
+; bug#1514
+[error? try [try/except [1 / 0] :add]]
 ; functions/control/unless.r
 [
 	success: false
