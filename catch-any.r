@@ -80,7 +80,7 @@ make object! [
 					; RETURN or EXIT
 					set exception 'return
 					set/any 'result do block
-					
+
 					; no exception
 					set exception none
 					return get/any 'result

@@ -520,7 +520,7 @@
 	f: make closure! reduce [[x] f-body: [x + x]]
 	change f-body 'x
 	x: 1
-	3 == f 2 
+	3 == f 2
 ]
 ; datatypes/datatype.r
 [not datatype? 1]
@@ -7267,7 +7267,7 @@
 ; bug#539
 [
 	f1: does [do "return 1 2" 2]
-	1 = f1	
+	1 = f1
 ]
 ; THROW stops evaluation
 [
@@ -8137,7 +8137,7 @@
 ; functions/control/loop.r
 [
 	num: 0
-	loop 10 [num: num + 1] 
+	loop 10 [num: num + 1]
 	10 = num
 ]
 ; cycle return value
@@ -8199,7 +8199,7 @@
 					break: 1
 					f 2
 					1 = get/any 'break
-				] 
+				]
 			]
 		]
 	]
@@ -8567,7 +8567,7 @@
 ; bug#37
 ; Test body-block return values
 [
-	num: 0 
+	num: 0
 	1 = while [num < 1] [num: num + 1]
 ]
 [none? while [false] []]

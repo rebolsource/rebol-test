@@ -112,10 +112,10 @@ make object! compose [
 		test-sources test-checksum guard
 	] [
 		allowed-flags: flags
-		
+
 		; calculate test checksum
 		test-checksum: checksum/method read-binary file 'sha1
-		
+
 		log-file: log-file-prefix
 
 		foreach checksum reduce [code-checksum test-checksum] [
@@ -225,9 +225,9 @@ make object! compose [
 				"Skipped: " skipped
 				"^(line)"
 			]
-	
+
 			log [summary]
-	
+
 			reduce [log-file summary]
 		] [
 			reduce [log-file "testing already complete"]

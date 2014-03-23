@@ -86,7 +86,7 @@ make-diff: func [
 						]
 					]
 					"^/"
-				]				
+				]
 			]
 			all [
 				old-test
@@ -141,7 +141,7 @@ make-diff: func [
 				none? new-test
 				old-test == first sort/case reduce [old-test new-test]
 			]
-		] 
+		]
 		next-new-log: all [
 			new-test
 			any [
