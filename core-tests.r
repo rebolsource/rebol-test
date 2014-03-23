@@ -12397,11 +12397,11 @@
 #r3only
 [equal? read write clipboard:// c: "test" c]
 ; system/file.r
-; bug#1675
-[block? read %.]
+; bug#1675 (The extra MOLD is to more consistently provoke the crash.)
+[files: read %. mold files block? files]
 [block? read %./]
 ; bug#1675
-[block? read %fixtures]
+[files: read %fixtures mold files block? files]
 [block? read %fixtures/]
 ; system/gc.r
 ; bug#2072
