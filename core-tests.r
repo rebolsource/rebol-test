@@ -8295,6 +8295,12 @@
 	repeat i [a] [continue success: false]
 	success
 ]
+#r3
+; decimal! test
+[[1 2 3] == collect [repeat i 3.0 [keep i]]]
+[[1 2 3] == collect [repeat i 3.1 [keep i]]]
+[[1 2 3] == collect [repeat i 3.5 [keep i]]]
+[[1 2 3] == collect [repeat i 3.9 [keep i]]]
 #r2only
 ; string! test
 [
@@ -8323,7 +8329,8 @@
 	repeat i [1 2 3] [append out i]
 	out = [1 2 3 2 3 3]
 ]
-; is hash! test and list! test needed too?;zero repetition
+; TODO: is hash! test and list! test needed too?
+; zero repetition
 [
 	success: true
 	repeat i 0 [success: false]
