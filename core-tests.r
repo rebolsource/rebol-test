@@ -8301,6 +8301,9 @@
 [[1 2 3] == collect [repeat i 3.1 [keep i]]]
 [[1 2 3] == collect [repeat i 3.5 [keep i]]]
 [[1 2 3] == collect [repeat i 3.9 [keep i]]]
+#r3
+; pair! test (bug#1995)
+[[1x1 2x1 1x2 2x2] == collect [repeat i 2x2 [keep i]]]
 #r2only
 ; string! test
 [
