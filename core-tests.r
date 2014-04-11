@@ -12384,6 +12384,21 @@
 ["foo" == to string! decompress/gzip #{1F8B0800EF46BE4C00034BCBCF07002165738C03000000}]
 ; bug#3
 [value? try [decompress #{AAAAAAAAAAAAAAAAAAAA}]]
+; functions/string/dehex.r
+["a%b" = dehex "a%b"]
+["a%~b" = dehex "a%~b"]
+["a^@b" = dehex "a%00b"]
+["a b" = dehex "a%20b"]
+["a%b" = dehex "a%25b"]
+["a+b" = dehex "a%2bb"]
+["a+b" = dehex "a%2Bb"]
+["abc" = dehex "a%62c"]
+; bug#1986
+["aβc" = dehex "a%ce%b2c"]
+; bug#1986
+[(to-string #{61CEB262}) = dehex "a%ce%b2c"]
+; bug#1986
+[#{61CEB262} = to-binary dehex "a%ce%b2c"]
 ; system/system.r
 ; bug#76
 [date? system/build]
