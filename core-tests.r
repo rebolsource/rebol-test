@@ -11347,8 +11347,6 @@
 	append p [b 2]
 	not in o 'b
 ]
-; bug#1776
-[a: copy [] until [error? try [a: append/only copy [] a]]]
 ; bug#1894
 [
 	port: open/new %pokus.txt
@@ -12446,10 +12444,10 @@
 [files: read %fixtures mold files block? files]
 [block? read %fixtures/]
 ; system/gc.r
-; bug#2072
+; bug#1776, bug#2072
 [
 	a: copy []
-	loop 200000 [a: append/only copy [] a]
+	loop 200'000 [a: append/only copy [] a]
 	recycle
 	true
 ]
