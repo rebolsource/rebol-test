@@ -1496,6 +1496,31 @@
 	]
 	f 1
 ]
+; Argument passing of "get arguments" ("get-args")
+[gf: func [:x] [:x] 10 == gf 10]
+#r3only
+[gf: func [:x] [:x] 'a == gf a]
+[gf: func [:x] [:x] (quote 'a) == gf 'a]
+[gf: func [:x] [:x] (quote :a) == gf :a]
+[gf: func [:x] [:x] (quote a:) == gf a:]
+[gf: func [:x] [:x] (quote (10 + 20)) == gf (10 + 20)]
+[gf: func [:x] [:x] o: context [f: 10] (quote :o/f) == gf :o/f]
+#r2only
+[gf: func [:x] [:x] a: 10 10 == gf a]
+; Argument passing of "literal arguments" ("lit-args")
+[lf: func ['x] [:x] 10 == lf 10]
+[lf: func ['x] [:x] 'a == lf a]
+[lf: func ['x] [:x] (quote 'a) == lf 'a]
+[lf: func ['x] [:x] a: 10 10 == lf :a]
+[lf: func ['x] [:x] (quote a:) == lf a:]
+#r3only
+[lf: func ['x] [:x] 30 == lf (10 + 20)]
+#r3only
+[lf: func ['x] [:x] o: context [f: 10] 10 == lf :o/f]
+#r2only
+[lf: func ['x] [:x] (quote (10 + 20)) == lf (10 + 20)]
+#r2only
+[lf: func ['x] [:x] (quote :o/f) == lf :o/f]
 ; bug#19
 [
 	f: func [/r x] [x]
