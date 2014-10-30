@@ -1,9 +1,9 @@
 This project's primary goal is to build and maintain a suite of regression
 tests for both REBOL 2 and REBOL 3. It also comes with a test framework built
 for this purpose, the details of which are described in the [test framework
-documentation on Rebol.org][doc]
+documentation][doc]
 
-[doc]: http://www.rebol.org/art-display-article.r?article=n28vx
+[doc]: tests.mdp
 
 The test suite itself as well as the test framework are Licensed under the
 [Apache License, Version 2.0][license].
