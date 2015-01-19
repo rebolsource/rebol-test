@@ -12462,6 +12462,38 @@
 #r3only
 [equal? read write clipboard:// c: "test" c]
 ; system/file.r
+[#{C3A4C3B6C3BC} == read %fixtures/umlauts-utf8.txt]
+#r3only
+["äöü" == read/string %fixtures/umlauts-utf8.txt]
+#r3only
+[["äöü"] == read/lines %fixtures/umlauts-utf8.txt]
+[#{EFBBBFC3A4C3B6C3BC} == read %fixtures/umlauts-utf8bom.txt]
+#r3only
+["äöü" == read/string %fixtures/umlauts-utf8bom.txt]
+#r3only
+[["äöü"] == read/lines %fixtures/umlauts-utf8bom.txt]
+[#{FFFEE400F600FC00} == read %fixtures/umlauts-utf16le.txt]
+#r3only
+["äöü" == read/string %fixtures/umlauts-utf16le.txt]
+#r3only
+[["äöü"] == read/lines %fixtures/umlauts-utf16le.txt]
+[#{FEFF00E400F600FC} == read %fixtures/umlauts-utf16be.txt]
+#r3only
+["äöü" == read/string %fixtures/umlauts-utf16be.txt]
+#r3only
+[["äöü"] == read/lines %fixtures/umlauts-utf16be.txt]
+[#{FFFE0000E4000000F6000000FC000000} == read %fixtures/umlauts-utf32le.txt]
+#r3only
+; bug#2186
+["äöü" == read/string %fixtures/umlauts-utf32le.txt]
+#r3only
+[["äöü"] == read/lines %fixtures/umlauts-utf32le.txt]
+[#{0000FEFF000000E4000000F6000000FC} == read %fixtures/umlauts-utf32be.txt]
+#r3only
+; bug#2186
+["äöü" == read/string %fixtures/umlauts-utf32be.txt]
+#r3only
+[["äöü"] == read/lines %fixtures/umlauts-utf32be.txt]
 ; bug#1675 (The extra MOLD is to more consistently provoke the crash.)
 [files: read %. mold files block? files]
 [block? read %./]
