@@ -11556,6 +11556,19 @@
 	error? try [copy :f]
 	true
 ]
+; functions/series/deline.r
+[
+	equal?
+		"^/"
+		deline case [
+			system/version/4 = 3  "^M^/" ; CR LF on Windows
+			true                  "^/"   ; LF elsewhere
+		]
+]
+; bug#648
+[["a"] = deline/lines "a"]
+; bug#1794
+[1 = length? deline/lines "Slovenščina"]
 ; functions/series/difference.r
 ; bug#799
 #r3only
@@ -11569,6 +11582,19 @@
 ]
 #r3only
 [empty? none]
+; functions/series/enline.r
+[
+	equal?
+		enline "^/"
+		case [
+			system/version/4 = 3  "^M^/" ; CR LF on Windows
+			true                  "^/"   ; LF elsewhere
+		]
+]
+; bug#190
+[x: copy "xx^/" loop 20 [enline x: join x x] true]
+; bug#647
+[string? enline ["a" "b"]]
 ; functions/series/exclude.r
 [empty? exclude [1 2] [2 1]]
 ; bug#799
