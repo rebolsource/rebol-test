@@ -11583,6 +11583,7 @@
 #r3only
 [empty? none]
 ; functions/series/enline.r
+; bug#2191
 [
 	equal?
 		enline "^/"
