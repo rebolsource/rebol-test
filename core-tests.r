@@ -2983,6 +2983,8 @@
 [strict-equal? #[tag! ""] make tag! 0]
 [strict-equal? #[tag! ""] to tag! ""]
 ["<tag>" == mold <tag>]
+; bug#2169
+["<ēee>" == mold <ēee>]
 [equal? mold/all #[tag! ""] {#[tag! ""]}]
 ; datatypes/time.r
 [time? 0:00]
