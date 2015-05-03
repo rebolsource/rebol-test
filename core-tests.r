@@ -426,6 +426,8 @@
 	f: closure [] ['a]
 	'a == f
 ]
+; basic test for recursive closure! invocation
+[i: 0 countdown: closure [n] [if n > 0 [++ i countdown n - 1]] countdown 10 i = 10]
 ; bug#21
 [
 	c: closure [a] [return a]
@@ -1525,6 +1527,8 @@
 [lf: func ['x] [:x] (quote (10 + 20)) == lf (10 + 20)]
 #r2only
 [lf: func ['x] [:x] (quote :o/f) == lf :o/f]
+; basic test for recursive function! invocation
+[i: 0 countdown: func [n] [if n > 0 [++ i countdown n - 1]] countdown 10 i = 10]
 ; bug#19
 [
 	f: func [/r x] [x]
