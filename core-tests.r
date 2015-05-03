@@ -12162,6 +12162,10 @@
 [not parse "a" compose [thru (charset "a") skip]]
 [parse "ba" compose [to (charset "a") skip]]
 [not parse "ba" compose [to (charset "a") "ba"]]
+; self-modifying rule
+[not parse "abcd" rule: ["ab" (remove back tail rule) "cd"]]
+; bug#2214
+[not parse "abcd" rule: ["ab" (clear rule) "cd"]]
 ; functions/series/pick.r
 #64bit
 [error? try [pick at [1 2 3 4 5] 3 -9223372036854775808]]
