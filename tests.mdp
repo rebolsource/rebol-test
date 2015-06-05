@@ -16,12 +16,12 @@ The test file format has been originally designed by Carl Sassenrath to be:
 
 ===Types of tests
 
-The test framework supports unit testing of:
+This test framework supports unit testing of:
 
 * Rebol interpreter (or compiler) core
 * Rebol function libraries
 
-GUI testing is not supported yet.
+GUI testing is not supported.
 
 ===How to run the tests?
 
