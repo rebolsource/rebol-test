@@ -426,6 +426,8 @@
 	f: closure [] ['a]
 	'a == f
 ]
+; basic test for recursive closure! invocation
+[i: 0 countdown: closure [n] [if n > 0 [++ i countdown n - 1]] countdown 10 i = 10]
 ; bug#21
 [
 	c: closure [a] [return a]
@@ -1223,6 +1225,10 @@
 [a: 1 error? try [a: 1 / 0] :a =? 1]
 [a: 1 error? try [set 'a 1 / 0] :a =? 1]
 [a: 1 error? try [set/any 'a 1 / 0] :a =? 1]
+; bug#2190
+[catch/quit [attempt [catch/quit [1 / 0]] quit/return true]]
+; bug#2190
+[error? try [catch/quit [attempt [quit]] print x]]
 ; datatypes/event.r
 [not event? 1]
 ; datatypes/file.r
@@ -1521,6 +1527,8 @@
 [lf: func ['x] [:x] (quote (10 + 20)) == lf (10 + 20)]
 #r2only
 [lf: func ['x] [:x] (quote :o/f) == lf :o/f]
+; basic test for recursive function! invocation
+[i: 0 countdown: func [n] [if n > 0 [++ i countdown n - 1]] countdown 10 i = 10]
 ; bug#19
 [
 	f: func [/r x] [x]
@@ -2983,6 +2991,8 @@
 [strict-equal? #[tag! ""] make tag! 0]
 [strict-equal? #[tag! ""] to tag! ""]
 ["<tag>" == mold <tag>]
+; bug#2169
+["<ēee>" == mold <ēee>]
 [equal? mold/all #[tag! ""] {#[tag! ""]}]
 ; datatypes/time.r
 [time? 0:00]
@@ -8720,6 +8730,9 @@
 	]
 	10 = num3
 ]
+; functions/control/quit.r
+; bug#2190
+[error? try [catch/quit [attempt [quit]] 1 / 0]]
 ; functions/convert/as-binary.r
 #r2only
 [
@@ -12149,6 +12162,10 @@
 [not parse "a" compose [thru (charset "a") skip]]
 [parse "ba" compose [to (charset "a") skip]]
 [not parse "ba" compose [to (charset "a") "ba"]]
+; self-modifying rule
+[not parse "abcd" rule: ["ab" (remove back tail rule) "cd"]]
+; bug#2214
+[not parse "abcd" rule: ["ab" (clear rule) "cd"]]
 ; functions/series/pick.r
 #64bit
 [error? try [pick at [1 2 3 4 5] 3 -9223372036854775808]]
