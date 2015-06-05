@@ -233,4 +233,28 @@ make object! compose [
 			reduce [log-file "testing already complete"]
 		]
 	]
+	
+	set 'test-code func [
+		{Runner for code tests}
+		code [file! block!]
+		/local
+		result log-file summary code-checksum log-file-prefix
+	] [
+		; calculate checksum
+		either file? code [
+			code-checksum: read/binary code
+		] [
+			code-checksum: make binary! 0
+			foreach file code [append code-checksum read/binary file]
+		]
+		code-checksum: checksum/method code-checksum 'sha1
+
+		log-file-prefix: %f
+
+		print "Testing ..."
+		set [log-file summary] do-recover %tests.r [] code-checksum log-file-prefix
+
+		print ["Done, see the log file:" log-file]
+		print summary
+	]
 ]
