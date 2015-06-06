@@ -1534,7 +1534,13 @@
 [
 	f: func [code value] [either none? code ['value] [do code]]
 	f-value: f none none
-	42 == f compose [2 * (f-value)] 21
+	42 == f compose [2 * (f-value)] 21  ; re-entering same function
+]
+[
+	f: func [code value] [either none? code ['value] [do code]]
+	g: func [code value] [either none? code ['value] [do code]]
+	f-value: f none none
+	error? try [g compose [2 * (f-value)] 21]  ; re-entering different function
 ]
 ; bug#19
 [
