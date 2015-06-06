@@ -1529,6 +1529,13 @@
 [lf: func ['x] [:x] (quote :o/f) == lf :o/f]
 ; basic test for recursive function! invocation
 [i: 0 countdown: func [n] [if n > 0 [++ i countdown n - 1]] countdown 10 i = 10]
+; a function-local word that escapes the function's dynamic extent still works
+; when re-entering the dynamic extent of the same function later.
+[
+	f: func [code value] [either none? code ['value] [do code]]
+	f-value: f none none
+	42 == f compose [2 * (f-value)] 21
+]
 ; bug#19
 [
 	f: func [/r x] [x]
