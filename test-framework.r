@@ -235,7 +235,10 @@ make object! compose [
 	]
 	
 	set 'test-code func [
-		{Runner for code tests}
+		{
+			Runner for tests, the tests are assumed to be in the %tests.r file
+			in the current directory.
+		}
 		code [file! block!]
 		/local
 		result log-file summary code-checksum log-file-prefix
