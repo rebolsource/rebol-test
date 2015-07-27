@@ -106,7 +106,7 @@ make object! compose [
 		{Executes tests in the FILE and recovers from crash}
 		file [file!] {test file}
 		flags [block!] {which flags to accept}
-		code-checksum [binary!]
+		code-checksum [binary! none!]
 		log-file-prefix [file!]
 		/local interpreter last-vector value position next-position
 		test-sources test-checksum guard
@@ -117,11 +117,14 @@ make object! compose [
 		test-checksum: checksum/method read-binary file 'sha1
 
 		log-file: log-file-prefix
-
-		foreach checksum reduce [code-checksum test-checksum] [
+		
+		if code-checksum [
 			append log-file "_"
-			append log-file copy/part skip mold checksum 2 6
-		]
+			append log-file copy/part skip mold code-checksum 2 6
+		]		
+
+		append log-file "_"
+		append log-file copy/part skip mold test-checksum 2 6
 
 		append log-file ".log"
 		log-file: clean-path log-file
@@ -232,32 +235,5 @@ make object! compose [
 		] [
 			reduce [log-file "testing already complete"]
 		]
-	]
-	
-	set 'test-code func [
-		{
-			Runner for tests, the tests are assumed to be in the %tests.r file
-			in the current directory.
-		}
-		code [file! block!]
-		/local
-		result log-file summary code-checksum log-file-prefix
-	] [
-		; calculate checksum
-		either file? code [
-			code-checksum: read/binary code
-		] [
-			code-checksum: make binary! 0
-			foreach file code [append code-checksum read/binary file]
-		]
-		code-checksum: checksum/method code-checksum 'sha1
-
-		log-file-prefix: %f
-
-		print "Testing ..."
-		set [log-file summary] do-recover %tests.r [] code-checksum log-file-prefix
-
-		print ["Done, see the log file:" log-file]
-		print summary
 	]
 ]
