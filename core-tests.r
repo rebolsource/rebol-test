@@ -7326,6 +7326,8 @@
 	1 == do :a-value
 ]
 [unset? do ""]
+[1 = do "1"]
+[3 = do "1 2 3"]
 [
 	a-value: make tag! ""
 	same? :a-value do :a-value
