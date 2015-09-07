@@ -15,7 +15,7 @@ Rebol [
 ]
 
 ; define the INCLUDE function
-do %../framework/dev-tools/include.r
+do %include.r
 
 do %test-framework.r 
 
