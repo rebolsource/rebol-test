@@ -25,7 +25,7 @@ GUI testing is not supported.
 
 ===How to run the tests?
 
-Example running core-tests in my machine with Microsoft Windows 8:
+Example running core-tests in my machine with Microsoft Windows 10:
 
     e:\Ladislav\rebol\rebol-view.exe -s run-recover.r
 
@@ -260,12 +260,12 @@ Test as well as documentation contributions are welcome.
 
 To run tests from Windows Explorer you need to create one or more associtations for Windows Explorer context menu.
 
----How to add a new association for Windows Explorer in Windows Vista, Windows 7 or Windows 8
+---How to add a new association for Windows Explorer in Windows Vista, Windows 7, Windows 8, or Windows 10
 
 Let's assume that you decided to use the *%.tst* suffix for your test files. Then you can, for example, define a command called *open* to left-click run your tests in Windows Explorer or a command called *test* to right-click run your tests using a Windows Explorer context menu.
 
 *Run the *regedit.exe* program
-*Find the *HKEY_CLASSES_ROOT\.tst* key
+*Find (or create) the *HKEY_CLASSES_ROOT\.tst* key
 *Edit its *(Default)* value, should be something like *tst_auto_file*
 *Find (or create) the *HKEY_CLASSES_ROOT\tst_auto_file* key
 *Find (or create) the *HKEY_CLASSES_ROOT\tst_auto_file\shell* subkey
@@ -273,17 +273,20 @@ Let's assume that you decided to use the *%.tst* suffix for your test files. The
 *Under the *open* (or *test*) key add a new *command* subkey
 *Change the *(Default)* value of the *command* key to something like (do not forget to use your directory paths).
 	"D:\Rebol\rebol.exe" d:\rebol\run-tests.r "%1"
+To suppress the interpreter security dialog when running the tests, use
+	"D:\Rebol\rebol.exe" -s d:\rebol\run-tests.r "%1"
+instead.
 
 Having added the *open* command association for the test files left-clicking a *.tst* file will run tests in the file in the Windows Explorer. Having added the *test* command association, you will see the new *test* context menu item when right-clicking a test file in Windows Explorer.
 
 \note
-After using the Windows 7 built-in "Choose default program..." action (found under the file-right-click context menu under "Open with") it re-associates the extension with whatever new program you choose.
+After using the Windows 7 (or later) built-in "Choose default program..." action (found under the file-right-click context menu under "Open with") it re-associates the extension with whatever new program you choose.
 What happens at this point is that *HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tst\UserChoice*, and possibly *HKEY_CURRENT_USER\Software\Microsoft\Windows\Roaming\OpenWith\FileExts\.tst\UserChoice* are created/changed by the system, and so the newly selected program takes over. To regain control over the extension you can delete the above UserChoice key/keys.
 /note
 
 ---How to add the new association for *.tst* files in Windows XP or older
 
-Run the Windows Explorer and click on *Tools/Options* in menu. Next click on the *File Types* tab and find the *.tst* file type associations. Click on the *Advanced* button and add a new action. Call the new action *test* and the application associated with the new action may be e.g. (do not forget to use your directory paths):
+Run the Windows Explorer and click on *Tools/Options* in menu. Next click on the *File Types* tab and find the *.tst* file type associations. Click on the *Advanced* button and add a new action. Call the new action *test* and the application associated with the new action may be, e.g. (do not forget to use your directory paths):
 	"D:\Rebol\rebol.exe" d:\rebol\run-tests.r "%1"
 
 ===This documentation
