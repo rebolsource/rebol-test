@@ -3160,22 +3160,37 @@
 ; bug#2011
 [not equal? load "http://a.b.c/d?e=f%26" load "http://a.b.c/d?e=f&"]
 ; datatypes/vector.r
+#r3only
 [vector? make vector! 0]
+#r3only
 [vector? make vector! [integer! 8]]
+#r3only
 [vector? make vector! [integer! 16]]
+#r3only
 [vector? make vector! [integer! 32]]
+#r3only
 [vector? make vector! [integer! 64]]
+#r3only
 [0 = length? make vector! 0]
+#r3only
 [1 = length? make vector! 1]
+#r3only
 [1 = length? make vector! [integer! 32]]
+#r3only
 [2 = length? make vector! 2]
+#r3only
 [2 = length? make vector! [integer! 32 2]]
 ; bug#1538
+#r3only
 [10 = length? make vector! 10.5]
 ; bug#1213
+#r3only
 [error? try [make vector! -1]]
+#r3only
 [0 = first make vector! [integer! 32]]
+#r3only
 [all map-each x make vector! [integer! 32 16] [zero? x]]
+#r3only
 [
 	v: make vector! [integer! 32 3]
 	v/1: 10
@@ -5978,6 +5993,25 @@
 	a: 1
 	error? try [use 'a [a: 2]]
 	a = 1
+]
+[
+	[x] = words-of bound? use [x] ['x]
+]
+[
+	[x y] = words-of bound? use [x y] ['x]
+]
+; use does not bind special words
+[
+	same? 'self use [x] ['self]
+]
+[
+	same? 'local use [x] ['local]
+]
+[
+	same? 'return use [x] ['return]
+]
+[
+	same? 'exit use [x] ['exit]
 ]
 ; initialization
 #r2only

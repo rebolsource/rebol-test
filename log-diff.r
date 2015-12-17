@@ -185,4 +185,14 @@ make-diff: func [
 	write/append diff-file rejoin ["^/Summary:^/" summary "^/"]
 ]
 
-make-diff to-file first load system/script/args to-file second load system/script/args %diff.r
+either all [
+	block? load system/script/args
+	2 <= length? system/script/args
+] [
+	first-arg: first load system/script/args
+	second-arg: second load system/script/args
+] [
+	first-arg: ask "old-log: "
+	second-arg: ask "new-log: "
+]
+make-diff to-file first-arg to-file second-arg %diff.r
