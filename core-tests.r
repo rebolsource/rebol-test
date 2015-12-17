@@ -2487,6 +2487,25 @@
 	a-value: file://a
 	file://a/1 = a-value/1
 ]
+; calling functions through paths: function in object
+[
+	obj: make object! [fun: func [] [1]]
+	1 == obj/fun
+]
+[
+	obj: make object! [fun: func [/ref val] [val]]
+	1 == obj/fun/ref 1
+]
+; calling functions through paths: function in block, positional
+[
+	blk: reduce [func [] [10]  func [] [20]]
+	10 == blk/1
+]
+; calling functions through paths: function in block, "named"
+[
+	blk: reduce ['foo func [] [10]  'bar func [] [20]]
+	20 == blk/bar
+]
 ; bug#26
 [
 	b: [b 1]
@@ -7360,6 +7379,8 @@
 	1 == do :a-value
 ]
 [unset? do ""]
+[1 = do "1"]
+[3 = do "1 2 3"]
 [
 	a-value: make tag! ""
 	same? :a-value do :a-value
@@ -8549,6 +8570,8 @@
 	cases: reduce [1 head insert copy [] try [1 / 0]]
 	error? switch 1 cases
 ]
+; bug#2242
+[11 = do does [switch/all 1 [1 [return 11 88]] 99]]
 ; functions/control/throw.r
 ; see functions/control/catch.r for basic functionality
 ; the "result" of throw should not be assignable, bug#1515
@@ -8778,6 +8801,30 @@
 	10 = num3
 ]
 ; functions/control/quit.r
+; In R3, DO of a script provided as a string! code catches QUIT, just as it
+; would do for scripts in files.
+#r3only
+[42 = do "quit/return 42"]
+#r3only
+[99 = do {do {quit/return 42} 99}]
+; Returning of Rebol values from called to calling script via QUIT/return.
+[
+	do-script-returning: func [value /local script] [
+		save/header script: %tmp-inner.reb compose ['quit/return (value)] []
+		do script
+	]
+	all map-each value reduce [
+		42
+		{foo}
+		#{CAFE}
+		none
+		http://somewhere
+		1900-01-30
+		context [x: 42]
+	] [
+		value = do-script-returning value
+	]
+]
 ; bug#2190
 [error? try [catch/quit [attempt [quit]] 1 / 0]]
 ; functions/convert/as-binary.r
