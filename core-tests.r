@@ -3223,6 +3223,14 @@
 [word! = type? 'a]
 ; literal form
 [word? first [a]]
+; transitivity, bug#2251
+[
+	not all [
+		lesser-or-equal? 'C 'a
+		lesser-or-equal? 'c 'C
+		not lesser-or-equal? 'c 'a
+	]
+]
 ; words are active; actions are word-active
 [1 == abs -1]
 [
