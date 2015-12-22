@@ -794,8 +794,8 @@
 [error? try [1 / 0]]
 [not error? 1]
 [error! = type? try [1 / 0]]
-#r2only
 ; error types
+#r2only
 [error? make error! [throw no-loop]]
 #r2only
 [error? make error! [throw no-function]]
@@ -965,11 +965,11 @@
 [error? make error! [internal globals-full]]
 #r2only
 [error? make error! [internal bad-internal]]
-#r3only
 ; error evaluation
-[error? do head insert copy [] try [1 / 0]]
 #r3only
+[error? do head insert copy [] try [1 / 0]]
 ; error that does not exist
+#r3only
 [try/except [make error! [type: 'script id: 'set-self]] [true]]
 ; throw errors cannot be made
 #r3only
@@ -1547,8 +1547,8 @@
 	f: func [/r x] [x]
 	2 == f/r/r 1 2
 ]
-#r3only
 ; bug#27
+#r3only
 [error? try [(type?) 1]]
 ; bug#1659
 ; inline function test
@@ -1567,11 +1567,11 @@
 ]
 ; bug#1528
 [function? func [self] []]
-#r3only
 ; bug#1756
-[do does [reduce reduce [:self] true]]
 #r3only
+[do does [reduce reduce [:self] true]]
 ; bug#2025
+#r3only
 [
 	body: [x + y]
 	f: make function! reduce [[x] body]
@@ -1619,8 +1619,8 @@
 	e: try [do to block! ":a"]
 	e/id = 'not-defined
 ]
-#r2only
 ; behaviour for REBOL datatypes; unset
+#r2only
 [
 	unset 'a
 	e: disarm try [:a]
@@ -1869,13 +1869,13 @@
 [m: make map! [a 1 b 2] none? m/c]
 #r3only
 [m: make map! [a 1 b 2] m/c: 3 3 == m/c]
-#r3only
 ; Maps contain key/value pairs and must be created from blocks of even length.
+#r3only
 [error? try [make map! [1]]]
 #r3
 [empty? clear make map! [a 1 b 2]]
-#r3only
 ; bug#1930: Lookup crashes on empty hashed map.
+#r3only
 [m: make map! 8 clear m none? m/a]
 ; datatypes/module.r
 #r3only
@@ -1896,8 +1896,8 @@
 	var: 2
 	1 == a-module/var
 ]
-#r3only
 ; import test
+#r3only
 [
 	a-module: make module! [
 		[
@@ -1911,8 +1911,8 @@
 	import a-module
 	2 == var
 ]
-#r3only
 ; import test
+#r3only
 [
 	var: 1
 	a-module: make module! [
@@ -2022,8 +2022,8 @@
 ["$1.0000000000000000000000000" = mold $1 * $1.0000000000000000000000000]
 #r3only
 ["$1.0000000000000000000000000" = mold $1.0000000000000000000000000 * $1.0000000000000000000000000]
-#r3only
 ; division uses "full precision"
+#r3only
 ["$1.0000000000000000000000000" = mold $1 / $1]
 #r3only
 ["$1.0000000000000000000000000" = mold $1 / $1.0]
@@ -2043,8 +2043,8 @@
 ["$0.33333333333333333333333333" = mold $1 / $3]
 #r3only
 ["$0.66666666666666666666666667" = mold $2 / $3]
-#r3only
 ; conversion to integer
+#r3only
 [1 = to integer! $1]
 #r3only
 #64bit
@@ -2302,8 +2302,8 @@
 [3 == do reduce [get '+ 1 2]]
 #r3only
 [error? try [do reduce [get '+ 1 2]]]
-#r3only
 ; bug#1934
+#r3only
 [3 = do reduce [1 :+ 2]]
 ; datatypes/pair.r
 [pair? 1x2]
@@ -2538,8 +2538,8 @@
 	b: [user 1 _user 2]
 	1 = b/user
 ]
-#r3only
 ; bug#1977
+#r3only
 [f: func [/r] [1] error? try [f/r/%]]
 ; datatypes/percent.r
 #r3only
@@ -2599,31 +2599,31 @@
 ; bug#97
 #r3only
 [$100.6 = ($100 + 60%)]
-#r3only
 ; 64-bit IEEE 754 maximum
 ; bug#1475
-[same? 1.7976931348623157e310% load mold/all 1.7976931348623157e310%]
 #r3only
+[same? 1.7976931348623157e310% load mold/all 1.7976931348623157e310%]
 ; bug#1475
 ; 64-bit IEEE 754 minimum
+#r3only
 [same? -1.7976931348623157E310% load mold/all -1.7976931348623157e310%]
-#r3only
 ; Minimal positive normalized
+#r3only
 [same? 2.2250738585072014E-310% load mold/all 2.2250738585072014E-310%]
-#r3only
 ; Maximal positive denormalized
+#r3only
 [same? 2.2250738585072009E-310% load mold/all 2.2250738585072009E-310%]
-#r3only
 ; Minimal positive denormalized
+#r3only
 [same? 4.9406564584124654E-322% load mold/all 4.9406564584124654E-322%]
-#r3only
 ; Maximal negative normalized
+#r3only
 [same? -2.2250738585072014E-306% load mold/all -2.2250738585072014E-306%]
-#r3only
 ; Minimal negative denormalized
-[same? -2.2250738585072009E-306% load mold/all -2.2250738585072009E-306%]
 #r3only
+[same? -2.2250738585072009E-306% load mold/all -2.2250738585072009E-306%]
 ; Maximal negative denormalized
+#r3only
 [same? -4.9406564584124654E-322% load mold/all -4.9406564584124654E-322%]
 #r3only
 [same? 10.000000000000001% load mold/all 10.000000000000001%]
@@ -2633,8 +2633,8 @@
 [same? 30.000000000000004% load mold/all 30.000000000000004%]
 #r3only
 [same? 9.9999999999999926e154% load mold/all 9.9999999999999926e154%]
-#r3only
 ; alternative form
+#r3only
 [1.1% == 1,1%]
 #r3only
 [110% = make percent! 110%]
@@ -2653,6 +2653,7 @@
 [not refinement? 1]
 [refinement! = type? /a]
 ; datatypes/routine.r
+#r2only
 [
 	success: routine? case [
 		; this needs to be system-specific
@@ -2797,8 +2798,8 @@
 [set-word? first [/:]]
 [set-word? first [//:]]
 [set-word? first [///:]]
-#r3only
 ; bug#1817
+#r3only
 [
 	a: make map! []
 	a/b: make object! [
@@ -3308,14 +3309,14 @@
 	a-value: #
 	same? :a-value a-value
 ]
-#r2only
 ; lit-paths are word-active
+#r2only
 [
 	a-value: first ['a/b]
 	a-value == to path! :a-value
 ]
-#r3only
 ; lit-paths aren't word-active
+#r3only
 [
 	a-value: first ['a/b]
 	a-value == :a-value
@@ -3343,8 +3344,8 @@
 	a-value: first [()]
 	same? :a-value a-value
 ]
-#r2only
 ; ops are word-active
+#r2only
 [
 	a-value: get '+
 	3 == a-value 1 2
@@ -3370,7 +3371,7 @@
 	a-value: /a
 	:a-value == a-value
 ]
-; routine test?
+; set-paths are not word-active
 [
 	a-value: first [a/b:]
 	:a-value == a-value
@@ -3656,9 +3657,9 @@
 ; case sensitivity
 ; bug#1459
 [not-equal? #{0141} #{0161}]
-#r3only
 ; email! vs. string!
 ; RAMBO #3518
+#r3only
 [
 	a-value: to email! ""
 	equal? a-value to string! a-value
@@ -3668,9 +3669,9 @@
 	a-value: to email! ""
 	equal? equal? to string! a-value a-value equal? a-value to string! a-value
 ]
-#r3only
 ; file! vs. string!
 ; RAMBO #3518
+#r3only
 [
 	a-value: %""
 	equal? a-value to string! a-value
@@ -3690,41 +3691,41 @@
 [not equal? #[image! 2x1 #{000000}] #[image! 1x1 #{000000}]]
 ; image! different rgb
 [not equal? #[image! 1x1 #{000001}] #[image! 1x1 #{000000}]]
-#r2only
 ; image! alpha not specified = 0
+#r2only
 [equal? #[image! 1x1 #{000000} #{00}] #[image! 1x1 #{000000}]]
-#r3only
 ; image! alpha not specified = ff
+#r3only
 [equal? #[image! 1x1 #{000000} #{ff}] #[image! 1x1 #{000000}]]
 ; image! alpha different
 [not equal? #[image! 1x1 #{000000} #{01}] #[image! 1x1 #{000000} #{00}]]
-#r3only
 ; Literal offset not supported in R2.
+#r3only
 [equal? #[image! 1x1 #{000000} 2] #[image! 1x1 #{000000} 2]]
-#r3only
 ; Literal offset not supported in R2.
+#r3only
 [not equal? #[image! 1x1 #{000000} 2] #[image! 1x1 #{000000}]]
 [
 	a-value: #[image! 1x1 #{000000}]
 	not equal? a-value next a-value
 ]
-#r3only
 ; image! offset + structural equivalence
+#r3only
 [equal? #[image! 0x0 #{}] next #[image! 1x1 #{000000}]]
-#r3only
 ; image! offset + structural equivalence
+#r3only
 [equal? #[image! 1x0 #{}] next #[image! 1x1 #{000000}]]
+; image! offset + structural equivalence
 #r3only
-; image! offset + structural equivalence
 [equal? #[image! 0x1 #{}] next #[image! 1x1 #{000000}]]
-#r2
 ; image! offset + structural equivalence
+#r2
 [not equal? #[image! 0x0 #{}] next #[image! 1x1 #{000000}]]
-#r2
 ; image! offset + structural equivalence
+#r2
 [not equal? #[image! 1x0 #{}] next #[image! 1x1 #{000000}]]
-#r2
 ; image! offset + structural equivalence
+#r2
 [not equal? #[image! 0x1 #{}] next #[image! 1x1 #{000000}]]
 ; No implicit to binary! from image!
 [not equal? #{00} #[image! 1x1 #{000000}]]
@@ -3736,9 +3737,9 @@
 ; No implicit to binary! from integer!
 [not equal? #{00} to integer! #{00}]
 [equal? equal? #{00} to integer! #{00} equal? to integer! #{00} #{00}]
-#r3only
 ; issue! vs. string!
 ; RAMBO #3518
+#r3only
 [not-equal? a-value: #a to string! a-value]
 [
 	a-value: #a
@@ -3750,9 +3751,9 @@
 	a-value: ""
 	equal? equal? a-value to binary! a-value equal? to binary! a-value a-value
 ]
-#r3only
 ; tag! vs. string!
 ; RAMBO #3518
+#r3only
 [equal? a-value: to tag! "" to string! a-value]
 [
 	a-value: to tag! ""
@@ -3784,9 +3785,9 @@
 [equal? equal? #[bitset! #{00}] #{00} equal? #{00} #[bitset! #{00}]]
 [equal? [] []]
 [equal? a-value: [] a-value]
-#r3only
 ; Reflexivity for past-tail blocks
 ; Error in R2.
+#r3only
 [
 	a-value: tail [1]
 	clear head a-value
@@ -3853,15 +3854,15 @@
 [not equal? number! integer!]
 ; datatype! vs. typeset! symmetry
 [equal? equal? number! integer! equal? integer! number!]
-#r3only
 ; datatype! vs. typeset!
+#r3only
 [not equal? integer! make typeset! [integer!]]
-#r3only
 ; datatype! vs. typeset!
+#r3only
 [not equal? integer! to typeset! [integer!]]
-#r3
 ; datatype! vs. typeset!
 ; Supported by R2/Forward.
+#r3
 [not equal? integer! to-typeset [integer!]]
 ; typeset! (or pseudo-type in R2)
 [equal? number! number!]
@@ -3871,8 +3872,8 @@
 [equal? make typeset! [integer!] make typeset! [integer!]]
 #r3only
 [equal? to typeset! [integer!] to typeset! [integer!]]
-#r3
 ; Supported by R2/Forward.
+#r3
 [equal? to-typeset [integer!] to-typeset [integer!]]
 [equal? -1 -1]
 [equal? 0 0]
@@ -4007,44 +4008,44 @@
 [equal? 0 0.0]
 ; integer! vs. money!
 [equal? 0 $0]
-#r3only
 ; integer! vs. percent!
+#r3only
 [equal? 0 0%]
 ; decimal! vs. money!
 [equal? 0.0 $0]
-#r3only
 ; decimal! vs. percent!
-[equal? 0.0 0%]
 #r3only
+[equal? 0.0 0%]
 ; money! vs. percent!
+#r3only
 [equal? $0 0%]
 ; integer! vs. decimal! symmetry
 [equal? equal? 1 1.0 equal? 1.0 1]
 ; integer! vs. money! symmetry
 [equal? equal? 1 $1 equal? $1 1]
-#r3only
 ; integer! vs. percent! symmetry
+#r3only
 [equal? equal? 1 100% equal? 100% 1]
 ; decimal! vs. money! symmetry
 [equal? equal? 1.0 $1 equal? $1 1.0]
-#r3only
 ; decimal! vs. percent! symmetry
+#r3only
 [equal? equal? 1.0 100% equal? 100% 1.0]
-#r3only
 ; money! vs. percent! symmetry
+#r3only
 [equal? equal? $1 100% equal? 100% $1]
-#r3only
 ; percent! approximate equality
-[equal? 10% + 10% + 10% 30%]
 #r3only
+[equal? 10% + 10% + 10% 30%]
 ; percent! approximate equality symmetry
+#r3only
 [equal? equal? 10% + 10% + 10% 30% equal? 30% 10% + 10% + 10%]
 [equal? 2-Jul-2009 2-Jul-2009]
-#r2only
 ; date! ignores time portion
+#r2only
 [equal? 2-Jul-2009 2-Jul-2009/22:20]
-#r3only
 ; date! doesn't ignore time portion
+#r3only
 [not equal? 2-Jul-2009 2-Jul-2009/22:20]
 [equal? equal? 2-Jul-2009 2-Jul-2009/22:20 equal? 2-Jul-2009/22:20 2-Jul-2009]
 ; date! missing time and zone = 00:00:00+00:00
@@ -4063,20 +4064,20 @@
 ; bug#1103
 [not equal? 0 00:00]
 [equal? #"a" #"a"]
-#r3only
 ; char! vs. integer!
 ; No implicit to char! from integer! in R3.
+#r3only
 [not equal? #"a" 97]
 ; char! vs. integer! symmetry
 [equal? equal? #"a" 97 equal? 97 #"a"]
-#r3only
 ; char! vs. decimal!
 ; No implicit to char! from decimal! in R3.
+#r3only
 [not equal? #"a" 97.0]
 ; char! vs. decimal! symmetry
 [equal? equal? #"a" 97.0 equal? 97.0 #"a"]
-#r3only
 ; char! case
+#r3only
 [equal? #"a" #"A"]
 ; string! case
 [equal? "a" "A"]
@@ -4149,16 +4150,16 @@
 [not equal? false true]
 ; object! reflexivity
 [equal? a-value: make object! [a: 1] a-value]
-#r3only
 ; object! simple structural equivalence
+#r3only
 [equal? make object! [a: 1] make object! [a: 1]]
 ; object! different values
 [not equal? make object! [a: 1] make object! [a: 2]]
 ; object! different words
 [not equal? make object! [a: 1] make object! [b: 1]]
 [not equal? make object! [a: 1] make object! []]
-#r3only
 ; object! complex structural equivalence
+#r3only
 [
 	a-value: construct/only [
 		a: 1 b: 1.0 c: $1 d: 1%
@@ -4174,10 +4175,10 @@
 	]
 	equal? a-value b-value
 ]
-#r3only
 ; object! complex structural equivalence
 ; Slight differences.
 ; bug#1133
+#r3only
 [
 	a-value: construct/only [c: $1]
 	b-value: construct/only [c: 100%]
@@ -4199,9 +4200,9 @@
 	]
 	equal? a-value b-value
 ]
-#r3only
 ; object! structural equivalence verified
 ; Structural equality requires equality of the object's fields.
+#r3only
 [
 	a-value: construct/only [
 		a: 1 b: 1.0 c: $1 d: 1%
@@ -4223,9 +4224,9 @@
 			true
 		]
 ]
-#r3only
 ; object! structural equivalence verified
 ; Structural equality requires equality of the object's fields.
+#r3only
 [
 	a-value: construct/only [
 		a: 1 b: 1.0 c: $1 d: 1%
@@ -4263,20 +4264,20 @@
 [error? try [equal? none ()]]
 #r3only
 [not-equal? none ()]
-#r3only
 ; unset! symmetry
+#r3only
 [equal? equal? none () equal? () none]
 ; unset! symmetry
 ; Fails on R2 because there is no structural comparison of objects.
 #r2only
 [not equal? disarm try [equal? none ()] disarm try [equal? () none]]
-#r3only
 ; basic comparison with unset first argument succeeds with = op
 ; Code in R3 mezzanines depends on this.
-[not (() = none)]
 #r3only
+[not (() = none)]
 ; basic comparison with unset first argument succeeds with != op
 ; Code in R3 mezzanines depends on this.
+#r3only
 [() != none]
 ; basic comparison with unset second argument fails with = op
 #r2only
@@ -4296,64 +4297,64 @@
 [error? try [() != ()]]
 #r3only
 [not () != ()]
-#r3only
 ; unset! symmetry with =
-[equal? none = () () = none]
 #r3only
+[equal? none = () () = none]
 ; error! reflexivity
 ; Evaluates (try [1 / 0]) to get error! value.
+#r3only
 [
 	a-value: none
 	set/any 'a-value (try [1 / 0])
 	equal? a-value a-value
 ]
-#r3only
 ; error! structural equivalence
 ; Evaluates (try [1 / 0]) to get error! value.
+#r3only
 [equal? (try [1 / 0]) (try [1 / 0])]
-#r3only
 ; error! structural equivalence
+#r3only
 [equal? (make error! "hello") (make error! "hello")]
-#r3only
 ; error! difference in code
+#r3only
 [not equal? (try [1 / 0]) (make error! "hello")]
-#r3only
 ; error! difference in data
-[not equal? (make error! "hello") (make error! "there")]
 #r3only
+[not equal? (make error! "hello") (make error! "there")]
 ; error! difference in op! code
 ; bug#60: operators generate errors with offset NEAR field
+#r3only
 [not equal? (try [1 / 0]) (try [2 / 0])]
-#r3only
 ; error! basic comparison
+#r3only
 [not equal? (try [1 / 0]) none]
-#r3only
 ; error! basic comparison
+#r3only
 [not equal? none (try [1 / 0])]
-#r3only
 ; error! basic comparison symmetry
+#r3only
 [equal? equal? (try [1 / 0]) none equal? none (try [1 / 0])]
-#r3only
 ; error! basic comparison with = op
+#r3only
 [not ((try [1 / 0]) = none)]
-#r3only
 ; error! basic comparison with != op
+#r3only
 [(try [1 / 0]) != none]
-#r3only
 ; error! basic comparison with = op
+#r3only
 [not (none = (try [1 / 0]))]
-#r3only
 ; error! basic comparison with != op
+#r3only
 [none != (try [1 / 0])]
-#r3only
 ; error! symmetry with = op
+#r3only
 [equal? not ((try [1 / 0]) = none) not (none = (try [1 / 0]))]
-#r3only
 ; error! symmetry with != op
-[equal? (try [1 / 0]) != none none != (try [1 / 0])]
 #r3only
+[equal? (try [1 / 0]) != none none != (try [1 / 0])]
 ; port! reflexivity
 ; Error in R2 (could be fixed).
+#r3only
 [equal? p: make port! http:// p]
 ; No structural equivalence for port!
 ; Error in R2 (could be fixed).
@@ -5298,16 +5299,16 @@
 [not same? 0 0.0]
 ; datatype differences
 [not same? 0 $0]
-#r3only
 ; datatype differences
+#r3only
 [not same? 0 0%]
 ; datatype differences
 [not same? 0.0 $0]
-#r3only
 ; datatype differences
+#r3only
 [not same? 0.0 0%]
-#r3only
 ; datatype differences
+#r3only
 [not same? $0 0%]
 ; symmetry
 [equal? same? 1 1.0 same? 1.0 1]
@@ -5318,17 +5319,17 @@
 [equal? same? 1 100% same? 100% 1]
 ; symmetry
 [equal? same? 1.0 $1 same? $1 1.0]
-#r3only
 ; symmetry
+#r3only
 [equal? same? 1.0 100% same? 100% 1.0]
-#r3only
 ; symmetry
+#r3only
 [equal? same? $1 100% same? 100% $1]
-#r3only
 ; approximate equality
-[not same? 10% + 10% + 10% 30%]
 #r3only
+[not same? 10% + 10% + 10% 30%]
 ; symmetry
+#r3only
 [equal? same? 10% + 10% + 10% 30% same? 30% 10% + 10% + 10%]
 ; date!; approximate equality
 [not same? 2-Jul-2009 2-Jul-2009/22:20]
@@ -5774,37 +5775,37 @@
 [not strict-equal? 0 0.0]
 ; datatype differences
 [not strict-equal? 0 $0]
-#r3only
 ; datatype differences
+#r3only
 [not strict-equal? 0 0%]
 ; datatype differences
 [not strict-equal? 0.0 $0]
-#r3only
 ; datatype differences
+#r3only
 [not strict-equal? 0.0 0%]
-#r3only
 ; datatype differences
+#r3only
 [not strict-equal? $0 0%]
 ; symmetry
 [equal? strict-equal? 1 1.0 strict-equal? 1.0 1]
 ; symmetry
 [equal? strict-equal? 1 $1 strict-equal? $1 1]
-#r3only
 ; symmetry
+#r3only
 [equal? strict-equal? 1 100% strict-equal? 100% 1]
 ; symmetry
 [equal? strict-equal? 1.0 $1 strict-equal? $1 1.0]
-#r3only
 ; symmetry
+#r3only
 [equal? strict-equal? 1.0 100% strict-equal? 100% 1.0]
-#r3only
 ; symmetry
+#r3only
 [equal? strict-equal? $1 100% strict-equal? 100% $1]
-#r3only
 ; approximate equality
-[not strict-equal? 10% + 10% + 10% 30%]
 #r3only
+[not strict-equal? 10% + 10% + 10% 30%]
 ; symmetry
+#r3only
 [equal? strict-equal? 10% + 10% + 10% 30% strict-equal? 30% 10% + 10% + 10%]
 ; date!; approximate equality
 #r2only
@@ -5974,8 +5975,8 @@
 	same? bound? in o 'self bound? in o 'a
 ]
 ; functions/context/resolve.r
-#r3only
 ; bug#2017: crash in RESOLVE/extend/only
+#r3only
 [get in resolve/extend/only context [] context [a: true] [a] 'a]
 ; functions/context/set.r
 ; bug#1745
@@ -6087,8 +6088,8 @@
 ; functions/context/valueq.r
 [false == value? 'nonsense]
 [true == value? 'value?]
-#r3only
 ; bug#1914
+#r3only
 [false == value? do func [x] ['x] none]
 ; functions/control/all.r
 ; zero values
@@ -6519,7 +6520,7 @@
 	port? any [:a-value]
 ]
 [/a == any [/a]]
-; routine test?
+; set-path test
 [
 	a-value: first [a/b:]
 	:a-value == any [:a-value]
@@ -7080,14 +7081,14 @@
 		2
 	]
 ]
-#r3only
 ; CATCH/QUIT
+#r3only
 [
 	catch/quit [quit]
 	true
 ]
-#r3only
 ; bug#851
+#r3only
 [error? try [catch/quit [] do make error! ""]]
 ; bug#851
 [none? attempt [catch/quit [] do make error! ""]]
@@ -7115,8 +7116,8 @@
 [1 = catch [compose [(throw 1 2)] 2]]
 ; BREAK stops the evaluation
 [1 = loop 1 [compose [(break/return 1 2)] 2]]
-#r3only
 ; Test that errors do not stop the evaluation:
+#r3only
 [block? compose [(try [1 / 0])]]
 [
 	blk: []
@@ -7165,8 +7166,8 @@
 [loop 1 [words-of continue] true]
 #r3only
 [loop 1 [values-of continue] true]
-#r3only
 ; bug#1945
+#r3only
 [loop 1 [spec-of continue] true]
 ; continue should not be caught by try
 #r3only
@@ -7458,8 +7459,8 @@
 [unset? do/next [] 'b]
 #r3only
 [error? do/next [try [1 / 0]] 'b]
-#r2only
 ; RETURN stops the evaluation
+#r2only
 [
 	f1: does [do/next [return 1 2] 2]
 	1 = f1
@@ -7496,8 +7497,8 @@
 	blk: [do/next blk 'b]
 	error? try blk
 ]
-#r2only
 ; are error reports for do and do/next consistent?
+#r2only
 [
 	val1: disarm try [do [1 / 0]]
 	val2: disarm try [do/next [1 / 0]]
@@ -7674,8 +7675,8 @@
 	f1: does [for i 1 1 1 [return 1 2] 2]
 	1 = f1
 ]
-#r3only
 ; Test that errors do not stop the loop and errors can be returned
+#r3only
 [
 	num: 0
 	e: for i 1 2 1 [num: i try [1 / 0]]
@@ -7794,8 +7795,8 @@
 [equal? type? for i 1 2 0 [break] type? for i 2 1 0 [break]]
 [equal? type? for i -1 -2 0 [break] type? for i 2 1 0 [break]]
 [equal? type? for i -1 -2 0 [break] type? for i -2 -1 0 [break]]
-#r2only
 ; char tests
+#r2only
 [
 	num: 0
 	char: #"^(ff)"
@@ -7934,8 +7935,8 @@
 	f1: does [forall blk [return 1 2]]
 	1 = f1
 ]
-#r3only
 ; Test that errors do not stop the loop and errors can be returned
+#r3only
 [
 	num: 0
 	blk: [1 2]
@@ -7953,8 +7954,8 @@
 	]
 	num = 80
 ]
-#r2only
 ; in Rebol2 the FORALL function is unable to pass a THROW error test
+#r2only
 [
 	f: func [[catch] /local x] [
 		x: [1]
@@ -8029,8 +8030,8 @@
 	f1: does [foreach i blk [return 1 2]]
 	1 = f1
 ]
-#r3only
 ; Test that errors do not stop the loop and errors can be returned
+#r3only
 [
 	num: 0
 	blk: [1 2]
@@ -8073,8 +8074,8 @@
 ]
 ; Test that exit stops the loop
 [unset? do does [forever [exit]]]
-#r3only
 ; Test that errors do not stop the loop and errors can be returned
+#r3only
 [
 	num: 0
 	e: forever [
@@ -8161,8 +8162,8 @@
 	f1: does [forskip blk 2 [return 1 2]]
 	1 = f1
 ]
-#r3only
 ; Test that errors do not stop the loop and errors can be returned
+#r3only
 [
 	num: 0
 	blk: [1 2]
@@ -8180,8 +8181,8 @@
 	]
 	num = 80
 ]
-#r2only
 ; in Rebol2 the FORSKIP function is unable to pass a THROW error test
+#r2only
 [
 	f: func [[catch] /local x] [
 		x: [1]
@@ -8316,8 +8317,8 @@
 	f1: does [loop 1 [return 1 2]]
 	1 = f1
 ]
-#r3only
 ; Test that errors do not stop the loop and errors can be returned
+#r3only
 [
 	num: 0
 	e: loop 2 [num: num + 1 try [1 / 0]]
@@ -8430,38 +8431,38 @@
 	repeat i [a] [continue success: false]
 	success
 ]
-#r3
 ; decimal! test
+#r3
 [[1 2 3] == collect [repeat i 3.0 [keep i]]]
 [[1 2 3] == collect [repeat i 3.1 [keep i]]]
 [[1 2 3] == collect [repeat i 3.5 [keep i]]]
 [[1 2 3] == collect [repeat i 3.9 [keep i]]]
-#r3
 ; pair! test (bug#1995)
+#r3
 [[1x1 2x1 1x2 2x2] == collect [repeat i 2x2 [keep i]]]
-#r2only
 ; string! test
+#r2only
 [
 	out: copy ""
 	repeat i "abc" [append out i]
 	out = "abc"
 ]
-#r3only
 ; string! test
+#r3only
 [
 	out: copy ""
 	repeat i "abc" [append out i]
 	out = "abcbcc"
 ]
-#r2only
 ; block! test
+#r2only
 [
 	out: copy []
 	repeat i [1 2 3] [append out i]
 	out = [1 2 3]
 ]
-#r3only
 ; block! test
+#r3only
 [
 	out: copy []
 	repeat i [1 2 3] [append out i]
@@ -8484,8 +8485,8 @@
 	f1: does [repeat i 1 [return 1 2]]
 	1 = f1
 ]
-#r3only
 ; Test that errors do not stop the loop and errors can be returned
+#r3only
 [
 	num: 0
 	e: repeat i 2 [num: i try [1 / 0]]
@@ -8501,8 +8502,8 @@
 	]
 	num = 10
 ]
-#r2only
 ; local variable type safety
+#r2only
 [
 	test: false
 	repeat i 2 [
@@ -8513,8 +8514,8 @@
 		]
 	]
 ]
-#r3only
 ; local variable type safety
+#r3only
 [
 	test: false
 	error? try [
@@ -8628,9 +8629,9 @@
 	error? try [f1]
 	success
 ]
-#r3only
 ; testing TRY/EXCEPT
 ; bug#822
+#r3only
 [error? try/except [make error! ""] [0]]
 #r3only
 [try/except [do make error! ""] [true]]
@@ -8640,8 +8641,8 @@
 [try/except [1 / 0] func [e] [error? e]]
 #r3only
 [try/except [true] func [e] [false]]
-#r3only
 ; bug#1514
+#r3only
 [error? try [try/except [1 / 0] :add]]
 ; functions/control/unless.r
 [
@@ -8691,8 +8692,8 @@
 	f1: does [until [return 1]]
 	1 = f1
 ]
-#r3only
 ; Test that errors do not stop the loop
+#r3only
 [1 = until [try [1 / 0] 1]]
 ; Recursion check
 [
@@ -8787,8 +8788,8 @@
 	cycle?: true
 	1 = catch/name [while [if cycle? [throw/name 1 'a] false] [cycle?: false]] 'a
 ]
-#r3only
 ; Test that disarmed errors do not stop the loop and errors can be returned
+#r3only
 [
 	num: 0
 	e: while [num < 10] [num: num + 1 try [1 / 0]]
@@ -8952,8 +8953,8 @@
 ; bug#1967
 [not same? to binary! [1] to binary! [2]]
 ; functions/datatype/as-pair.r
-#r3only
 ; bug#1624
+#r3only
 [native? :as-pair]
 ; functions/define/func.r
 ; recursive safety
@@ -9314,8 +9315,8 @@
 [255.255.255 and 255.255.255 = 255.255.255]
 ; binary
 [#{030000} and #{020000} = #{020000}]
-#r2only
 ; string
+#r2only
 ["^(03)^(00)" and "^(02)^(00)" = "^(02)^(00)"]
 ; functions/math/arccosine.r
 [0 = arccosine 1]
@@ -9389,8 +9390,8 @@
 [0 = complement -1]
 [2147483647 = complement -2147483648]
 [-2147483648 = complement 2147483647]
-#r2only
 ; char
+#r2only
 [#"^(ff)" = complement #"^@"]
 #r2only
 [#"^@" = complement #"^(ff)"]
@@ -9404,8 +9405,8 @@
 ; binary
 [#{ffffffffff} = complement #{0000000000}]
 [#{0000000000} = complement #{ffffffffff}]
-#r2only
 ; string
+#r2only
 ["^(ff)" = complement "^@"]
 #r2only
 ["^@" = complement "^(ff)"]
@@ -9845,8 +9846,8 @@
 [negative? -4.94065645841247E-324]
 [not negative? 1.7976931348623157e308]
 [negative? -1.7976931348623157e308]
-#r2only
 ; char
+#r2only
 [not negative? #"^@"]
 #r2only
 [not negative? #"^a"]
@@ -9962,8 +9963,8 @@
 [not positive? -4.94065645841247E-324]
 [positive? 1.7976931348623157e308]
 [not positive? -1.7976931348623157e308]
-#r2only
 ; char
+#r2only
 [not positive? #"^@"]
 #r2only
 [positive? #"^a"]
@@ -11377,8 +11378,8 @@
 		equal? value original
 	]
 ]
-#r3only
 ; bug#1764
+#r3only
 [unset 'blk protect/deep 'blk]
 ; functions/secure/unprotect.r
 ; bug#1748
@@ -12228,8 +12229,8 @@
 	i == 2
 ]
 ; THEN rule
-#r3only
 ; bug#1267
+#r3only
 [
 	b: "abc"
 	c: ["a" | "b"]
@@ -12238,8 +12239,8 @@
 	equal? parse "aaaaabc" a2 parse "aaaaabc" a4
 ]
 ; NOT rule
-#r3only
 ; bug#1246
+#r3only
 [parse "1" [not not "1" "1"]]
 #r3only
 [parse "1" [not [not "1"] "1"]]
@@ -12309,8 +12310,8 @@
 [#"1" = pick at "12345" 3 -1]
 #r2only
 [none? pick at "12345" 3 0]
-#r3only
 ; bug#857
+#r3only
 [#"2" = pick at "12345" 3 0]
 [#"3" = pick at "12345" 3 1]
 [#"4" = pick at "12345" 3 2]
@@ -12444,7 +12445,6 @@
 [["12345" "67812" "345678"] == split/into "1234567812345678" 3]
 #r3
 [["123" "456" "781" "234" "5678"] == split/into "1234567812345678" 5]
-#r3
 ; Delimiter longer than series
 #r3
 [["1" "2" "3" "" "" ""] == split/into "123" 6]
@@ -12653,14 +12653,14 @@
 #r3only
 [["äöü"] == read/lines %fixtures/umlauts-utf16be.txt]
 [#{FFFE0000E4000000F6000000FC000000} == read %fixtures/umlauts-utf32le.txt]
-#r3only
 ; bug#2186
+#r3only
 ["äöü" == read/string %fixtures/umlauts-utf32le.txt]
 #r3only
 [["äöü"] == read/lines %fixtures/umlauts-utf32le.txt]
 [#{0000FEFF000000E4000000F6000000FC} == read %fixtures/umlauts-utf32be.txt]
-#r3only
 ; bug#2186
+#r3only
 ["äöü" == read/string %fixtures/umlauts-utf32be.txt]
 #r3only
 [["äöü"] == read/lines %fixtures/umlauts-utf32be.txt]
