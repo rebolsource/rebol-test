@@ -24,8 +24,19 @@
 [not action? 1]
 [action! = type? :abs]
 ; bug#1659
-; actions are active
+; implicit evaluation
 [1 == do reduce [:abs -1]]
+; indirect (word) implicit evaluation
+[1 == abs -1]
+; indirect (path) implicit evaluation
+[
+	b: reduce [:abs]
+	1 == b/1 -1
+]
+; explicit evaluation
+[1 == do :abs -1]
+; indirect (word) explicit evaluation
+; indirect (path) explicit evaluation
 ; datatypes/binary.r
 [binary? #{00}]
 [not binary? 1]
@@ -82,6 +93,23 @@
 [[] == make block! 0]
 [[] == to block! ""]
 ["[]" == mold []]
+; implicit evaluation
+[
+	a-block: [1 + 2]
+	same? :a-block do reduce [:a-block]
+]
+; indirect (word) implicit evaluation
+[
+	a-block: [1 + 2]
+	same? :a-block do [a-block]
+]
+; indirect (path) implicit evaluation
+[
+	a-block: [[1 + 2]]
+	same? first :a-block a-block/1
+]
+; explicit evaluation
+[do [true]]
 ; datatypes/char.r
 [char? #"a"]
 [not char? 1]
@@ -3232,8 +3260,7 @@
 		not lesser-or-equal? 'c 'a
 	]
 ]
-; words are active; actions are word-active
-[1 == abs -1]
+; words are active
 [
 	a-value: #{}
 	same? :a-value a-value
