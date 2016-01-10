@@ -3206,7 +3206,13 @@
 [equal? mold/all #[url! ""] {#[url! ""]}]
 [equal? mold/all #[url! "a"] {#[url! "a"]}]
 ; bug#2011
-[not equal? load "http://a.b.c/d?e=f%26" load "http://a.b.c/d?e=f&"]
+[url? http://a.b.c/d?e=f%26]
+[url? http://a.b.c/d?e=f&]
+[not equal? http://a.b.c/d?e=f%26 http://a.b.c/d?e=f&]
+; bug#2013
+[url? http://a.b.c/d?e=č]
+[url? http://a.b.c/d?e=%c4%8d]
+[equal? http://a.b.c/d?e=%c4%8d http://a.b.c/d?e=č]
 ; datatypes/vector.r
 #r3only
 [vector? make vector! 0]
