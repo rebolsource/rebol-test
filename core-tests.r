@@ -1914,10 +1914,10 @@
 	append b k
 	append b copy "value"
 	m: make map! b
-	if select m "key" <> "value" [res: false]
+	if "value" <> select m "key" [res: false]
 	append k "chain"
-	if select m "keychain" <> none [res: false]
-	if select m "key" <> "value" [res: false]
+	if none <> select m "keychain" [res: false]
+	if "value" <> select m "key" [res: false]
 	res
 ]
 ; datatypes/module.r
@@ -12726,3 +12726,10 @@
 	recycle
 	true
 ]
+;; tidy up temporary files 
+[
+	if exists? %pokus.txt [delete %pokus.txt]
+	if exists? %tmp-inner.reb [delete %tmp-inner.reb]
+	true
+]
+	
