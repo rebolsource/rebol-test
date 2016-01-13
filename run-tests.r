@@ -14,9 +14,6 @@ Rebol [
 	Purpose: {Click and run tests in a file or directory.}
 ]
 
-; define the INCLUDE function
-do %include.r
-
 do %test-framework.r 
 
 run-tests: func [
