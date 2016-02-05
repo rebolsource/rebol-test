@@ -808,6 +808,12 @@
 [same? to decimal! #{3ff0000000000000} 1.0]
 ; bug#747
 [equal? #{3FF0000000000009} to binary! to decimal! #{3FF0000000000009}]
+; bug#2256
+[
+	a: 0.1 + 0.1 + 0.1
+	b: 0.3
+	equal? (lesser? a b) or (equal? a b) lesser-or-equal? a b
+]
 ; datatypes/email.r
 [email? me@here.com]
 [not email? 1]
