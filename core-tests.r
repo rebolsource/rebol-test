@@ -455,7 +455,12 @@
 	'a == f
 ]
 ; basic test for recursive closure! invocation
-[i: 0 countdown: closure [n] [if n > 0 [++ i countdown n - 1]] countdown 10 i = 10]
+[
+	i: 0
+	countdown: closure [n] [if n > 0 [++ i countdown n - 1]]
+	countdown 10
+	i = 10
+]
 ; bug#21
 [
 	c: closure [a] [return a]
@@ -538,6 +543,21 @@
 	all [
 		1 = b
 		2 = c
+	]
+]
+; recursive closure test
+[
+	blk: copy []
+	c: closure [a] [
+		append blk 'a
+		if a <> 2 [
+			c 2
+		]
+	]
+	c 1
+	all [
+		[a a] = blk
+		[1 2] = reduce blk
 	]
 ]
 ; bug#447
