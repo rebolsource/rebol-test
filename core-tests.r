@@ -1767,21 +1767,24 @@
 [integer? 1]
 [integer? -1]
 [integer? 2]
-; 32bit minimum
+; 32-bit minimum for two's complement representation
 [integer? -2147483648]
-; 32bit maximum
+; 32-bit maximum
 [integer? 2147483647]
-; 64bit minimum
+; 64-bit minimum for two's complement representation
 #64bit
 [integer? -9223372036854775808]
-; 64bit maximum
+; 64-bit maximum
 #64bit
 [integer? 9223372036854775807]
 [0 == make integer! 0]
 [0 == make integer! "0"]
 [0 == to integer! 0]
+; 32-bit minimum for two's complement representation
 [-2147483648 == to integer! -2147483648.0]
+; 32-bit minimum for two's complement representation
 [-2147483648 == to integer! -2147483648.9]
+; 32-bit maximum
 [2147483647 == to integer! 2147483647.9]
 #32bit
 [error? try [to integer! -2147483649.0]]
@@ -1799,8 +1802,10 @@
 [1 == to integer! #1]
 [0 == to integer! #{00}]
 [1 == to integer! #{01}]
+; -1 for 32-bit two's complement representation
 #32bit
 [-1 == to integer! #{ffffffff}]
+; -1 for 64-bit two's complement representation
 #64bit
 [-1 == to integer! #{ffffffffffffffff}]
 #64bit
