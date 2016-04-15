@@ -9450,9 +9450,13 @@
 [false = complement true]
 [true = complement false]
 ; integer
+; two's complement representation
 [-1 = complement 0]
+; two's complement representation
 [0 = complement -1]
+; two's complement representation
 [2147483647 = complement -2147483648]
+; two's complement representation
 [-2147483648 = complement 2147483647]
 ; char
 #r2only
@@ -9499,8 +9503,8 @@
 	a: make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
 	a == complement complement a
 ]
-; bug#1706
 ; image
+; bug#1706
 [(make image! [1x1 #{000000} #{00}]) = complement make image! [1x1 #{ffffff} #{ff}]]
 [(make image! [1x1 #{ffffff} #{ff}]) = complement make image! [1x1 #{000000} #{00}]]
 ; typeset
