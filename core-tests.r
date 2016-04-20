@@ -7245,7 +7245,6 @@
 	do [success: true]
 	success
 ]
-[1 == do :abs -1]
 #r2only
 [
 	a-value: #{}
