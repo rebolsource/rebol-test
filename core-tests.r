@@ -1936,6 +1936,21 @@
 ; bug#1930: Lookup crashes on empty hashed map.
 #r3only
 [m: make map! 8 clear m none? m/a]
+; append to a map string key
+#r3only
+[
+	res: true
+	b: copy []
+	k: copy "key"
+	append b k
+	append b copy "value"
+	m: make map! b
+	if "value" <> select m "key" [res: false]
+	append k "chain"
+	if none <> select m "keychain" [res: false]
+	if "value" <> select m "key" [res: false]
+	res
+]
 ; datatypes/module.r
 #r3only
 [module? make module! [[] []]]
@@ -12745,3 +12760,10 @@
 	recycle
 	true
 ]
+;; tidy up temporary files 
+[
+	if exists? %pokus.txt [delete %pokus.txt]
+	if exists? %tmp-inner.reb [delete %tmp-inner.reb]
+	true
+]
+	
