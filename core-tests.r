@@ -8900,7 +8900,7 @@
 		save/header script: %tmp-inner.reb compose ['quit/return (value)] []
 		do script
 	]
-	all map-each value reduce [
+	result: all map-each value reduce [
 		42
 		{foo}
 		#{CAFE}
@@ -8911,6 +8911,8 @@
 	] [
 		value = do-script-returning value
 	]
+	delete %tmp-inner.reb
+	result
 ]
 ; bug#2190
 [error? try [catch/quit [attempt [quit]] 1 / 0]]
@@ -11598,6 +11600,12 @@
 [
 	port: open/new %pokus.txt
 	append port newline
+	true
+]
+; tidy up the previous test
+[
+	if exists? %pokus.txt [delete %pokus.txt]
+	true
 ]
 [block? append copy [] ()]
 ; functions/series/at.r
@@ -12758,12 +12766,6 @@
 	a: copy []
 	loop 200'000 [a: append/only copy [] a]
 	recycle
-	true
-]
-;; tidy up temporary files 
-[
-	if exists? %pokus.txt [delete %pokus.txt]
-	if exists? %tmp-inner.reb [delete %tmp-inner.reb]
 	true
 ]
 	
