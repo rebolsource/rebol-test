@@ -280,7 +280,7 @@ instead.
 Having added the *open* command association for the test files left-clicking a *.tst* file will run tests in the file in the Windows Explorer. Having added the *test* command association, you will see the new *test* context menu item when right-clicking a test file in Windows Explorer.
 
 \note
-After using the Windows 7 (or later) built-in "Choose default program..." action (found under the file-right-click context menu under "Open with") it re-associates the extension with whatever new program you choose.
+After using the Windows 7, Windows 8 or Windows 10 built-in "Choose default program..." action (found under the file-right-click context menu under "Open with") it re-associates the extension with whatever new program you choose.
 What happens at this point is that *HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.tst\UserChoice*, and possibly *HKEY_CURRENT_USER\Software\Microsoft\Windows\Roaming\OpenWith\FileExts\.tst\UserChoice* are created/changed by the system, and so the newly selected program takes over. To regain control over the extension you can delete the above UserChoice key/keys.
 /note
 
