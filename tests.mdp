@@ -150,7 +150,7 @@ Where, again, we see that the total number of tests was 4598. The count of "new-
 
 Log difference is useful if:
 
-* We want to know the effect of interpreter code update. In this case it is most convenient (but not required) to perform the same test suite in both the old as well as the new interpreter version.
+* We want to know the effect of interpreter code update. In this case it is most convenient (but not required) to perform the same test suite using both the old as well as the new interpreter version and compare the logs.
 * We want to know the effect of test suite changes. In this case it is most convenient (but not required) to perform both the old and new test suite version using the same interpreter and compare the logs.
 
 ===Features of the test dialect
