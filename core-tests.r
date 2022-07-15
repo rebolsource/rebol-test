@@ -9089,14 +9089,22 @@
 [1 = abs -1]
 [2147483647 = abs 2147483647]
 [2147483647 = abs -2147483647]
+#32bit
+[error? try [abs -2147483648]]
+#64bit
+[2147483648 = abs 2147483648]
+#64bit
+[2147483648 = abs -2147483648]
 [0.0 = abs 0.0]
 [zero? 1.0 - abs 1.0]
 [zero? 1.0 - abs -1.0]
-; simple tests verify correct args and refinements; integer tests
 #64bit
 [9223372036854775807 = abs 9223372036854775807]
 #64bit
 [9223372036854775807 = abs -9223372036854775807]
+#64bit
+; bug#833
+[error? try [abs -9223372036854775808]]
 ; pair! tests
 [0x0 = abs 0x0]
 [0x1 = abs 0x1]
@@ -9109,12 +9117,6 @@
 [2147483647x2147483647 = abs 2147483647x-2147483647]
 [2147483647x2147483647 = abs -2147483647x2147483647]
 [2147483647x2147483647 = abs -2147483647x-2147483647]
-; bug#833
-#64bit
-[
-	a: try [abs to integer! #{8000000000000000}]
-	any [error? a not negative? a]
-]
 ; functions/math/add.r
 [3 = add 1 2]
 ; integer -9223372036854775808 + x tests
@@ -12768,3 +12770,4 @@
 	recycle
 	true
 ]
+
