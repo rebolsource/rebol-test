@@ -7689,73 +7689,111 @@
 [a: 1 do does [a: error? try [exit]] :a =? 1]
 ; functions/control/for.r
 [
+	; traverse all values
 	success: true
 	num: 0
 	for i 1 10 1 [
 		num: num + 1
-		success: i = num and success
+		success: i == num and success
 	]
-	10 = num and success
+	10 == num and success
 ]
-; cycle return value
-[false = for i 1 1 1 [false]]
-; break cycle
 [
-	num: 0
-	for i 1 10 1 [num: i break]
-	num = 1
+	; cycle value
+	false == for i 1 1 1 [false]
 ]
-; break return value
-[unset? for i 1 10 1 [break]]
-; break/return return value
-[2 = for i 1 10 1 [break/return 2]]
-; continue cycle
-; bug#58
+[
+	; break stops the cycle
+	num: 0
+	for i 1 10 1 [
+		num: num + 1
+		break
+	]
+	num == 1
+]
+[
+	; break cycle value
+	unset? for i 1 10 1 [break]
+]
+[
+	; break/return stops the cycle
+	num: 0
+	for i 1 10 1 [
+		num: num + 1
+		break/return -1
+	]
+	num == 1
+]
+[
+	; break/return cycle value
+	-1 == for i 1 10 1 [break/return -1 i]
+]
 #r3only
 [
+	; continue cycle
+	; bug#58
 	success: true
 	for i 1 1 1 [continue success: false]
 	success
 ]
 #r3only
 [
+	; block! continue cycle
 	success: true
 	x: "a"
 	for i x tail x 1 [continue success: false]
 	success
 ]
-; string! test
 [
+	; string! all values
 	out: copy ""
 	for i s: "abc" back tail s 1 [append out i]
 	out = "abcbcc"
 ]
-; block! test
 [
+	; block! all values
 	out: copy []
 	for i b: [1 2 3] back tail b 1 [append out i]
 	out = [1 2 3 2 3 3]
 ]
-; zero repetition
 [
+	; block! cycle end for positive BUMP
+	num: 0
+	1 == for i b: [1 2 3] tail b 4 [
+		num: num + 1
+		if num > 2 [break/return -1]
+		index? i
+	]
+]
+[
+	; block! cycle end for negative BUMP
+	num: 0
+	3 == for i back tail b: [1 2 3] b -3 [
+		num: num + 1
+		if num > 2 [break/return -1]
+		index? i
+	]
+]
+[
+	; zero repetition
 	success: true
 	for i 1 0 1 [success: false]
 	success
 ]
-; zero repetition block test
 [
+	; block! zero repetition
 	success: true
 	for i b: [1] tail :b -1 [success: false]
 	success
 ]
-; Test that return stops the loop
 [
+	; return stops the loop
 	f1: does [for i 1 1 1 [return 1 2] 2]
 	1 = f1
 ]
-; Test that errors do not stop the loop and errors can be returned
 #r3only
 [
+	; errors do not stop the loop and can become cycle value
 	num: 0
 	e: for i 1 2 1 [num: i try [1 / 0]]
 	all [error? e num = 2]
