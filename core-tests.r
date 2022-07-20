@@ -7800,6 +7800,24 @@
 ]
 ; infinite loop tests
 [
+	; block! with zero bump
+	 num: 0
+	 for i s: [1] tail s 0 [
+		num: num + 1
+		if num > 1 [break]
+	]
+	num > 1
+]
+[
+	; block! with zero bump
+	 num: 0
+	 for i tail s: [1] s 0 [
+		num: num + 1
+		if num > 1 [break]
+	]
+	num > 1
+]
+[
 	num: 0
 	for i b: [1] tail b 1 [
 		num: num + 1
