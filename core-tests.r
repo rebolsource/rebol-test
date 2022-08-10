@@ -7738,7 +7738,7 @@
 ]
 #r3only
 [
-	; block! continue cycle
+	; string!, continue cycle
 	success: true
 	x: "a"
 	for i x tail x 1 [continue success: false]
@@ -7789,20 +7789,20 @@
 [
 	; return stops the loop
 	f1: does [for i 1 1 1 [return 1 2] 2]
-	1 = f1
+	1 == f1
 ]
 #r3only
 [
 	; errors do not stop the loop and can become cycle value
 	num: 0
 	e: for i 1 2 1 [num: i try [1 / 0]]
-	all [error? e num = 2]
+	all [error? e num == 2]
 ]
 ; infinite loop tests
 [
 	; block! with zero bump
-	 num: 0
-	 for i s: [1] tail s 0 [
+	num: 0
+	for i s: [1] tail s 0 [
 		num: num + 1
 		if num > 1 [break]
 	]
@@ -7810,8 +7810,8 @@
 ]
 [
 	; block! with zero bump
-	 num: 0
-	 for i tail s: [1] s 0 [
+	num: 0
+	for i tail s: [1] s 0 [
 		num: num + 1
 		if num > 1 [break]
 	]
