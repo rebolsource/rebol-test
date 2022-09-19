@@ -7818,6 +7818,88 @@
 	num > 1
 ]
 [
+	; block! with zero bump, equal bounds and skip
+	num: 0
+	for i s: next [1 2] s 0 [
+		num: num + 1
+		if num > 1 [break]
+		i: next i
+	]
+	num == 1
+]
+[
+	; block! with zero bump, equal bounds and backward skip
+	num: 0
+	for i s: next [1 2] s 0 [
+		num: num + 1
+		if num > 1 [break]
+		i: back i
+	]
+	num == 1
+]
+[
+	; block! with zero bump, different bounds and skip
+	num: 0
+	for i s: next [1 2 3] next s 0 [
+		num: num + 1
+		if num > 2 [break]
+		i: next i
+	]
+	num == 2
+]
+[
+	; block! with zero bump, different bounds and skip
+	num: 0
+	for i next s: next [1 2 3] s 0 [
+		num: num + 1
+		if num > 2 [break]
+		i: next i
+	]
+	num == 3
+]
+[
+	; block! with zero bump, different bounds and backward skip
+	num: 0
+	for i s: next [1 2 3] next s 0 [
+		num: num + 1
+		if num > 2 [break]
+		i: back i
+	]
+	num == 3
+]
+[
+	; block! with zero bump, different bounds and backward skip
+	num: 0
+	for i next s: next [1 2 3] s 0 [
+		num: num + 1
+		if num > 2 [break]
+		i: back i
+	]
+	num == 2
+]
+[
+	; block with invalid word reference
+	num: 0
+	error? try [
+		for i next s: next [1 2 3] s 0 [
+			num: num + 1
+			if num > 1 [break]
+			i: 0
+		]
+	]
+]
+[
+	; block with invalid word reference
+	num: 0
+	error? try [
+		for i next s: next [1 2 3] s 0 [
+			num: num + 1
+			if num > 1 [break]
+			i: []
+		]
+	]
+]
+[
 	num: 0
 	for i b: [1] tail b 1 [
 		num: num + 1
