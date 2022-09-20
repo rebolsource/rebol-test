@@ -1780,12 +1780,18 @@
 [0 == make integer! 0]
 [0 == make integer! "0"]
 [0 == to integer! 0]
-; 32-bit minimum for two's complement representation
-[-2147483648 == to integer! -2147483648.0]
-; 32-bit minimum for two's complement representation
-[-2147483648 == to integer! -2147483648.9]
-; 32-bit maximum
-[2147483647 == to integer! 2147483647.9]
+[
+	; decimal! to 32-bit integer minimum
+	-2147483648 == to integer! -2147483648.0
+]
+[
+	; decimal! to 32-bit integer minimum
+	-2147483648 == to integer! -2147483648.9
+]
+[
+	; decimal! to 32-bit integer maximum
+	2147483647 == to integer! 2147483647.9
+]
 #32bit
 [error? try [to integer! -2147483649.0]]
 #32bit
