@@ -1800,8 +1800,14 @@
 [error? try [to integer! 9.2233720368547765e18]]
 [error? try [to integer! -9.2233720368547779e18]]
 [0 == to integer! "0"]
+#r2only
 [0 == to integer! false]
+#r3only
+[error? try [to integer! false]]
+#r2only
 [1 == to integer! true]
+#r3only
+[error? try [to integer! true]]
 [0 == to integer! #"^@"]
 [1 == to integer! #"^a"]
 [0 == to integer! #0]
@@ -1911,7 +1917,10 @@
 [no = false]
 [false = make logic! 0]
 [true = make logic! 1]
+#r2only
 [false = to logic! 0]
+#r3only
+[true = to logic! 0]
 [true = to logic! 1]
 [false = to logic! none]
 [true = to logic! "f"]
