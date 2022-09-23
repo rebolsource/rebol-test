@@ -1800,13 +1800,7 @@
 [error? try [to integer! 9.2233720368547765e18]]
 [error? try [to integer! -9.2233720368547779e18]]
 [0 == to integer! "0"]
-#r2only
-[0 == to integer! false]
-#r3only
 [error? try [to integer! false]]
-#r2only
-[1 == to integer! true]
-#r3only
 [error? try [to integer! true]]
 [0 == to integer! #"^@"]
 [1 == to integer! #"^a"]
@@ -1917,9 +1911,6 @@
 [no = false]
 [false = make logic! 0]
 [true = make logic! 1]
-#r2only
-[false = to logic! 0]
-#r3only
 [true = to logic! 0]
 [true = to logic! 1]
 [false = to logic! none]
@@ -7050,6 +7041,7 @@
 [foo: func [x y] [9] a: 1 loop 1 [a: foo break break] :a =? 1]
 ; check that BREAK is evaluated (and not CONTINUE):
 [foo: func [x y] [] a: 1 loop 2 [a: a + 1 foo break continue a: a + 10] :a =? 2]
+#r3
 ; check that BREAK is not evaluated (but CONTINUE is):
 [foo: func [x y] [] a: 1 loop 2 [a: a + 1 foo continue break a: a + 10] :a =? 3]
 ; bug#1535
@@ -7732,6 +7724,10 @@
 	false == for i 1 1 1 [false]
 ]
 [
+	; #[unset!] cycle value
+	unset? for i 1 1 1 []
+]
+[
 	; break stops the cycle
 	num: 0
 	for i 1 10 1 [
@@ -8061,8 +8057,10 @@
 ]
 ; skip before head test
 [[] = for i b: tail [1] head b -2 [i]]
-; "recursive safety", "locality" and "body constantness" test in one
-[for i 1 1 1 b: [not same? 'i b/3]]
+[
+	; the cycle variable must be local
+	not same? 'i for i 1 1 1 ['i]
+]
 ; recursivity
 [
 	num: 0
