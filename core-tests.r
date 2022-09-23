@@ -540,9 +540,9 @@
 	a: closure [b] [does [b]]
 	b: a 1
 	c: a 2
-	all [
-		1 = b
-		2 = c
+	found? all [
+		1 == b
+		2 == c
 	]
 ]
 ; recursive closure test
@@ -555,9 +555,9 @@
 		]
 	]
 	c 1
-	all [
-		[a a] = blk
-		[1 2] = reduce blk
+	found? all [
+		[a a] == blk
+		[1 2] == reduce blk
 	]
 ]
 ; bug#447
@@ -683,34 +683,24 @@
 [decimal? 1.5]
 ; LOAD decimal and to binary! tests
 ; 64-bit IEEE 754 maximum
-#r3only
 [equal? #{7FEFFFFFFFFFFFFF} to binary! 1.7976931348623157e308]
 ; Minimal positive normalized
-#r3only
 [equal? #{0010000000000000} to binary! 2.2250738585072014E-308]
 ; Maximal positive denormalized
-#r3only
 [equal? #{000FFFFFFFFFFFFF} to binary! 2.225073858507201E-308]
 ; Minimal positive denormalized
-#r3only
 [equal? #{0000000000000001} to binary! 4.9406564584124654E-324]
 ; zero
-#r3only
 [equal? #{0000000000000000} to binary! 0.0]
 ; negative zero
-#r3only
 [equal? #{8000000000000000} to binary! -0.0]
 ; Maximal negative denormalized
-#r3only
 [equal? #{8000000000000001} to binary! -4.9406564584124654E-324]
 ; Minimal negative denormalized
-#r3only
 [equal? #{800FFFFFFFFFFFFF} to binary! -2.225073858507201E-308]
 ; Maximal negative normalized
-#r3only
 [equal? #{8010000000000000} to binary! -2.2250738585072014E-308]
 ; 64-bit IEEE 754 minimum
-#r3only
 [equal? #{FFEFFFFFFFFFFFFF} to binary! -1.7976931348623157e308]
 ; bug#729
 ; MOLD decimal accuracy tests
@@ -1614,7 +1604,7 @@
 [
 	a: func [b] [a: none c: b]
 	f: func [d] [a [d] do c]
-	all [
+	found? all [
 		1 = f 1
 		2 = f 2
 	]
@@ -2837,7 +2827,7 @@
 [
 	a: 1x2
 	a/x: (a: [x 4] 3)
-	any [
+	found? any [
 		a == 3x2
 		a == [x 3]
 	]
@@ -3151,14 +3141,14 @@
 ]
 [
 	; time overflow?
-	any [
+	found? any [
 		error? try [596522:14:07.999999999 + 1:00:0.000000001]
 		greater? 596522:14:07.999999999 + 1:00:0.000000001 596522:14:07.999999999 + 1:00:00
 	]
 ]
 [
 	; time maximum?
-	any [
+	found? any [
 		error? try [596522:14:07.999999998 + 1:00:0.000000001]
 		greater? 596522:14:07.999999998 + 1:00:0.000000001 596522:14:07.999999999 + 1:00:00
 	]
@@ -5063,7 +5053,7 @@
 #r3
 [
 	p: make port! http://
-	any [
+	found? any [
 		error? try [equiv? p p]
 		equiv? p p
 	]
@@ -5538,7 +5528,7 @@
 ; port! values; reflexivity; in this case the error should not be generated, I think
 [
 	p: make port! http://
-	any [
+	found? any [
 		error? try [same? p p]
 		same? p p
 	]
@@ -5998,7 +5988,7 @@
 ; port! values; reflexivity; in this case the error should not be generated, I think
 [
 	p: make port! http://
-	any [
+	found? any [
 		error? try [strict-equal? p p]
 		strict-equal? p p
 	]
@@ -9126,7 +9116,7 @@
 [error? try [load/next "1"]]
 ; bug#1122
 [
-	any [
+	found? any [
 		error? try [load "9999999999999999999"]
 		greater? load "9999999999999999999" load "9223372036854775807"
 	]
@@ -9228,14 +9218,14 @@
 ; bug#1674
 #r2only
 [
-	any [
+	found? any [
 		not error? e: try [make-dir %/folder-to-save-test-files]
 		(e: disarm e e/type = 'access)
 	]
 ]
 #r3only
 [
-	any [
+	found? any [
 		not error? e: try [make-dir %/folder-to-save-test-files]
 		e/type = 'access
 	]
