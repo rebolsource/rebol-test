@@ -1786,9 +1786,13 @@
 [error? try [to integer! -2147483649.0]]
 #32bit
 [error? try [to integer! 2147483648.0]]
+#64-bit
+[to integer! -9223372036854775808.0]
+#64-bit
+[to integer! 9223372036854775807.0]
 ; bug#921
-[error? try [to integer! 9.2233720368547765e18]]
-[error? try [to integer! -9.2233720368547779e18]]
+[error? try [to integer! -9.223372036854778e+18]]
+[error? try [to integer! 9.223372036854778e+18]]
 [0 == to integer! "0"]
 [error? try [to integer! false]]
 [error? try [to integer! true]]
