@@ -8095,7 +8095,6 @@
 	b/near = [pokus1 b]
 ]
 ; local variable type safety
-#r3only
 [
 	test: false
 	error? try [
@@ -8110,6 +8109,15 @@
 ; FOR should not bind 'self
 ; bug#1529
 [same? 'self for i 1 1 1 ['self]]
+[
+	; big decimal bounds and bump
+	s: to decimal!  #{7FEFFFFFFFFFFFFF}
+	num: 0
+	for i s s s [
+		num: num + 1
+	]
+	1 == num
+]
 ; functions/control/forall.r
 [
 	str: "abcdef"
