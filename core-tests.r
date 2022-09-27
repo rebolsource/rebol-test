@@ -10243,6 +10243,12 @@
 [4 = power 2 2]
 [0.5 = power 2 -1]
 [0.1 = power 10 -1]
+[error? try [power 0 0]]
+[error? try [power 0 -1]]
+[error? try [power 0.0 0.0]]
+[error? try [power 0.0 -1.0]]
+[error? try [power -1 0.5]]
+[error? try [power -1.0 0.5]]
 ; functions/math/random.r
 ; bug#1084
 #r3only
