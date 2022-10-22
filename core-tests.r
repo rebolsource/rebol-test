@@ -11271,7 +11271,7 @@
 #r3only
 [strict-equal? 0 shift 1 -31]
 #r2only
-[strict-equal? to integer! #{80000000} shift 1 -31]
+[error? try [shift 1 -31]]
 #r2only
 [strict-equal? 0 shift/left 1 -31]
 #r3only
@@ -11294,7 +11294,7 @@
 #r2only
 [strict-equal? 0 shift 1 31]
 #r2only
-[strict-equal? to integer! #{80000000} shift/left 1 31]
+[error? try [shift/left 1 31]]
 #r3only
 [strict-equal? to integer! #{0100000000} shift 1 32]
 #r2only
