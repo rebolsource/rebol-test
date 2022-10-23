@@ -681,6 +681,11 @@
 [decimal? 1.0]
 [decimal? -1.0]
 [decimal? 1.5]
+; to decimal! tests
+[error? try [to decimal! #{7ff0000000000000}]]
+[error? try [to decimal! #{7ff0000000000001}]]
+[error? try [to decimal! #{fff0000000000000}]]
+[error? try [to decimal! #{fff0000000000001}]]
 ; LOAD decimal and to binary! tests
 ; 64-bit IEEE 754 maximum
 [equal? #{7FEFFFFFFFFFFFFF} to binary! 1.7976931348623157e308]
