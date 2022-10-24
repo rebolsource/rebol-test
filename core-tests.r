@@ -12265,24 +12265,58 @@
 	]
 ]
 [
+	str: ""
+	all [
+		str = copy str
+		not same? str copy str
+	]
+]
+[
 	blk: [1]
 	all [
 		blk = copy blk
 		not same? blk copy blk
 	]
 ]
+[
+	str: "1"
+	all [
+		str = copy str
+		not same? str copy str
+	]
+]
 [[1] = copy/part tail [1] -1]
+["1" = copy/part tail "1" -1]
 [[1] = copy/part tail [1] -2147483647]
+["1" = copy/part tail "1" -2147483647]
 ; bug#853
 ; bug#1118
 [[1] = copy/part tail [1] -2147483648]
+["1" = copy/part tail "1" -2147483648]
+[
+	b: tail [1 2 3]
+	remove head b
+	block? copy/part b 1
+]
+[
+	s: tail "123"
+	remove head s
+	string? copy/part s 1
+]
 #64bit
 [[1] = copy/part tail [1] -9223372036854775808]
+#64bit
+["1" = copy/part tail "1" -9223372036854775808]
 [[] = copy/part [] 0]
+["" = copy/part "" 0]
 [[] = copy/part [] 1]
+["" = copy/part "" 1]
 [[] = copy/part [] 2147483647]
+["" = copy/part "" 2147483647]
 #64bit
 [[] = copy/part [] 9223372036854775807]
+#64bit
+["" = copy/part "" 9223372036854775807]
 [error? try [copy none]]
 ; bug#877
 [
