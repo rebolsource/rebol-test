@@ -74,6 +74,67 @@
 ; case sensitivity
 ; bug#1459
 [lesser? #{0141} #{0161}]
+; integer! to binary!
+#64-bit
+[strict-equal? #{8000000000000000} to binary! -9223372036854775808]
+#32-bit
+[error? try [to binary! -9223372036854775808]]
+#64-bit
+[strict-equal? #{8000000000000001} to binary! -9223372036854775807]
+#32-bit
+[error? try [to binary! -9223372036854775807]]
+#64-bit
+[strict-equal? #{ffffffff80000000} to binary! -2147483648]
+#32-bit
+[strict-equal? #{80000000} to binary! -2147483648]
+#64-bit
+[strict-equal? #{ffffffff80000001} to binary! -2147483647]
+#32-bit
+[strict-equal? #{80000001} to binary! -2147483647]
+#64-bit
+[strict-equal? #{ffffffffffffffff} to binary! -1]
+#32-bit
+[strict-equal? #{ffffffff} to binary! -1]
+#64-bit
+[strict-equal? #{0000000000000000} to binary! 0]
+#32-bit
+[strict-equal? #{00000000} to binary! 0]
+#64-bit
+[strict-equal? #{000000000000001} to binary! 1]
+#32-bit
+[strict-equal? #{00000001} to binary! 1]
+#64-bit
+[strict-equal? #{000000007fffffff} to binary! 2147483647]
+#32-bit
+[strict-equal? #{7fffffff} to binary! 2147483647]
+; decimal! to binary!
+; LOAD decimal and to binary! tests
+; 64-bit IEEE 754 minimum
+[equal? #{FFEFFFFFFFFFFFFF} to binary! -1.7976931348623157e308]
+; -1.0
+[strict-equal? #{BFF0000000000000} to binary! -1.0]
+; Maximal negative normalized
+[strict-equal? #{8010000000000000} to binary! -2.2250738585072014E-308]
+; Minimal negative denormalized
+[strict-equal? #{800FFFFFFFFFFFFF} to binary! -2.225073858507201E-308]
+; Maximal negative denormalized
+[strict-equal? #{8000000000000001} to binary! -4.9406564584124654E-324]
+; negative zero
+[strict-equal? #{8000000000000000} to binary! -0.0]
+; zero
+[strict-equal? #{0000000000000000} to binary! 0.0]
+; Minimal positive denormalized
+[strict-equal? #{0000000000000001} to binary! 4.9406564584124654E-324]
+; Maximal positive denormalized
+[strict-equal? #{000FFFFFFFFFFFFF} to binary! 2.225073858507201E-308]
+; Minimal positive normalized
+[strict-equal? #{0010000000000000} to binary! 2.2250738585072014E-308]
+; 1.0
+[strict-equal? #{3ff0000000000000} to binary! 1.0]
+; 64-bit IEEE 754 maximum
+[strict-equal? #{7FEFFFFFFFFFFFFF} to binary! 1.7976931348623157e308]
+; bug#747
+[strict-equal? #{3FF0000000000009} to binary! to decimal! #{3FF0000000000009}]
 ; datatypes/bitset.r
 [bitset? make bitset! "a"]
 [not bitset? 1]
@@ -681,32 +742,14 @@
 [decimal? 1.0]
 [decimal? -1.0]
 [decimal? 1.5]
-; to decimal! tests
+; binary! to decimal! tests
+[error? try [to decimal! #{00000000}]]
+[error? try [to decimal! #{00000000000000}]]
+[error? try [to decimal! #{000000000000000000}]]
 [error? try [to decimal! #{7ff0000000000000}]]
 [error? try [to decimal! #{7ff0000000000001}]]
 [error? try [to decimal! #{fff0000000000000}]]
 [error? try [to decimal! #{fff0000000000001}]]
-; LOAD decimal and to binary! tests
-; 64-bit IEEE 754 maximum
-[equal? #{7FEFFFFFFFFFFFFF} to binary! 1.7976931348623157e308]
-; Minimal positive normalized
-[equal? #{0010000000000000} to binary! 2.2250738585072014E-308]
-; Maximal positive denormalized
-[equal? #{000FFFFFFFFFFFFF} to binary! 2.225073858507201E-308]
-; Minimal positive denormalized
-[equal? #{0000000000000001} to binary! 4.9406564584124654E-324]
-; zero
-[equal? #{0000000000000000} to binary! 0.0]
-; negative zero
-[equal? #{8000000000000000} to binary! -0.0]
-; Maximal negative denormalized
-[equal? #{8000000000000001} to binary! -4.9406564584124654E-324]
-; Minimal negative denormalized
-[equal? #{800FFFFFFFFFFFFF} to binary! -2.225073858507201E-308]
-; Maximal negative normalized
-[equal? #{8010000000000000} to binary! -2.2250738585072014E-308]
-; 64-bit IEEE 754 minimum
-[equal? #{FFEFFFFFFFFFFFFF} to binary! -1.7976931348623157e308]
 ; bug#729
 ; MOLD decimal accuracy tests
 #r3only
@@ -818,14 +861,6 @@
 [1.1 = to decimal! 1.1]
 [1.1 = to decimal! "1.1"]
 [error? try [to decimal! "t"]]
-; decimal! to binary! and binary! to decimal!
-[equal? #{3ff0000000000000} to binary! 1.0]
-[same? to decimal! #{3ff0000000000000} 1.0]
-; bug#747
-[equal? #{3FF0000000000009} to binary! to decimal! #{3FF0000000000009}]
-[error? try [to decimal! #{00000000}]]
-[error? try [to decimal! #{00000000000000}]]
-[error? try [to decimal! #{000000000000000000}]]
 ; bug#2256
 [
 	a: 0.1 + 0.1 + 0.1
