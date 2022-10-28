@@ -110,7 +110,7 @@
 ; decimal! to binary!
 ; LOAD decimal and to binary! tests
 ; 64-bit IEEE 754 minimum
-[equal? #{FFEFFFFFFFFFFFFF} to binary! -1.7976931348623157e308]
+[strict-equal? #{FFEFFFFFFFFFFFFF} to binary! -1.7976931348623157e308]
 ; -1.0
 [strict-equal? #{BFF0000000000000} to binary! -1.0]
 ; Maximal negative normalized
@@ -772,9 +772,13 @@
 ; Positive zero
 [zero? 0.0 - load mold 0.0]
 [same? 0.0 load mold 0.0]
+; roundtrip
+[strict-equal? #{0000000000000000} to binary! load mold to decimal! #{0000000000000000}]
 ; Negative zero
 [zero? -0.0 - load mold -0.0]
 [same? -0.0 load mold -0.0]
+; roundtrip
+[strict-equal? #{8000000000000000} to binary! load mold to decimal! #{8000000000000000}]
 ; Maximal negative denormalized
 [zero? -4.9406564584124654E-324 - load mold -4.9406564584124654E-324]
 [same? -4.9406564584124654E-324 load mold -4.9406564584124654E-324]
@@ -841,17 +845,17 @@
 [zero? 9.9999999999999926e152 - load mold/all 9.9999999999999926e152]
 [same? 9.9999999999999926e152 load mold/all 9.9999999999999926e152]
 ; LOAD decimal accuracy tests
-[equal? to binary! 2.2250738585072004e-308 #{000FFFFFFFFFFFFE}]
-[equal? to binary! 2.2250738585072005e-308 #{000FFFFFFFFFFFFE}]
-[equal? to binary! 2.2250738585072006e-308 #{000FFFFFFFFFFFFE}]
-[equal? to binary! 2.2250738585072007e-308 #{000FFFFFFFFFFFFF}]
-[equal? to binary! 2.2250738585072008e-308 #{000FFFFFFFFFFFFF}]
-[equal? to binary! 2.2250738585072009e-308 #{000FFFFFFFFFFFFF}]
-[equal? to binary! 2.225073858507201e-308 #{000FFFFFFFFFFFFF}]
-[equal? to binary! 2.2250738585072011e-308 #{000FFFFFFFFFFFFF}]
-[equal? to binary! 2.2250738585072012e-308 #{0010000000000000}]
-[equal? to binary! 2.2250738585072013e-308 #{0010000000000000}]
-[equal? to binary! 2.2250738585072014e-308 #{0010000000000000}]
+[strict-equal? to binary! 2.2250738585072004e-308 #{000FFFFFFFFFFFFE}]
+[strict-equal? to binary! 2.2250738585072005e-308 #{000FFFFFFFFFFFFE}]
+[strict-equal? to binary! 2.2250738585072006e-308 #{000FFFFFFFFFFFFE}]
+[strict-equal? to binary! 2.2250738585072007e-308 #{000FFFFFFFFFFFFF}]
+[strict-equal? to binary! 2.2250738585072008e-308 #{000FFFFFFFFFFFFF}]
+[strict-equal? to binary! 2.2250738585072009e-308 #{000FFFFFFFFFFFFF}]
+[strict-equal? to binary! 2.225073858507201e-308 #{000FFFFFFFFFFFFF}]
+[strict-equal? to binary! 2.2250738585072011e-308 #{000FFFFFFFFFFFFF}]
+[strict-equal? to binary! 2.2250738585072012e-308 #{0010000000000000}]
+[strict-equal? to binary! 2.2250738585072013e-308 #{0010000000000000}]
+[strict-equal? to binary! 2.2250738585072014e-308 #{0010000000000000}]
 ; bug#1753
 [c: last mold/all 1e16 (#"0" <= c) and (#"9" >= c)]
 ; alternative form
