@@ -4107,37 +4107,49 @@
 #64bit
 [not equal? 9223372036854775807 9223372036854775806]
 ; decimal! approximate equality
+#no-ulp
 [equal? 0.3 0.1 + 0.1 + 0.1]
 ; decimal! approximate equality symmetry
 [equal? equal? 0.3 0.1 + 0.1 + 0.1 equal? 0.1 + 0.1 + 0.1 0.3]
+#no-ulp
 [equal? 0.15 - 0.05 0.1]
 [equal? equal? 0.15 - 0.05 0.1 equal? 0.1 0.15 - 0.05]
+#no-ulp
 [equal? -0.5 cosine 120]
 [equal? equal? -0.5 cosine 120 equal? cosine 120 -0.5]
+#no-ulp
 [equal? 0.5 * square-root 2.0 sine 45]
 [equal? equal? 0.5 * square-root 2.0 sine 45 equal? sine 45 0.5 * square-root 2.0]
+#no-ulp
 [equal? 0.5 sine 30]
 [equal? equal? 0.5 sine 30 equal? sine 30 0.5]
+#no-ulp
 [equal? 0.5 cosine 60]
 [equal? equal? 0.5 cosine 60 equal? cosine 60 0.5]
 [equal? 0.5 * square-root 3.0 sine 60]
 [equal? equal? 0.5 * square-root 3.0 sine 60 equal? sine 60 0.5 * square-root 3.0]
+#no-ulp
 [equal? 0.5 * square-root 3.0 cosine 30]
 [equal? equal? 0.5 * square-root 3.0 cosine 30 equal? cosine 30 0.5 * square-root 3.0]
+#no-ulp
 [equal? square-root 3.0 tangent 60]
 [equal? equal? square-root 3.0 tangent 60 equal? tangent 60 square-root 3.0]
 [equal? (square-root 3.0) / 3.0 tangent 30]
 [equal? equal? (square-root 3.0) / 3.0 tangent 30 equal? tangent 30 (square-root 3.0) / 3.0]
+#no-ulp
 [equal? 1.0 tangent 45]
 [equal? equal? 1.0 tangent 45 equal? tangent 45 1.0]
+#no-ulp
 [
 	num: square-root 2.0
 	equal? 2.0 num * num
 ]
+#no-ulp
 [
 	num: square-root 2.0
 	equal? equal? 2.0 num * num equal? num * num 2.0
 ]
+#no-ulp
 [
 	num: square-root 3.0
 	equal? 3.0 num * num
@@ -5590,9 +5602,9 @@
 [strict-equal? :abs :abs]
 ; reflexivity test for native!
 [strict-equal? :all :all]
-; reflexivity test for op!
+; reflexivity for op!
 [strict-equal? :+ :+]
-; reflexivity test for function!
+; reflexivity for function!
 [
 	a-value: func [] []
 	strict-equal? :a-value :a-value
@@ -5610,8 +5622,13 @@
 [strict-equal? #{00} #{00}]
 ; binary versus bitset
 [not strict-equal? #{00} #[bitset! #{00}]]
-; symmetry
+; symmetry for bitset!
 [equal? strict-equal? #[bitset! #{00}] #{00} strict-equal? #{00} #[bitset! #{00}]]
+[
+	; symmetry for decimal!
+	num: square-root 2.0
+	equal? equal? 2.0 num * num equal? num * num 2.0
+]
 ; email versus string
 [
 	a-value: to email! ""
@@ -9312,6 +9329,7 @@
 #64bit
 [2147483648 = abs -2147483648]
 [0.0 = abs 0.0]
+[strict-equal? #{0000000000000000} to binary! abs to decimal! #{8000000000000000}]
 [zero? 1.0 - abs 1.0]
 [zero? 1.0 - abs -1.0]
 #64bit
@@ -9619,40 +9637,91 @@
 ; functions/math/arccosine.r
 [0 = arccosine 1]
 [0 = arccosine/radians 1]
+#no-ulp
 [30 = arccosine (square-root 3) / 2]
+#ulp
+[1 >= ulp-dist 30.0 arccosine (square-root 3) / 2]
+#no-ulp
 [pi / 6 = arccosine/radians (square-root 3) / 2]
+#ulp
+[1 >= ulp-dist pi / 6 arccosine/radians (square-root 3) / 2]
 [45 = arccosine (square-root 2) / 2]
 [pi / 4 = arccosine/radians (square-root 2) / 2]
+#no-ulp
 [60 = arccosine 0.5]
+#ulp
+[1 >= ulp-dist 60.0 arccosine 0.5]
+#no-ulp
 [pi / 3 = arccosine/radians 0.5]
+#ulp
+[1 >= ulp-dist pi / 3 arccosine/radians 0.5]
 [90 = arccosine 0]
 [pi / 2 = arccosine/radians 0]
 [180 = arccosine -1]
 [pi = arccosine/radians -1]
+#no-ulp
 [150 = arccosine (square-root 3) / -2]
+#ulp
+[1 >= ulp-dist 150.0 arccosine (square-root 3) / -2]
 [pi * 5 / 6 = arccosine/radians (square-root 3) / -2]
 [135 = arccosine (square-root 2) / -2]
 [pi * 3 / 4 = arccosine/radians (square-root 2) / -2]
+#no-ulp
 [120 = arccosine -0.5]
+#ulp
+[1 >= ulp-dist 120.0 arccosine -0.5]
+#no-ulp
 [pi * 2 / 3 = arccosine/radians -0.5]
+#ulp
+[1 >= ulp-dist pi * 2 / 3 arccosine/radians -0.5]
 [error? try [arccosine 1.1]]
 [error? try [arccosine -1.1]]
 ; functions/math/arcsine.r
 [0 = arcsine 0]
 [0 = arcsine/radians 0]
+#no-ulp
 [30 = arcsine 0.5]
+#ulp
+[1 >= ulp-dist 30.0 arcsine 0.5]
+#no-ulp
 [pi / 6 = arcsine/radians 0.5]
+#ulp
+[1 >= ulp-dist pi / 6 arcsine/radians 0.5]
+#no-ulp
 [45 = arcsine (square-root 2) / 2]
+#ulp
+[1 >= ulp-dist 45.0 arcsine (square-root 2) / 2]
+#no-ulp
 [pi / 4 = arcsine/radians (square-root 2) / 2]
+#ulp
+[1 >= ulp-dist pi / 4 arcsine/radians (square-root 2) / 2]
+#no-ulp
 [60 = arcsine (square-root 3) / 2]
+#ulp
+[1 >= ulp-dist 60.0 arcsine (square-root 3) / 2]
 [pi / 3 = arcsine/radians (square-root 3) / 2]
 [90 = arcsine 1]
 [pi / 2 = arcsine/radians 1]
+#no-ulp
 [-30 = arcsine -0.5]
+#ulp
+[1 >= ulp-dist -30.0 arcsine -0.5]
+#no-ulp
 [pi / -6 = arcsine/radians -0.5]
+#ulp
+[1 >= ulp-dist pi / -6 arcsine/radians -0.5]
+#no-ulp
 [-45 = arcsine (square-root 2) / -2]
+#ulp
+[1 >= ulp-dist -45.0 arcsine (square-root 2) / -2]
+#no-ulp
 [pi / -4 = arcsine/radians (square-root 2) / -2]
+#ulp
+[1 >= ulp-dif pi / -4 arcsine/radians (square-root 2) / -2]
+#no-ulp
 [-60 = arcsine (square-root 3) / -2]
+#ulp
+[1 >= ulp-dist -60.0 arcsine (square-root 3) / -2]
 [pi / -3 = arcsine/radians (square-root 3) / -2]
 [-90 = arcsine -1]
 [pi / -2 = arcsine/radians -1]
@@ -9663,19 +9732,31 @@
 ; functions/math/arctangent.r
 [-90 = arctangent -1e16]
 [pi / -2 = arctangent/radians -1e16]
+#no-ulp
 [-60 = arctangent negate square-root 3]
+#ulp
+[1 >= ulp-dist -60.0 arctangent negate square-root 3]
 [pi / -3 = arctangent/radians negate square-root 3]
 [-45 = arctangent -1]
 [pi / -4 = arctangent/radians -1]
+#no-ulp
 [-30 = arctangent (square-root 3) / -3]
+#ulp
+[1 >= ulp-dist -30.0 arctangent (square-root 3) / -3]
 [pi / -6 = arctangent/radians (square-root 3) / -3]
 [0 = arctangent 0]
 [0 = arctangent/radians 0]
+#no-ulp
 [30 = arctangent (square-root 3) / 3]
+#ulp
+[1 >= ulp-dist 30.0 arctangent (square-root 3) / 3]
 [pi / 6 = arctangent/radians (square-root 3) / 3]
 [45 = arctangent 1]
 [pi / 4 = arctangent/radians 1]
+#no-ulp
 [60 = arctangent square-root 3]
+#ulp
+[1 >= ulp-dist 60.0 arctangent square-root 3]
 [pi / 3 = arctangent/radians square-root 3]
 [90 = arctangent 1e16]
 [pi / 2 = arctangent/radians 1e16]
@@ -9748,22 +9829,52 @@
 ; functions/math/cosine.r
 [1 = cosine 0]
 [1 = cosine/radians 0]
+#no-ulp
 [(square-root 3) / 2 = cosine 30]
+#ulp
+[1 >= ulp-dist (square-root 3) / 2 cosine 30]
+#no-ulp
 [(square-root 3) / 2 = cosine/radians pi / 6]
+#ulp
+[1 >= ulp-dist (square-root 3) / 2 cosine/radians pi / 6]
 [(square-root 2) / 2 = cosine 45]
 [(square-root 2) / 2 = cosine/radians pi / 4]
+#no-ulp
 [0.5 = cosine 60]
+#ulp
+[1 >= ulp-dist 0.5 cosine 60]
+#no-ulp
 [0.5 = cosine/radians pi / 3]
+#ulp
+[1 >= ulp-dist 0.5 cosine/radians pi / 3]
 [0 = cosine 90]
 [0 = cosine/radians pi / 2]
 [-1 = cosine 180]
 [-1 = cosine/radians pi]
+#no-ulp
 [(square-root 3) / -2 = cosine 150]
+#ulp
+[1 >= ulp-dist (square-root 3) / -2 cosine 150]
+#no-ulp
 [(square-root 3) / -2 = cosine/radians pi * 5 / 6]
+#ulp
+[1 >= ulp-dist (square-root 3) / -2 cosine/radians pi * 5 / 6]
+#no-ulp
 [(square-root 2) / -2 = cosine 135]
+#ulp
+[1 >= ulp-dist (square-root 2) / -2 cosine 135]
+#no-ulp
 [(square-root 2) / -2 = cosine/radians pi * 3 / 4]
+#ulp
+[1 >= ulp-dist (square-root 2) / -2 cosine/radians pi * 3 / 4]
+#no-ulp
 [-0.5 = cosine 120]
+#ulp
+[4 >= ulp-dist -0.5 cosine 120]
+#no-ulp
 [-0.5 = cosine/radians pi * 2 / 3]
+#ulp
+[4 >= ulp-dist -0.5 cosine/radians pi * 2 / 3]
 ; functions/math/difference.r
 [24:00 = difference 1/Jan/2007 31/Dec/2006]
 [0:00 = difference 1/Jan/2007 1/Jan/2007]
@@ -9934,7 +10045,6 @@
 [not negative? 1e-8 - abs 0.9999 - mod 99'999'999.9999 1]
 [not negative? 1e-8 - abs 0.99999 - mod 99'999'999.99999 1]
 [not negative? 1e-8 - abs 0.999999 - mod 99'999'999.999999 1]
-[$0 == mod $999'999'999'999'999 1]
 [$0 == mod $999'999'999'999'999 $1]
 [0.0 == mod 9'999'999'999'999'999 1.0]
 [0.0 == mod 999'999'999'999'999 1.0]
@@ -9960,7 +10070,7 @@
 [not negative? 1e-16 - abs mod 0.15 - 0.05 - 0.1 0.1]
 [not negative? 1e-16 - abs mod 0.1 + 0.1 + 0.1 0.3]
 [not negative? 1e-16 - abs mod 0.3 0.1 + 0.1 + 0.1]
-[not negative? 1e-16 - abs mod to money! 0.1 + 0.1 + 0.1 0.3]
+[not negative? 1e-16 - abs mod to money! 0.1 + 0.1 + 0.1 $0.3]
 ; functions/math/modulo.r
 [0.0 == modulo 0.1 + 0.1 + 0.1 0.3]
 [0.0 == modulo 0.3 0.1 + 0.1 + 0.1]
@@ -10438,7 +10548,10 @@
 [1:03:02 == round/even 1:03:01.5]
 [1:03:02 == round/even 1:03:01.9]
 [$100 == round/even $100.25]
+#no-ulp
 [-$100 == round/even -$100.25]
+#ulp
+[1 >= ulp-dist -$100 round/even -$100.25]
 ; round/even/to; divide by 0
 [error? try [round/even/to 0.1 0]]
 [zero? round/even/to 0.1 -1.0]
@@ -10457,24 +10570,51 @@
 [0.0 == round/even/to 0.1 1E-0]
 [0.0 == round/even/to -0.1 1E-0]
 [0.1 == round/even/to 0.12 1E-1]
+#no-ulp
 [-0.1 == round/even/to -0.12 1E-1]
+#ulp
+[1 >= ulp-dist -0.1 round/even/to -0.12 1E-1]
 [0.12 == round/even/to 0.123 1E-2]
+#no-ulp
 [-0.12 == round/even/to -0.123 1e-2]
+#ulp
+[1 >= ulp-dist -0.12 round/even/to -0.123 1e-2]
 [0.123 == round/even/to 0.1234 1E-3]
+#no-ulp
 [-0.123 == round/even/to -0.1234 1E-3]
+#ulp
+[1 >= ulp-dist -0.123 round/even/to -0.1234 1E-3]
+#no-ulp
 [0.1234 = round/even/to 0.12345 1E-4]
+#ulp
+[1 >= ulp-dist 0.1234 round/even/to 0.12345 1E-4]
+#no-ulp
 [-0.1234 = round/even/to -0.12345 1E-4]
+#ulp
+[1 >= ulp-dist -0.1234 round/even/to -0.12345 1E-4]
 ; bug#1470
 [2.6 == round/even/to $2.55 0.1]
 ; bug#1470
 [$2.6 == round/even/to 2.55 $0.1]
 ; round-up breakpoint
+#no-ulp
 [0.12346 = round/even/to 0.123456 1E-5]
+#ulp
+[1 >= ulp-dist 0.12346 round/even/to 0.123456 1E-5]
+#no-ulp
 [-0.12346 = round/even/to -0.123456 1E-5]
+#ulp
+[1 >= ulp-dist -0.12346 round/even/to -0.123456 1E-5]
 [1.0 == round/even/to 0.9 1E-0]
 [-1.0 == round/even/to -0.9 1E-0]
+#no-ulp
 [0.6 = round/even/to 0.55 1E-1]
+#ulp
+[1 >= ulp-dist 0.6 round/even/to 0.55 1E-1]
+#no-ulp
 [-0.6 = round/even/to -0.55 1E-1]
+#ulp
+[1 >= ulp-dist -0.6 round/even/to -0.55 1E-1]
 [0.56 == round/even/to 0.555 1E-2]
 [-0.56 == round/even/to -0.555 1E-2]
 [2.0 == round/even/to 1.5 1E-0]
@@ -10488,10 +10628,16 @@
 [1.55555556 == round/even/to 1.555555555 1E-8]
 [1.555555556 = round/even/to 1.5555555555 1E-9]
 [0.2 == round/even/to 0.15 1E-1]
+#no-ulp
 [-0.2 == round/even/to -0.15 1E-1]
+#ulp
+[1 >= ulp-dist -0.2 round/even/to -0.15 1E-1]
 [0.4 == round/even/to 0.35 1E-1]
 [1.0 == round/even/to 0.95 1E-1]
+#no-ulp
 [1.2 = round/even/to 1.15 1E-1]
+#ulp
+[1 >= ulp-dist 1.2 round/even/to 1.15 1E-1]
 [2.2 == round/even/to 2.15 1E-1]
 [2.6 == round/even/to 2.55 1E-1]
 [10.0 == round/even/to 10 1E-1]
@@ -10519,13 +10665,21 @@
 [0.0 == (-562'949'953'421'313.0 - round/even/to -562'949'953'421'313.0 1.0)]
 [562'949'953'421'314.0 == round/even/to 562'949'953'421'314.0 1.0]
 [-562'949'953'421'314.0 == round/even/to -562'949'953'421'314.0 1.0]
-; bug#1116
+#no-ulp
+[$1.15 == round/even/to $1.15 $0.01]
+#ulp
+[1 >= ulp-dist $1.15 round/even/to $1.15 $0.01]
+#no-ulp
 [$1.15 == round/even/to 1.15 $0.01]
-; this fails, by design
+#ulp
+[1 >= ulp-dist $1.15 round/even/to 1.15 $0.01]
 [0:0:1.15 == round/even/to 0:0:1.15 0:0:0.01]
 [1.15 == round/even/to $1.15 0.01]
 [-0:0:2.6 == round/even/to -0:0:2.55 0:0:0.1]
+#no-ulp
 [-$2.6 == round/even/to -$2.55 $0.1]
+#ulp
+[1 >= ulp-dist -$2.6 round/even/to -$2.55 $0.1]
 [0.0 == (1e-15 - round/even/to 1.1e-15 1e-15)]
 #r2only
 [$0.0 == ($0.000'000'000'000'001 - round/even/to $0.000'000'000'000'001'1 1e-15)]
@@ -10547,14 +10701,29 @@
 #r3only
 [not negative? $1e-31 - abs -$26e-17 - round/even/to -$0.000'000'000'000'000'255 $1e-17]
 [$1 == round/even/to $1.23456789 $1]
+#no-ulp
 [$1.2 == round/even/to $1.23456789 $0.1]
+#ulp
+[1 >= ulp-dist $1.2 round/even/to $1.23456789 $0.1]
 [$1.23 == round/even/to $1.23456789 $0.01]
 [$1.235 == round/even/to $1.23456789 $0.001]
+#no-ulp
 [$1.2346 == round/even/to $1.23456789 $0.0001]
+#ulp
+[1 >= ulp-dist $1.2346 round/even/to $1.23456789 $0.0001]
+#no-ulp
 [$1.23457 == round/even/to $1.23456789 $0.00001]
+#ulp
+[1 >= ulp-dist $1.23457 round/even/to $1.23456789 $0.00001]
+#no-ulp
 [$1.234568 == round/even/to $1.23456789 $0.000001]
+#ulp
+[1 >= ulp-dist $1.234568 round/even/to $1.23456789 $0.000001]
 [$1.2345679 == round/even/to $1.23456789 $0.0000001]
+#no-ulp
 [$1.23456789 == round/even/to $1.23456789 $0.00000001]
+#ulp
+[1 >= ulp-dist $1.23456789 round/even/to $1.23456789 $0.00000001]
 ; round/ceiling
 [0 == round/ceiling 0]
 [1 == round/ceiling 1]
@@ -10675,7 +10844,10 @@
 [-$100 == round/half-ceiling -$100]
 [-$100 == round/half-ceiling -$100.5]
 ; bug#1471
+#no-ulp
 [-$101 == round/half-ceiling -$100.5000000001]
+#ulp
+[1 >= ulp-dist -$101 round/half-ceiling -$100.5000000001]
 ; round/half-ceiling/to
 [0.0 == round/half-ceiling/to 0.1 -1.0]
 [zero? round/half-ceiling/to 0.1 -1]
@@ -10709,21 +10881,39 @@
 [-1:03:02 == round/half-down -1:03:01.50001]
 [$100 == round/half-down $100]
 [$100 == round/half-down $100.5]
+#no-ulp
 [$101 == round/half-down $100.5000000001]
+#ulp
+[1 >= ulp-dist $101 round/half-down $100.5000000001]
 [-$100 == round/half-down -$100]
 [-$100 == round/half-down -$100.5]
+#no-ulp
 [-$101 == round/half-down -$100.5000000001]
+#ulp
+[1 >= ulp-dist -$101 round/half-down -$100.5000000001]
 ; round/half-down/to
 [0.1 == round/half-down/to 0.15 0.1]
 [0.2 == round/half-down/to 0.15001 0.1]
 [0.5 == round/half-down/to 0.55 0.1]
+#no-ulp
 [0.6 == round/half-down/to 0.55001 0.1]
+#ulp
+[1 >= ulp-dist 0.6 round/half-down/to 0.55001 0.1]
 [0.5 == round/half-down/to 0.75 0.5]
 [1.0 == round/half-down/to 0.75001 0.5]
+#no-ulp
 [-0.1 == round/half-down/to -0.15 0.1]
+#ulp
+[1 >= ulp-dist -0.1 round/half-down/to -0.15 0.1]
+#no-ulp
 [-0.2 == round/half-down/to -0.15001 0.1]
+#ulp
+[1 >= ulp-dist -0.2 round/half-down/to -0.15001 0.1]
 [-0.5 == round/half-down/to -0.55 0.1]
+#no-ulp
 [-0.6 == round/half-down/to -0.55001 0.1]
+#ulp
+[1 >= ulp-dist -0.6 round/half-down/to -0.55001 0.1]
 [-0.5 == round/half-down/to -0.75 0.5]
 [-1.0 == round/half-down/to -0.75001 0.5]
 ; functions/math/shift.r
@@ -11459,22 +11649,46 @@
 ; functions/math/sine.r
 [0 = sine 0]
 [0 = sine/radians 0]
+#no-ulp
 [0.5 = sine 30]
+#ulp
+[1 >= ulp-dist 0.5 sine 30]
+#no-ulp
 [0.5 = sine/radians pi / 6]
+#ulp
+[1 >= ulp-dist 0.5 sine/radians pi / 6]
+#no-ulp
 [(square-root 2) / 2 = sine 45]
+#ulp
+[1 >= ulp-dist (square-root 2) / 2 sine 45]
+#no-ulp
 [(square-root 2) / 2 = sine/radians pi / 4]
+#ulp
+[1 >= ulp-dist (square-root 2) / 2 sine/radians pi / 4]
 [(square-root 3) / 2 = sine 60]
 [(square-root 3) / 2 = sine/radians pi / 3]
 [1 = sine 90]
 [1 = sine/radians pi / 2]
 [0 = sine 180]
 [0 = sine/radians pi]
+#no-ulp
 [-0.5 = sine -30]
+#ulp
+[1 >= ulp-dist -0.5 sine -30]
+#no-ulp
 [-0.5 = sine/radians pi / -6]
+#ulp
+[1 >= ulp-dist -0.5 sine/radians pi / -6]
 [(square-root 2) / -2 = sine -45]
 [(square-root 2) / -2 = sine/radians pi / -4]
+#no-ulp
 [(square-root 3) / -2 = sine -60]
+#ulp
+[1 >= ulp-dist (square-root 3) / -2 sine -60]
+#no-ulp
 [(square-root 3) / -2 = sine/radians pi / -3]
+#ulp
+[1 >= ulp-dist (square-root 3) / -2 sine/radians pi / -3]
 [-1 = sine -90]
 [-1 = sine/radians pi / -2]
 [0 = sine -180]
@@ -11641,11 +11855,18 @@
 #64bit
 [0 == subtract 9223372036854775807 9223372036854775807]
 ; decimal - integer
+#no-ulp
 [0.1 == subtract 1.1 1]
+#ulp
+[6 >= ulp-dist 0.1 subtract 1.1 1]
 [-2147483648.0 == subtract -1.0 2147483647]
 [2147483649.0 == subtract 1.0 -2147483648]
 ; integer - decimal
+; subtraction of nearly equal values is inaccurate
+#no-ulp
 [-0.1 == subtract 1 1.1]
+#ulp
+[6 >= ulp-dist -0.1 subtract 1 1.1]
 [2147483648.0 == subtract 2147483647 -1.0]
 [-2147483649.0 == subtract -2147483648 1.0]
 ; -1.7976931348623157e308 - decimal
@@ -11774,20 +11995,44 @@
 ; functions/math/tangent.r
 [error? try [tangent -90]]
 [error? try [tangent/radians pi / -2]]
+#no-ulp
 [(negate square-root 3) = tangent -60]
+#ulp
+[2 >= ulp-dist (negate square-root 3) tangent -60]
+#no-ulp
 [(negate square-root 3) = tangent/radians pi / -3]
+#ulp
+[2 >= ulp-dist (negate square-root 3) tangent/radians pi / -3]
+#no-ulp
 [-1 = tangent -45]
+#ulp
+[1 >= ulp-dist -1.0 tangent -45]
+#no-ulp
 [-1 = tangent/radians pi / -4]
+#ulp
+[1 >= ulp-dist -1.0 tangent/radians pi / -4]
 [(square-root 3) / -3 = tangent -30]
 [(square-root 3) / -3 = tangent/radians pi / -6]
 [0 = tangent 0]
 [0 = tangent/radians 0]
 [(square-root 3) / 3 = tangent 30]
 [(square-root 3) / 3 = tangent/radians pi / 6]
+#no-ulp
 [1 = tangent 45]
+#ulp
+[1 >= ulp-dist 1.0 tangent 45]
+#no-ulp
 [1 = tangent/radians pi / 4]
+#ulp
+[1 >= ulp-dist 1.0 tangent/radians pi / 4]
+#no-ulp
 [(square-root 3) = tangent 60]
+#ulp
+[2 >= ulp-dist (square-root 3) tangent 60]
+#no-ulp
 [(square-root 3) = tangent/radians pi / 3]
+#ulp
+[2 >= ulp-dist (square-root 3) tangent/radians pi / 3]
 [error? try [tangent 90]]
 [error? try [tangent/radians pi / 2]]
 ; Flint Hills test
@@ -13359,4 +13604,37 @@
 	recycle
 	true
 ]
-
+; ulp-dist.r
+#ulp
+[0 == ulp-dist 0.0 0.0]
+#ulp
+[0 == ulp-dist -0.0 -0.0]
+#ulp
+[0 == ulp-dist 0.0 -0.0]
+#ulp
+[0 == ulp-dist -0.0 0.0]
+#ulp
+[1 == ulp-dist 0.1 + 0.2 0.3]
+#ulp
+[1 == ulp-dist -0.1 + -0.2 -0.3]
+#ulp
+[1 == ulp-dist 0.3 0.1 + 0.2]
+#ulp
+[1 == ulp-dist -0.3 -0.1 + -0.2]
+; ulp-dif.r
+#ulp
+[0 == ulp-dif 0.0 0.0]
+#ulp
+[0 == ulp-dif -0.0 -0.0]
+#ulp
+[0 == ulp-dif 0.0 -0.0]
+#ulp
+[0 == ulp-dif -0.0 0.0]
+#ulp
+[1 == ulp-dif 0.1 + 0.2 0.3]
+#ulp
+[-1 == ulp-dif -0.1 + -0.2 -0.3]
+#ulp
+[-1 == ulp-dif 0.3 0.1 + 0.2]
+#ulp
+[1 == ulp-dif -0.3 -0.1 + -0.2]

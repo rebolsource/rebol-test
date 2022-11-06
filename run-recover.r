@@ -27,6 +27,8 @@ do-core-tests: has [
 		[#32bit #r2only]
 	] found? in system 'catalog
 
+	append flags either value? 'ulp-dist [#ulp] [#no-ulp]
+
 	; calculate interpreter checksum
 	case [
 		all [file? system/options/boot #"/" = first system/options/boot] [
@@ -41,7 +43,7 @@ do-core-tests: has [
 			; use system/build
 			interpreter-checksum: checksum/method to binary!
 				mold system/build 'sha1
-		] 
+		]
 	]
 
 	log-file-prefix: %r
