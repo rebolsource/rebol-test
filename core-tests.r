@@ -10548,10 +10548,7 @@
 [1:03:02 == round/even 1:03:01.5]
 [1:03:02 == round/even 1:03:01.9]
 [$100 == round/even $100.25]
-#no-ulp
 [-$100 == round/even -$100.25]
-#ulp
-[1 >= ulp-dist -$100 round/even -$100.25]
 ; round/even/to; divide by 0
 [error? try [round/even/to 0.1 0]]
 [zero? round/even/to 0.1 -1.0]
@@ -10570,20 +10567,11 @@
 [0.0 == round/even/to 0.1 1E-0]
 [0.0 == round/even/to -0.1 1E-0]
 [0.1 == round/even/to 0.12 1E-1]
-#no-ulp
 [-0.1 == round/even/to -0.12 1E-1]
-#ulp
-[1 >= ulp-dist -0.1 round/even/to -0.12 1E-1]
 [0.12 == round/even/to 0.123 1E-2]
-#no-ulp
 [-0.12 == round/even/to -0.123 1e-2]
-#ulp
-[1 >= ulp-dist -0.12 round/even/to -0.123 1e-2]
 [0.123 == round/even/to 0.1234 1E-3]
-#no-ulp
 [-0.123 == round/even/to -0.1234 1E-3]
-#ulp
-[1 >= ulp-dist -0.123 round/even/to -0.1234 1E-3]
 #no-ulp
 [0.1234 = round/even/to 0.12345 1E-4]
 #ulp
