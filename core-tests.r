@@ -9717,7 +9717,7 @@
 #no-ulp
 [pi / -4 = arcsine/radians (square-root 2) / -2]
 #ulp
-[1 >= ulp-dif pi / -4 arcsine/radians (square-root 2) / -2]
+[1 >= ulp-dist pi / -4 arcsine/radians (square-root 2) / -2]
 #no-ulp
 [-60 = arcsine (square-root 3) / -2]
 #ulp
