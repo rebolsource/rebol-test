@@ -1675,6 +1675,27 @@
 	p: make o []
 	not same? o/f 1 p/f 1
 ]
+[
+	; argument passing with changes
+	f1: func [x] [type? get/any 'x]
+	f2: func [x] [type? get/any 'x]
+	f: :f1
+	integer! = f (f: :f2 1)
+]
+[
+    ; argument passing with changes
+    f1: func [x] [type? get/any 'x]
+    f2: func [x] [type? get/any 'x]
+    b: reduce [:f1 first [(change b :f2 1)]]
+    integer! = do b
+]
+[
+    ; argument passing with changes
+    f1: func [x] [type? get/any 'x]
+    f2: func [x] [type? get/any 'x]
+    b: reduce [:f1]
+    integer! = b/1 (change b :f2 1)
+]
 ; datatypes/get-path.r
 ; minimum
 ; bug#1947
@@ -9282,7 +9303,7 @@
 	]
 	do f 1
 ]
-; functions/onvert/to-hex.r
+; functions/convert/to-hex.r
 ; bug#43
 #r3only
 [#FFFFFFFE = to-hex/size -2 8]
