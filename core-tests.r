@@ -1345,7 +1345,7 @@
 [function? first [#[function! [] []]]]
 #r3only
 [function? first [#[function! [[] []]]]]
-; return-less return value tests
+; return-less return value test
 [
 	f: does []
 	unset? f
@@ -1559,11 +1559,12 @@
 		2
 	]
 ]
-; BREAK out leaves a "running" function in a "clean" state
 [
-	1 = loop 1 [
+	; BREAK out leaves a "running" function in a "consistent" state
+	3 = loop 1 [
 		f: func [x] [
 			either x = 1 [
+				x: 3
 				loop 1 [f 2]
 				x
 			] [break/return 1]
@@ -1571,11 +1572,12 @@
 		f 1
 	]
 ]
-; THROW out leaves a "running" function in a "clean" state
 [
-	1 = catch [
+	; THROW out leaves a "running" function in a "consistent" state
+	3 = catch [
 		f: func [x] [
 			either x = 1 [
+				x: 3
 				catch [f 2]
 				x
 			] [throw 1]
@@ -1583,12 +1585,13 @@
 		f 1
 	]
 ]
-; "error out" leaves a "running" function in a "clean" state
 [
+	; "error out" leaves a "running" function in a "consistent" state
 	f: func [x] [
 		either x = 1 [
+			x: 3
 			error? try [f 2]
-			x = 1
+			x = 3
 		] [1 / 0]
 	]
 	f 1
@@ -1695,6 +1698,16 @@
     f2: func [x] [type? get/any 'x]
     b: reduce [:f1]
     integer! = b/1 (change b :f2 1)
+]
+[
+	; argument passing from one function frame to another
+	get!: func [w [any-word!]] [
+		error? try [return get/any w]
+		#[unset!]
+	]
+	f: func [x [any-type!]] ['x]
+	w: f 1
+	equal? type? get! w type? get! f get! w
 ]
 ; datatypes/get-path.r
 ; minimum
@@ -8117,6 +8130,18 @@
 [equal? type? for i 1 2 0 [break] type? for i 2 1 0 [break]]
 [equal? type? for i -1 -2 0 [break] type? for i 2 1 0 [break]]
 [equal? type? for i -1 -2 0 [break] type? for i -2 -1 0 [break]]
+[
+	; float cycle comparisons with a tolerance
+	min-v: 0.0
+	max-v: 1.0
+	range: max-v - min-v
+	steps: 10
+	count: 0
+	for variance min-v max-v (max-v - min-v) / (steps - 1) [
+		count: count + 1
+	]
+	count = steps
+]
 ; char tests
 #r2only
 [
