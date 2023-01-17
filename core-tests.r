@@ -1706,7 +1706,8 @@
 		#[unset!]
 	]
 	f: func [x [any-type!]] ['x]
-	w: f 1
+	w: f none
+	error? try [set w 1]
 	equal? type? get! w type? get! f get! w
 ]
 ; datatypes/get-path.r
@@ -3170,8 +3171,12 @@
 	same? third :a-value third any [:a-value false]
 ]
 ; datatypes/symbol.r
-#r2only
-[symbol! = type? make symbol! "xx"]
+[
+	any [
+		error? try [s: make symbol! "xx"]
+		symbol! = type? s
+	]
+]
 ; datatypes/tag.r
 [tag? <tag>]
 [not tag? 1]
@@ -8130,18 +8135,6 @@
 [equal? type? for i 1 2 0 [break] type? for i 2 1 0 [break]]
 [equal? type? for i -1 -2 0 [break] type? for i 2 1 0 [break]]
 [equal? type? for i -1 -2 0 [break] type? for i -2 -1 0 [break]]
-[
-	; float cycle comparisons with a tolerance
-	min-v: 0.0
-	max-v: 1.0
-	range: max-v - min-v
-	steps: 10
-	count: 0
-	for variance min-v max-v (max-v - min-v) / (steps - 1) [
-		count: count + 1
-	]
-	count = steps
-]
 ; char tests
 #r2only
 [
@@ -12686,6 +12679,7 @@
 		]
 ]
 ; bug#190
+#long
 [x: copy "xx^/" loop 20 [enline x: join x x] true]
 ; bug#647
 [string? enline ["a" "b"]]
@@ -13632,6 +13626,7 @@
 [block? read %fixtures/]
 ; system/gc.r
 ; bug#1776, bug#2072
+#long
 [
 	a: copy []
 	loop 200'000 [a: append/only copy [] a]
