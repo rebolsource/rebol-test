@@ -8693,6 +8693,11 @@
 [
 	integer? do does [map-each v [] [] 1]
 ]
+; functions/control/quote.r
+[
+	x: 1
+	'x == quote x
+]
 ; functions/control/reduce.r
 [[1 2] = reduce [1 1 + 1]]
 [
