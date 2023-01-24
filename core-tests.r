@@ -6286,6 +6286,8 @@
 ; bug#1914
 #r3only
 [false == value? do func [x] ['x] none]
+#r3only
+[value? try [1 / 0]]
 ; functions/control/all.r
 ; zero values
 [true == all []]
@@ -13025,8 +13027,8 @@
 [equal? make typeset! [integer!] intersect make typeset! [decimal! integer!] make typeset! [integer!]]
 ; functions/series/last.r
 ; bug#2
-[value? try [last #"c"]]
-[value? try [last 7]]
+[error? try [last #"c"]]
+[error? try [last 7]]
 ; functions/series/lengthq.r
 ; bug#1626: "Allow LENGTH? to take none as an argument, return none"
 ; bug#1688: "LENGTH? NONE returns TRUE" (should return NONE)
