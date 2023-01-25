@@ -13527,7 +13527,10 @@
 #r3only
 ["foo" == to string! decompress/gzip #{1F8B0800EF46BE4C00034BCBCF07002165738C03000000}]
 ; bug#3
-[value? try [decompress #{AAAAAAAAAAAAAAAAAAAA}]]
+[
+	t: type? try [decompress #{AAAAAAAAAAAAAAAAAAAA}]
+	(t = string!) or (t = error!)
+]
 ; functions/string/dehex.r
 ["a%b" = dehex "a%b"]
 ["a%~b" = dehex "a%~b"]
