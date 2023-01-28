@@ -1707,6 +1707,33 @@
 	error? try [set w 1]
 	equal? type? get! w type? get! f get! w
 ]
+[
+	; argreturn test
+	get!: func [w [any-word!]] [
+		error? try [return get/any w]
+		#[unset!]
+	]
+	equal?!: func [t1 [any-type!] t2 [any-type!]] [
+		unless equal? type? get/any 't1 type? get/any 't2 [return false]
+		if unset? get/any 't1 [return true]
+		if error? :t1 [
+			return equal? disarm :t1 disarm :t2
+		]
+		equal? :t1 :t2
+	]
+	f: func [x] ['x]
+	g: func [] [f 3 + (return 4 5)]
+	w: f 1
+	set/any 'r1 get! w
+	f 2
+	set/any 'r2 get! w
+	g
+	f 6
+	set/any 'r3 get! w
+	f 7
+	set/any 'r4 get! w
+	equal? equal?! get/any 'r1 get/any 'r2 equal?! get/any 'r3 get/any 'r4
+]
 ; datatypes/get-path.r
 ; minimum
 ; bug#1947
