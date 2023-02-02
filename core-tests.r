@@ -1596,29 +1596,49 @@
 	]
 	f 1
 ]
+[
+	; return from the unary op argument
+	f: func [] [- (return 1 2) 3]
+	1 == f
+]
+[
+	; return from the first argument of a binary op
+	f: func [] [(1 return 2 3) + 4]
+	2 == f
+]
+[
+	; return from the second argument of a binary op
+	f: func [] [1 + (return 2 3) 4]
+	2 == f
+]
+[
+	; return in the middle of an op expression
+	f: func [] [1 + (return 2 3) + 4]
+	2 == f
+]
 ; Argument passing of "get arguments" ("get-args")
 [gf: func [:x] [:x] 10 == gf 10]
 [gf: func [:x] [:x] 'a == gf a]
-[gf: func [:x] [:x] (quote 'a) == gf 'a]
-[gf: func [:x] [:x] (quote :a) == gf :a]
-[gf: func [:x] [:x] (quote a:) == gf a:]
-[gf: func [:x] [:x] (quote (10 + 20)) == gf (10 + 20)]
-[gf: func [:x] [:x] o: context [f: 10] (quote :o/f) == gf :o/f]
+[gf: func [:x] [:x] (first ['a]) == gf 'a]
+[gf: func [:x] [:x] (first [:a]) == gf :a]
+[gf: func [:x] [:x] (first [a:]) == gf a:]
+[gf: func [:x] [:x] (first [(10 + 20)]) == gf (10 + 20)]
+[gf: func [:x] [:x] o: context [f: 10] (first [:o/f]) == gf :o/f]
 ; Argument passing of "literal arguments" ("lit-args")
 [lf: func ['x] [:x] 10 == lf 10]
 [lf: func ['x] [:x] 'a == lf a]
-[lf: func ['x] [:x] (quote 'a) == lf 'a]
+[lf: func ['x] [:x] (first ['a]) == lf 'a]
 [lf: func ['x] [:x] a: 10 10 == lf :a]
-[lf: func ['x] [:x] (quote a:) == lf a:]
+[lf: func ['x] [:x] (first [a:]) == lf a:]
 #r3only
 [lf: func ['x] [:x] 30 == lf (10 + 20)]
 #r3only
 [lf: func ['x] [:x] o: context [f: 10] 10 == lf :o/f]
 #r2only
-[lf: func ['x] [:x] (quote (10 + 20)) == lf (10 + 20)]
+[lf: func ['x] [:x] (first [(10 + 20)]) == lf (10 + 20)]
 #r2only
-[lf: func ['x] [:x] (quote :o/f) == lf :o/f]
-; basic test for recursive function! invocation
+[lf: func ['x] [:x] (first [:o/f]) == lf :o/f]
+; basic test for recursive function invocation
 [i: 0 countdown: func [n] [if n > 0 [++ i countdown n - 1]] countdown 10 i = 10]
 ; a function-local word that escapes the function's dynamic extent still works
 ; when re-entering the dynamic extent of the same function later.
@@ -2480,10 +2500,9 @@
 [op? get '+]
 [not op? 1]
 [op! = type? get '+]
-#r2only
-[3 == do reduce [get '+ 1 2]]
-#r3only
 [error? try [do reduce [get '+ 1 2]]]
+#r2only
+[1 == do reduce [get '- -1]]
 ; bug#1934
 #r3only
 [3 = do reduce [1 :+ 2]]
@@ -2942,6 +2961,8 @@
 	found? any [
 		a == 3x2
 		a == [x 3]
+		a == 1x2
+		a == [x 4]
 	]
 ]
 ; bug#64
@@ -3550,12 +3571,6 @@
 	same? :a-value a-value
 ]
 ; ops are word-active
-#r2only
-[
-	a-value: get '+
-	3 == a-value 1 2
-]
-#r3only
 [
 	a-value: get '+
 	1 a-value 2 == 3
