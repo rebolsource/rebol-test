@@ -2372,6 +2372,13 @@
 	make object! [x: 2]
 	x = 1
 ]
+[
+	; self
+	found? any [
+		error? try [o: make object! [self: 1]]
+		object? o
+	]
+]
 ; BREAK out of make object!
 ; bug#846
 [
