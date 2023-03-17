@@ -9348,6 +9348,25 @@
 ['money! = to word! money!]
 ; bug#1967
 [not same? to binary! [1] to binary! [2]]
+; functions/convert/to-c-array.r
+[either value? 'to-c-array [#{} == to-c-array []] [true]]
+[either value? 'to-c-array [#{0000000000000000} == to-c-array [0.0]] [true]]
+[
+	either value? 'to-c-array [
+		#{0000000000000000000000000000F03F00000000000000400000000000000840} ==
+		to-c-array [0.0 1.0 2.0 3.0]
+	] [
+		true
+	]
+]
+[
+	either value? 'to-c-array [
+		#{0000000000000000000000000000F03F00000000000000400000000000000840} ==
+		to-c-array [[0.0 1.0] [2.0 3.0]]
+	] [
+		true
+	]
+]
 ; functions/datatype/as-pair.r
 ; bug#1624
 #r3only
