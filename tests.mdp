@@ -29,19 +29,19 @@ Example running core-tests in my machine with Microsoft Windows 11:
 
     C:\Develop\rebol\rebview.exe -s run-recover.r
 
-My current local directory when running the tests is C:\Develop\rebol-test.
+My current local directory when running the tests is *C:\Develop\rebol-test*.
 
 The test framework needs a path to the interpreter executable to be able to calculate interpreter checksum.  
 
-It is possible to give the run-recover.r script an argument. If the full path to the interpreter executable isn't obtained from the command line, the argument of the run-recover.r script, if given, is used as the path to the executable.
+It is possible to give the *run-recover.r* script an argument. If the full path to the interpreter executable isn't obtained from the command line, the argument of the run-recover.r script, if given, is used as the path to the executable.
 
-If the path to the executable is not available using any of the above methods, the test framework checksums to value of the system/build variable instead.
+If the path to the executable is not available using any of the above methods, the test framework checksums to value of the *system/build* variable instead.
 
 Example running core-tests in my Kubuntu machine:
 
     ladislav@lkub64:/rebol-test$ /r3/make/r3 run-recover.r
 
-(my current local directory when running the tests is /rebol-test)
+(my current local directory when running the tests is */rebol-test*)
 
 Don't worry when the program (either the test framework or the interpreter) crashes (in the core-tests suite there are some tests crashing the interpreter), just run the tests again the same way as before:
 
@@ -51,7 +51,7 @@ or
 
     ladislav@lkub64:/rebol-test$ /r3/make/r3 run-recover.r
 
-Until the testing finishes. After testing was finished, calling run-recover.r again does not do anything.
+Until the testing finishes. After testing was finished, calling *run-recover.r* again does not do anything.
 
 ===Log file name
 
@@ -59,15 +59,15 @@ The result of the test is a log file named like:
 
    r_2_7_8_3_1_1DEF65_E85A1B.log
 
-(this is my run-recover.r result in Windows 8 running the official 2.7.8.3.1 interpreter) or
+(this is my *run-recover.r* result in Windows 8 running the official 2.7.8.3.1 interpreter) or
 
     r_2_101_0_4_4_F9A855_E85A1B.log
 
-(this is my run-recover.r result in Kubuntu runnning my build of the 2.101.0.4.4 interpreter).
+(this is my *run-recover.r* result in Kubuntu runnning my build of the 2.101.0.4.4 interpreter).
 
 The first character of the log file name, #"r" is common to all run-recover log files. The next part describes the version of the interpreter, the following 6 characters are a part of the interpreter executable checksum, and the last 6 characters preceding the file extension are a part of the core-tests.r file checksum.
 
-As you can notice from the checksums, I used the same version of the core-tests.r file in both examples.
+As you can notice from the checksums, I used the same version of the *core-tests.r* file in both examples.
 
 ===Summary
 
@@ -109,13 +109,13 @@ If you get more than zero dialect failures, you should correct the respective te
 
 ===Log file contents
 
-The tests in the log file are always text-copies of the tests from the test file, which means that they are not modified in any way. It is possible to run them in REBOL console as well as to find them using text search in the test file if desired.
+The tests in the log file are always text-copies of the tests from the test file, which means that they are not modified in any way. It is possible to run them in Rebol console as well as to find them using text search in the test file if desired.
 
-Note that if the tests weren't text-copies, but just molded (using either MOLD or MOLD/ALL) versions of the tests, the text search would not be guaranteed to work. (Furthermore, in some cases such modified tests would work differently.)
+Note that if the tests weren't text-copies, but just molded (using either *mold* or *mold/all* calls) versions of the tests, the text search would not be guaranteed to work. Furthermore, in some cases such modified tests would work differently.
 
 ===Filtering test logs
 
-Sometimes we are not interested in all test results preferring to see only a list of failed tests. The log-filter.r script can be used for that as follows:
+Sometimes we are not interested in all test results preferring to see only a list of failed tests. The *log-filter.r* script can be used for that as follows:
 
     e:\Ladislav\rebol\rebol-view.exe log-filter.r r_2_7_8_3_1_1DEF65_E85A1B.log
 
@@ -127,15 +127,15 @@ The result is the file:
 
 ===Comparing test logs
 
-We have seen that we obtained different test summaries for different interpreter versions. There is a log-diff.r script allowing us to obtain the list and summary of the differences between two log files.
+We have seen that we obtained different test summaries for different interpreter versions. There is a *log-diff.r* script allowing us to obtain the list and summary of the differences between two log files.
 
-The log-diff.r script can be run as follows:
+The *log-diff.r* script can be run as follows:
 
     e:\Ladislav\rebol\rebol-view.exe log-diff.r r_2_7_8_3_1_1 DEF65_E85A1B.log r_2_101_0_4_4_F9A855_E85A1B.log
 
 The first log file given is the "old log file" and the second file is "new log file".
 
-The result is the diff.r file containing the list of the tests with different results and the summary as follows:
+The result is the *diff.r* file containing the list of the tests with different results and the summary as follows:
 
     new-successes: 907
     new-failures: 25
@@ -157,19 +157,19 @@ Log difference is useful if:
 
 * In accordance with Carl's design intention, the test dialect is "Rebol compatible" and as simple as possible.
 * However, the test dialect is not handled by the test framework as Rebol code, because the tests contained in the test suite can be (and actually are) used to test different Rebol interpreters (both R2 and R3 in our case), every one of them having a different "idea" what "Rebol" is.
-* The fact that the test environment handles the test file as formatted text (i.e., not as Rebol code) complicates test file parsing a bit (not too much since the format was designed by Carl Sassenrath to be simple), but it brings significant advantages:
+* The fact that the test environment handles the test file as formatted text (i.e., not as Rebol code) complicates test file parsing a bit (not too much, since the format was designed by Carl Sassenrath to be simple), but it brings significant advantages:
 ** One test file can be used to test different (more or less source-code compatible) interpreters.
 ** One of the properties that can be and actually is tested is the ability of the interpreter to load the test as Rebol code.
-** Since the test file is handled by the test framework as a text file having the format described below, the test framework is able to always record/handle the original "look" of the tests.
-** Therefore, the original tests cannot be "distorted" by any incorrect LOAD/MOLD transformation performed by the interpreter.
+** Since the test file is handled by the test framework as a text file having the format described below, the test framework is able to always record and handle the original "look" of the tests.
+** Therefore, the original tests cannot be "distorted" by any incorrect *load/mold* transformations performed by the interpreter.
 ** Tests "stand for themselves" not needing any names. (Test writers can use whatever naming convention they prefer, but names are not required for the test framework to be able to handle the tests.)
 ** Log files can be further postprocessed
-** There is a sophisticated log-diff function tailor-made to compare test logs
-** It is possible to filter log files if just the tests with specific results are needed
+** There is a sophisticated *log-diff* function tailor-made to compare test logs
+** It is possible to filter log files if just the tests with specific results are examined
 ** The fact that the filtered logs are obtained only from the postprocessing phase guarantees that no differences caused by incompatibilities in testing code can occur
-* Issues are used to signal special handling of the test. They are handled by the environment as flags excluding the marked test from processing. Only if all flags used are in the set of acceptable flags, the specific test is processed by the environment, otherwise it is skipped.
-* Every test has to be in (properly matched) square brackets.
-* A test is successful only if it can be correctly loaded and it yields TRUE when evaluated. While this looks like a limitation, actually it allows any kind of checks (approximate equality of some result to some predetermined value, strict equality of some result to some predetermined value, sameness of certain examined values, or any other condition that can be written in Rebol).
+* Issues are used to signal special handling of the tests. They are handled by the environment as flags excluding the marked test from processing. Only if all flags used are in the set of acceptable flags, the specific test is processed by the environment, otherwise it is skipped.
+* Every test has to be in properly matched square brackets.
+* A test is successful only if it can be correctly loaded and it yields *true* when evaluated. While this looks like a limitation, actually it allows any kind of checks (approximate equality of some result to some predetermined value, strict equality of some result to some predetermined value, sameness of certain examined values, or any other condition that can be written in Rebol).
 * Breaks, throws, errors, returns, return/redo's, etc. leading out of the test code are detected and marked as test failures.
 * The test environment counts successful tests, failed tests, crashing tests, skipped tests and test dialect failures, i.e., the cases when the test file is not properly formatted.
 * Files or URLs in the test file "outside" of tests are handled as directives for the test environment to process the tests in the respective file as well.
@@ -191,9 +191,9 @@ Issues are used to indicate special character of tests. For example,
 
 	#r2only
 
-indicates that the test is meant to be used only in R2. Flags restrict the usage of tests. If the DO-RECOVER function is called without a specific flag being mentioned in the FLAGS argument, all tests marked using that flag are ignored. For example, if the above #r2only flag is not mentioned in the FLAGS argument, no #r2only test is run. Any test may be marked by as many flags as desired.
+indicates that the test is meant to be used only in R2. Flags restrict the usage of tests. If the *do-recover* function is called without a specific flag being mentioned in the *flags* argument, all tests marked using that flag are ignored. For example, if the above *#r2only* flag is not mentioned in the *flags* argument, no *#r2only* test is run. Any test may be marked by as many flags as desired.
 
-The flags used when testing REBOL/Core are:
+The flags used when testing Rebol/Core are:
 
     ; the flag influences only the test immediately following it,
     ; if not explicitly stated otherwise
@@ -219,7 +219,7 @@ Files or URLs specify what to include, i.e., they allow a file to contain refere
 
 ---Example
 
-Here are some tests cases for the closure! datatype, notice that only some of them are marked as #r3only, suggesting they are meant just for the R3 interpreter:
+Here are some tests cases for the *closure!* datatype, notice that only some of them are marked as *#r3only*, suggesting they are meant just for the R3 interpreter:
 
 	; datatypes/closure.r
 	[closure? closure [] ["OK"]]
@@ -236,7 +236,7 @@ Here are some tests cases for the closure! datatype, notice that only some of th
 
 ---The file containing tests
 
-The tests are in the core-tests.r file.
+The tests are in the *core-tests.r* file.
 
 ---File format
 
@@ -244,15 +244,15 @@ The test file is a text file in UNIX format (LF character used for line endings)
 
 ---Organization of tests
 
-As you may have already noticed there are some "sections" in the core-tests.r file. It is advisable to follow the structure or ask when in doubt (the present author also asked a couple of times) where to put the new test or tests.
+As you may have already noticed there are some "sections" in the *core-tests.r* file. It is advisable to follow the structure or ask when in doubt (the present author also asked a couple of times) where to put the new test or tests.
 
 ---Checking new tests
 
-To find out how to write new tests, you can consult the "Test dialect" section and have a look at actual tests in the core-tests.r file.
+To find out how to write new tests, you can consult the "Test dialect" section and have a look at actual tests in the *core-tests.r* file.
 
-When you write some new tests it is best to run the tests again to find out whether some dialect failures did not occur. The presence of dialect failures signals that the tests need corrections (balancing brackets or something else).
+When you write new tests, it is best to run the tests again to find out whether some dialect failures did not occur. The presence of dialect failures signals that the tests need corrections (balancing brackets or something else).
 
-After resolving dialect failures, it is best to run also log-diff.r to find out whether the new test log differs from the old one as intended.
+After resolving dialect failures, it is best to run also *log-diff.r* to find out whether the new test log differs from the old one as intended.
 
 Test as well as documentation contributions are welcome.
 
@@ -262,26 +262,9 @@ To run tests from Windows Explorer you need to create one or more associtations 
 
 ---How to add a new association for Windows Explorer in Windows Vista, Windows 7, Windows 8, Windows 10 or Windows 11
 
-Assume that you decided to use the *%.tst* suffix for your test files. Then you can, for example define a command called *test* to right-click run your tests using a Windows Explorer context menu.
+Assume that you decided to use the *.tst* suffix for your test files. Then you can define commands like *open* and *test* in the Windows Explorer right-click context menu. I define the *open* command for editing the *.tst* files using the Notepad++ editor and the *test* command for running the tests. Both commands are defined using a *tst_auto_file.reg* file.
 
-+++Manual setup
-
-*Run the *regedit.exe* program
-*Find (or create) the *HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.tst* key
-*Edit its *(Default)* value, should be something like *tst_auto_file*
-*Find (or create) the *HKEY_LOCAL_MACHINE\SOFTWARE\Classes\tst_auto_file* key
-*Find (or create) the *HKEY_LOCAL_MACHINE\SOFTWARE\Classes\tst_auto_file\shell* subkey
-*Under the *shell* key find (or create) a new *test* subkey
-*Under the *test* key add a new *command* subkey
-*Change the *(Default)* value of the *command* key to something like (do not forget to use your directory paths and file names).
-	"C:\Develop\Rebol\rebview.exe" C:\Develop\rebol-test\run-tests.r "%1"
-To suppress the interpreter security dialog when running the tests, use
-	"C:\Develop\Rebol\rebview.exe" -s d:\rebol\run-tests.r "%1"
-instead.
-
-+++Setup using a tst_auto_file.reg file
-
-The contents of the tst_auto_file.reg file corresponding to the above may be
+The contents of the *tst_auto_file.reg* file I am using (Do not forget to edit the file to reflect your setup and preferences.) are
 
  Windows Registry Editor Version 5.00
 
@@ -301,10 +284,8 @@ The contents of the tst_auto_file.reg file corresponding to the above may be
 
  [HKEY_LOCAL_MACHINE\SOFTWARE\Classes\tst_auto_file\shell\test\command]
  @="\"C:\\Develop\\Rebol\\rebview.exe\" -s C:\\Develop\\rebol-test\\run-tests.r \"%1\""
- 
-, which define both the test as well as open commands, the test command used for testing and the open command for editing of the .tst files.
 
-Having added the *test* command association, you will see the new *test* context menu item when right-clicking a test file in Windows Explorer.
++++Possible interferences
 
 \note
 After using the Windows 7, Windows 8 or Windows 10 built-in "Choose default program..." action (found under the file-right-click context menu under "Open with") it re-associates the extension with whatever new program you choose.
