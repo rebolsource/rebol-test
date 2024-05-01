@@ -1723,9 +1723,10 @@
 		#[unset!]
 	]
 	f: func [x [any-type!]] ['x]
+	t: type? get! f 1
 	w: f none
 	error? try [set w 1]
-	equal? type? get! w type? get! f get! w
+	equal? t type? get! f get! w
 ]
 [
 	; argreturn test
