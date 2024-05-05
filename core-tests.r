@@ -13351,6 +13351,12 @@
 	poke a: #{00} 1 pick b: #{11} 1
 	a == b
 ]
+[
+	blk1: [#[unset!]]
+	blk2: [2]
+	poke blk2 1 pick blk1 1
+	unset! = type? pick blk2 1
+]
 ; functions/series/remove.r
 [[] = remove []]
 [[] = head remove [1]]
