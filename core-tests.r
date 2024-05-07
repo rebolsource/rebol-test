@@ -12662,6 +12662,7 @@
 	true
 ]
 [block? append copy [] ()]
+[strict-equal? quote 'a/b/c append quote 'a/b 'c]
 ; functions/series/at.r
 [
 	blk: []
