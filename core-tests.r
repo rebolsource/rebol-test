@@ -8744,8 +8744,176 @@
 ]
 ; functions/control/quote.r
 [
-	x: 1
-	'x == quote x
+	unset? quote #[unset!]
+]
+[
+	blk: copy [error? quote error]
+	change at blk 3 make error! "test"
+	do blk
+]
+[
+	#[datatype! integer!] == quote #[datatype! integer!]
+]
+[
+	#[datatype! any-type!] == quote #[datatype! any-type!]
+]
+[
+	blk: copy [native? quote repeat]
+	change at blk 3 :repeat
+	do blk
+]
+[
+	blk: copy [action? quote add]
+	change at blk 3 :add
+	do blk
+]
+[
+	blk: copy [op? quote +]
+	change at blk 3 get '+
+	do blk
+]
+[
+	f: func [] []
+	blk: copy [:f == quote :f]
+	change at blk 4 :f
+	do blk
+]
+[
+	o: make object! [a: 1]
+	blk: copy [o == quote :o]
+	change at blk 4 :o
+	do blk
+]
+#r2only
+[
+	s: make struct! [a [int]] none
+	blk: copy [strict-equal? mold/all :s mold/all quote :s]
+	change at blk 6 :s
+	do blk
+]
+[
+	blk: copy [:a-library == quote :a-library]
+	a-library: load/library case [
+		; this needs to be system-specific
+		system/version/4 = 2 [%libc.dylib]					; OSX
+		system/version/4 = 3 [%kernel32.dll]					; Windows
+		all [system/version/4 = 4 system/version/5 = 2] [%/lib/libc.so.6]	; Linux libc6
+		system/version/4 = 4 [%libc.so]						; Linux
+		system/version/4 = 7 [%libc.so]						; FreeBSD
+		system/version/4 = 8 [%libc.so]						; NetBSD
+		system/version/4 = 9 [%libc.so]						; OpenBSD
+		system/version/4 = 10 [%libc.so]					; Solaris
+	]
+	change at blk 4 :a-library
+	success: do blk
+	free a-library
+	success
+]
+[
+	blk: copy [system/ports/input == quote system/ports/input]
+	change at blk 4 system/ports/input
+	do blk
+]
+[
+	strict-equal? first [rebol] quote rebol
+]
+[
+	strict-equal? first [rebol:] quote rebol:
+]
+[
+	strict-equal? first [:rebol] quote :rebol
+]
+[
+	strict-equal? first ['rebol] quote 'rebol
+]
+[
+	strict-equal? first [/rebol] quote /rebol
+]
+[
+	none? quote #[none]
+]
+[
+	#[true] == quote #[true]
+]
+[
+	#[false] == quote #[false]
+]
+[
+	1 == quote 1
+]
+[
+	1.0 == quote 1.0
+]
+[
+	$1.0 == quote $1.0
+]
+[
+	1:00 == quote 1:00
+]
+[
+	7-May-2024/11:29:44+2:00 == quote 7-May-2024/11:29:44+2:00
+]
+[
+	#"A" == quote #"A"
+]
+[
+	1x1 == quote 1x1
+]
+[
+	1.2.3 == quote 1.2.3
+]
+[
+	bitset: make bitset! "a"
+	blk: copy [bitset == quote bitset]
+	change/only blk bitset
+	change/only at blk 4 bitset
+	do blk
+]
+[
+	"a" == quote "a"
+]
+[
+	#issue == quote #issue
+]
+[
+	#{00} == quote #{00}
+]
+[
+	%core-tests.r == quote %core-tests.r
+]
+[
+	me@here.com == quote me@here.com
+]
+[
+	http://www.fm.tul.cz/~ladislav/rebol == quote http://www.fm.tul.cz/~ladislav/rebol
+]
+[
+	<tag> == quote <tag>
+]
+[
+	#[image! 0x0 #{}] == quote #[image! 0x0 #{}]
+]
+[
+	[] == quote []
+]
+[
+	strict-equal? first [()] quote ()
+]
+[
+	strict-equal? first [a/b] quote a/b
+]
+[
+	strict-equal? first [:a/b] quote :a/b
+]
+[
+	strict-equal? first ['a/b] quote 'a/b
+]
+[
+	#[hash![]] == quote #[hash![]]
+]
+#r2only
+[
+	#[list![]] == quote #[list![]]
 ]
 ; functions/control/reduce.r
 [[1 2] = reduce [1 1 + 1]]
@@ -13352,10 +13520,10 @@
 	a == b
 ]
 [
-	blk1: [#[unset!]]
-	blk2: [2]
+	blk1: copy [#[unset!]]
+	blk2: copy [2]
 	poke blk2 1 pick blk1 1
-	unset! = type? pick blk2 1
+	unset? pick blk2 1
 ]
 ; functions/series/remove.r
 [[] = remove []]
