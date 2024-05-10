@@ -12661,7 +12661,7 @@
 	if exists? %pokus.txt [delete %pokus.txt]
 	true
 ]
-[block? append copy [] ()]
+[block? append copy [] #[unset!]]
 [strict-equal? quote 'a/b/c append quote 'a/b 'c]
 ; functions/series/at.r
 [
@@ -12952,6 +12952,9 @@
 ["c" = find "abc" charset ["c"]]
 ; bug#88
 [none? find/part "ab" "b" 1]
+; /match refinement
+[found? find/match [1 2] 1]
+[none? find/match [1 2] 2]
 ; functions/series/indexq.r
 [1 == index? []]
 [2 == index? next [a]]
@@ -13702,6 +13705,11 @@
 [["abc" "de" "fghi" "jk"] == split "abc^M^Jde^Mfghi^Jjk" [crlf | #"^M" | newline]]
 #r3
 [["abc" "de" "fghi" "jk"] == split "abc     de fghi  jk" [some #" "]]
+; functions/series/swap.r
+[
+	lit-path: quote 'a/b
+	strict-equal? swap :lit-path next :lit-path quote 'b/a
+]
 ; functions/series/tailq.r
 [tail? []]
 [
