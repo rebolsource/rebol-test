@@ -10515,6 +10515,10 @@
 	a: make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
 	a == negate negate a
 ]
+#r2only
+[
+	strict-equal? - 1.0 * 1.0 -1.0
+]
 ; functions/math/negativeq.r
 [not negative? 0]
 [not negative? 1]
