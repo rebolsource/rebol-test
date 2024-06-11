@@ -19,12 +19,14 @@
 ;     See the License for the specific language governing permissions and
 ;     limitations under the License.
 ; *****************************************************************************
+;-------------------------------------------------------------------------------
 ; datatypes/action.r
 [action? :abs]
 [not action? 1]
 [action! = type? :abs]
 ; bug#1659
 ; implicit evaluation
+; direct implicit evaluation
 [1 == do reduce [:abs -1]]
 ; indirect (word) implicit evaluation
 [1 == abs -1]
@@ -34,9 +36,16 @@
 	1 == b/1 -1
 ]
 ; explicit evaluation
+; direct explicit evaluation
 [1 == do :abs -1]
 ; indirect (word) explicit evaluation
+[1 == do 'abs -1]
 ; indirect (path) explicit evaluation
+; [
+; 	b: reduce [:abs]
+; 	1 == do 'b/1 -1
+; ]
+;-------------------------------------------------------------------------------
 ; datatypes/binary.r
 [binary? #{00}]
 [not binary? 1]
@@ -135,6 +144,7 @@
 [strict-equal? #{7FEFFFFFFFFFFFFF} to binary! 1.7976931348623157e308]
 ; bug#747
 [strict-equal? #{3FF0000000000009} to binary! to decimal! #{3FF0000000000009}]
+;-------------------------------------------------------------------------------
 ; datatypes/bitset.r
 [bitset? make bitset! "a"]
 [not bitset? 1]
@@ -143,6 +153,7 @@
 [bitset? #[bitset! #{}]]
 ; TS crash
 [bitset? charset reduce [to-char "^(A0)"]]
+;-------------------------------------------------------------------------------
 ; datatypes/block.r
 [block? [1]]
 [not block? 1]
@@ -171,6 +182,7 @@
 ]
 ; explicit evaluation
 [do [true]]
+;-------------------------------------------------------------------------------
 ; datatypes/char.r
 [char? #"a"]
 [not char? 1]
@@ -320,6 +332,7 @@
 [char? #"^(00)"]
 ; maximum
 [char? #"^(ff)"]
+;-------------------------------------------------------------------------------
 ; datatypes/closure.r
 [closure? closure [] ["OK"]]
 [not closure? 1]
@@ -633,6 +646,7 @@
 	x: 1
 	3 == f 2
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/datatype.r
 [not datatype? 1]
 [datatype! = type? action!]
@@ -707,6 +721,7 @@
 [datatype? word!]
 ; alternative literal representation
 [datatype? #[datatype! action!]]
+;-------------------------------------------------------------------------------
 ; datatypes/date.r
 [date? 25/Sep/2006]
 [not date? 1]
@@ -735,6 +750,7 @@
 		date-d = load mold date-d
 	]
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/decimal.r
 [decimal? 0.0]
 [not decimal? 0]
@@ -871,6 +887,7 @@
 	b: 0.3
 	equal? (lesser? a b) or (equal? a b) lesser-or-equal? a b
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/email.r
 [email? me@here.com]
 [not email? 1]
@@ -881,6 +898,7 @@
 [strict-equal? #[email! ""] to email! ""]
 [equal? mold/all #[email! ""] {#[email! ""]}]
 [equal? mold/all #[email! "a"] {#[email! "a"]}]
+;-------------------------------------------------------------------------------
 ; datatypes/error.r
 [error? try [1 / 0]]
 [not error? 1]
@@ -1320,8 +1338,10 @@
 [catch/quit [attempt [catch/quit [1 / 0]] quit/return true]]
 ; bug#2190
 [error? try [catch/quit [attempt [quit]] print x]]
+;-------------------------------------------------------------------------------
 ; datatypes/event.r
 [not event? 1]
+;-------------------------------------------------------------------------------
 ; datatypes/file.r
 [file? %myscript.r]
 [not file? 1]
@@ -1334,6 +1354,7 @@
 ["%%2520" = mold to file! "%20"]
 ; bug#1241
 [file? %"/c/Program Files (x86)"]
+;-------------------------------------------------------------------------------
 ; datatypes/function.r
 [function? does ["OK"]]
 [not function? 1]
@@ -1755,6 +1776,7 @@
 	set/any 'r4 get! w
 	equal? equal?! get/any 'r1 get/any 'r2 equal?! get/any 'r3 get/any 'r4
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/get-path.r
 ; minimum
 ; bug#1947
@@ -1774,6 +1796,7 @@
 		2 == index? a
 	]
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/get-word.r
 [get-word? first [:a]]
 [not get-word? 1]
@@ -1806,6 +1829,7 @@
 [get-word? first [:/]]
 [get-word? first [://]]
 [get-word? first [:///]]
+;-------------------------------------------------------------------------------
 ; datatypes/gob.r
 ; minimum
 #r3only
@@ -1849,6 +1873,7 @@
 	]
 	true
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/hash.r
 #r2only
 ; minimum
@@ -1857,6 +1882,7 @@
 [not hash? 1]
 #r2only
 [hash! = type? make hash! []]
+;-------------------------------------------------------------------------------
 ; datatypes/image.r
 [image? make image! 100x100]
 [not image? 1]
@@ -1875,6 +1901,7 @@
 	a-value: #[image! 1x1 #{}]
 	equal? pick a-value 0x0 0.0.0.255
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/integer.r
 [integer? 0]
 ; bug#33
@@ -1943,6 +1970,7 @@
 ["0" = mold 0]
 ["1" = mold 1]
 ["-1" = mold -1]
+;-------------------------------------------------------------------------------
 ; datatypes/issue.r
 [issue? #aa]
 [not issue? 1]
@@ -1957,6 +1985,7 @@
 #r2only
 [# == to issue! ""]
 [issue? #a]
+;-------------------------------------------------------------------------------
 ; datatypes/library.r
 [
 	success: library? a-library: load/library case [
@@ -1973,6 +2002,7 @@
 	free a-library
 	success
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/list.r
 #r2only
 [list? make list! []]
@@ -1980,6 +2010,7 @@
 [not list? 1]
 #r2only
 [list! = type? make list! []]
+;-------------------------------------------------------------------------------
 ; datatypes/lit-path.r
 [lit-path? first ['a/b]]
 [not lit-path? 1]
@@ -2001,6 +2032,7 @@
 	a-value: first ['a/b]
 	strict-equal? to path! :a-value do reduce [:a-value]
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/lit-word.r
 [lit-word? first ['a]]
 [not lit-word? 1]
@@ -2020,6 +2052,7 @@
 [word? '<=]
 [word? '>=]
 [word? '<>]
+;-------------------------------------------------------------------------------
 ; datatypes/logic.r
 [logic? true]
 [logic? false]
@@ -2040,6 +2073,7 @@
 [true = to logic! "f"]
 ["true" = mold true]
 ["false" = mold false]
+;-------------------------------------------------------------------------------
 ; datatypes/map.r
 ; map! =? hash! in R2/Forward, R2 2.7.7+
 #r3
@@ -2080,6 +2114,7 @@
 	if "value" <> select m "key" [res: false]
 	res
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/module.r
 #r3only
 [module? make module! [[] []]]
@@ -2130,6 +2165,7 @@
 	import a-module
 	1 == var
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/money.r
 [money? $0.0]
 [not money? 0]
@@ -2332,6 +2368,7 @@
 	x: -9.2233720368547779E18
 	zero? x - to decimal! to money! x
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/native.r
 [native? :type?]
 [not native? 1]
@@ -2339,6 +2376,7 @@
 ; bug#1659
 ; natives are active
 [same? none! do reduce [:type? make none! none]]
+;-------------------------------------------------------------------------------
 ; datatypes/none.r
 [none? none]
 [not none? 1]
@@ -2359,6 +2397,7 @@
 	f: does [#]
 	# == f
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/object.r
 [object? make object! [x: 1]]
 [not object? 1]
@@ -2504,6 +2543,7 @@
 	o: bound? use [x] ['x]
 	2 == length? words-of append o [self: 1]
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/op.r
 [op? get '+]
 [not op? 1]
@@ -2514,6 +2554,7 @@
 ; bug#1934
 #r3only
 [3 = do reduce [1 :+ 2]]
+;-------------------------------------------------------------------------------
 ; datatypes/pair.r
 [pair? 1x2]
 [not pair? 1]
@@ -2529,6 +2570,7 @@
 [pair? -2147483648x-2147483648]
 ; maximum
 [pair? 2147483647x2147483647]
+;-------------------------------------------------------------------------------
 ; datatypes/paren.r
 [paren? first [(1 + 1)]]
 [not paren? 1]
@@ -2559,6 +2601,7 @@
 	insert/only fact fact
 	error? try [do fact]
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/path.r
 [path? 'a/b]
 ['a/b == first [a/b]]
@@ -2750,6 +2793,7 @@
 ; bug#1977
 #r3only
 [f: func [/r] [1] error? try [f/r/%]]
+;-------------------------------------------------------------------------------
 ; datatypes/percent.r
 #r3only
 [percent? 0%]
@@ -2853,14 +2897,17 @@
 [1.1% = to percent! 1.1%]
 #r3only
 [1.1% = to percent! "1.1%"]
+;-------------------------------------------------------------------------------
 ; datatypes/port.r
 [port? make port! http://]
 [not port? 1]
 [port! = type? make port! http://]
+;-------------------------------------------------------------------------------
 ; datatypes/refinement.r
 [refinement? /a]
 [not refinement? 1]
 [refinement! = type? /a]
+;-------------------------------------------------------------------------------
 ; datatypes/routine.r
 #r2only
 [
@@ -2933,6 +2980,7 @@
 	free a-library
 	success
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/set-path.r
 [set-path? first [a/b:]]
 [not set-path? 1]
@@ -2980,6 +3028,7 @@
 	blk/:i: 2
 	blk = [2]
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/set-word.r
 [set-word? first [a:]]
 [not set-word? 1]
@@ -3018,6 +3067,7 @@
 	]
 	integer? a/b/c/d: 1
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/string.r
 [string? "ahoj"]
 [not string? 1]
@@ -3167,6 +3217,7 @@
 ["ahoj" = #[string! "ahoj"]]
 ["1" = to string! 1]
 [{""} = mold ""]
+;-------------------------------------------------------------------------------
 ; datatypes/struct.r
 [struct? make struct! [i [integer!]] none]
 [not struct? 1]
@@ -3223,6 +3274,7 @@
 	a-value: make struct! [] none
 	same? third :a-value third any [:a-value false]
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/symbol.r
 [
 	any [
@@ -3230,6 +3282,7 @@
 		symbol! = type? s
 	]
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/tag.r
 [tag? <tag>]
 [not tag? 1]
@@ -3242,6 +3295,7 @@
 ; bug#2169
 ["<ēee>" == mold <ēee>]
 [equal? mold/all #[tag! ""] {#[tag! ""]}]
+;-------------------------------------------------------------------------------
 ; datatypes/time.r
 [time? 0:00]
 [not time? 1]
@@ -3298,6 +3352,7 @@
 		greater? 596522:14:07.999999998 + 1:00:0.000000001 596522:14:07.999999999 + 1:00:00
 	]
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/tuple.r
 [tuple? 1.2.3]
 [not tuple? 1]
@@ -3309,6 +3364,7 @@
 ; maximum
 [tuple? 255.255.255.255.255.255.255.255.255.255]
 [error? try [load "255.255.255.255.255.255.255.255.255.255.255"]]
+;-------------------------------------------------------------------------------
 ; datatypes/typeset.r
 #r2only
 [datatype? any-block!]
@@ -3379,6 +3435,7 @@
     x: to typeset! []
     not x = now
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/unset.r
 [unset? ()]
 [unset! == type? ()]
@@ -3394,6 +3451,7 @@
 [unset? to unset! 1]
 [error? try [a: ()]]
 [not error? try [set/any 'a ()]]
+;-------------------------------------------------------------------------------
 ; datatypes/url.r
 [url? http://www.fm.tul.cz/~ladislav/rebol]
 [not url? 1]
@@ -3414,6 +3472,7 @@
 [url? http://a.b.c/d?e=č]
 [url? http://a.b.c/d?e=%c4%8d]
 [equal? http://a.b.c/d?e=%c4%8d http://a.b.c/d?e=č]
+;-------------------------------------------------------------------------------
 ; datatypes/vector.r
 #r3only
 [vector? make vector! 0]
@@ -3453,6 +3512,7 @@
 	v/3: 30
 	v = make vector! [integer! 32 [10 20 30]]
 ]
+;-------------------------------------------------------------------------------
 ; datatypes/word.r
 [word? 'a]
 [not word? 1]
@@ -3645,6 +3705,7 @@
 	a-value: 'a
 	:a-value == a-value
 ]
+;-------------------------------------------------------------------------------
 ; functions/comparison/lesserq.r
 ; integer -9223372036854775808 < x tests
 #64bit
@@ -3841,9 +3902,11 @@
 [not 0.0.255 < 0.0.0]
 [not 0.0.255 < 0.0.1]
 [not 0.0.255 < 0.0.255]
+;-------------------------------------------------------------------------------
 ; functions/comparison/maximum-of.r
 ; bug#8
 [3 = first maximum-of [1 2 3]]
+;-------------------------------------------------------------------------------
 ; functions/comparison/equalq.r
 ; reflexivity test for native!
 [equal? :abs :abs]
@@ -4606,6 +4669,7 @@
 	insert/only a a
 	error? try [do a]
 ]
+;-------------------------------------------------------------------------------
 ; functions/comparison/equivq.r
 ; reflexivity test for native!
 #r3
@@ -5209,6 +5273,7 @@
 		equiv? p p
 	]
 ]
+;-------------------------------------------------------------------------------
 ; functions/comparison/sameq.r
 ; reflexivity test for action!
 [same? :abs :abs]
@@ -5684,6 +5749,7 @@
 		same? p p
 	]
 ]
+;-------------------------------------------------------------------------------
 ; functions/comparison/strict-equalq.r
 [strict-equal? :abs :abs]
 ; reflexivity test for native!
@@ -6149,9 +6215,131 @@
 		strict-equal? p p
 	]
 ]
+;-------------------------------------------------------------------------------
 ; functions/comparison/strict-not-equalq.r
 ; bug#32
 [strict-not-equal? 0 1]
+;-------------------------------------------------------------------------------
+; functions/comparison/eqq.r
+[eq? 0.0 0.0]
+[eq? -0.0 -0.0]
+[eq? 0.0 -0.0]
+[eq? -0.0 0.0]
+[eq? 0.1 + 0.2 0.3]
+[eq? -0.1 + -0.2 -0.3]
+[eq? 0.3 0.1 + 0.2]
+[eq? -0.3 -0.1 + -0.2]
+[not eq? 0.0 1.0]
+[not eq? 1.0 0.0]
+[not eq? 0.0 -1.0]
+[not eq? -1.0 0.0]
+;-------------------------------------------------------------------------------
+; functions/comparison/neq.r
+[not ne? 0.0 0.0]
+[not ne? -0.0 -0.0]
+[not ne? 0.0 -0.0]
+[not ne? -0.0 0.0]
+[not ne? 0.1 + 0.2 0.3]
+[not ne? -0.1 + -0.2 -0.3]
+[not ne? 0.3 0.1 + 0.2]
+[not ne? -0.3 -0.1 + -0.2]
+[ne? 0.0 1.0]
+[ne? 1.0 0.0]
+[ne? 0.0 -1.0]
+[ne? -1.0 0.0]
+;-------------------------------------------------------------------------------
+; functions/comparison/leq.r
+[le? 0.0 0.0]
+[le? -0.0 -0.0]
+[le? 0.0 -0.0]
+[le? -0.0 0.0]
+[le? 0.1 + 0.2 0.3]
+[le? -0.1 + -0.2 -0.3]
+[le? 0.3 0.1 + 0.2]
+[le? -0.3 -0.1 + -0.2]
+[le? 0.0 1.0]
+[not le? 1.0 0.0]
+[not le? 0.0 -1.0]
+[le? -1.0 0.0]
+;-------------------------------------------------------------------------------
+; functions/comparison/ltq.r
+[not lt? 0.0 0.0]
+[not lt? -0.0 -0.0]
+[not lt? 0.0 -0.0]
+[not lt? -0.0 0.0]
+[not lt? 0.1 + 0.2 0.3]
+[not lt? -0.1 + -0.2 -0.3]
+[not lt? 0.3 0.1 + 0.2]
+[not lt? -0.3 -0.1 + -0.2]
+[lt? 0.0 1.0]
+[not lt? 1.0 0.0]
+[not lt? 0.0 -1.0]
+[lt? -1.0 0.0]
+;-------------------------------------------------------------------------------
+; functions/comparison/geq.r
+[ge? 0.0 0.0]
+[ge? -0.0 -0.0]
+[ge? 0.0 -0.0]
+[ge? -0.0 0.0]
+[ge? 0.1 + 0.2 0.3]
+[ge? -0.1 + -0.2 -0.3]
+[ge? 0.3 0.1 + 0.2]
+[ge? -0.3 -0.1 + -0.2]
+[not ge? 0.0 1.0]
+[ge? 1.0 0.0]
+[ge? 0.0 -1.0]
+[not ge? -1.0 0.0]
+;-------------------------------------------------------------------------------
+; functions/comparison/gtq.r
+[not gt? 0.0 0.0]
+[not gt? -0.0 -0.0]
+[not gt? 0.0 -0.0]
+[not gt? -0.0 0.0]
+[not gt? 0.1 + 0.2 0.3]
+[not gt? -0.1 + -0.2 -0.3]
+[not gt? 0.3 0.1 + 0.2]
+[not gt? -0.3 -0.1 + -0.2]
+[not gt? 0.0 1.0]
+[gt? 1.0 0.0]
+[gt? 0.0 -1.0]
+[not gt? -1.0 0.0]
+;-------------------------------------------------------------------------------
+; functions/comparison/ulp-dist.r
+#ulp
+[0 == ulp-dist 0.0 0.0]
+#ulp
+[0 == ulp-dist -0.0 -0.0]
+#ulp
+[0 == ulp-dist 0.0 -0.0]
+#ulp
+[0 == ulp-dist -0.0 0.0]
+#ulp
+[1 == ulp-dist 0.1 + 0.2 0.3]
+#ulp
+[1 == ulp-dist -0.1 + -0.2 -0.3]
+#ulp
+[1 == ulp-dist 0.3 0.1 + 0.2]
+#ulp
+[1 == ulp-dist -0.3 -0.1 + -0.2]
+;-------------------------------------------------------------------------------
+; functions/comparison/ulp-dif.r
+#ulp
+[0 == ulp-dif 0.0 0.0]
+#ulp
+[0 == ulp-dif -0.0 -0.0]
+#ulp
+[0 == ulp-dif 0.0 -0.0]
+#ulp
+[0 == ulp-dif -0.0 0.0]
+#ulp
+[1 == ulp-dif 0.1 + 0.2 0.3]
+#ulp
+[-1 == ulp-dif -0.1 + -0.2 -0.3]
+#ulp
+[-1 == ulp-dif 0.3 0.1 + 0.2]
+#ulp
+[1 == ulp-dif -0.3 -0.1 + -0.2]
+;-------------------------------------------------------------------------------
 ; functions/context/bind.r
 ; bug#50
 #r3only
@@ -6209,8 +6397,9 @@
 	bind next block: [a a] use [a] ['a]
 	same? 'a first block
 ]
-; functions/context/boundq.r
+;-------------------------------------------------------------------------------
 ; functions/context/bindq.r
+; functions/context/boundq.r
 [
 	o: make object! [a: none]
 	same? o bound? in o 'a
@@ -6219,10 +6408,12 @@
 	o: make object! [a: none]
 	same? bound? in o 'self bound? in o 'a
 ]
+;-------------------------------------------------------------------------------
 ; functions/context/resolve.r
 ; bug#2017: crash in RESOLVE/extend/only
 #r3only
 [get in resolve/extend/only context [] context [a: true] [a] 'a]
+;-------------------------------------------------------------------------------
 ; functions/context/set.r
 ; bug#1745
 [equal? error? try [set /a 1] error? try [set [/a] 1]]
@@ -6243,6 +6434,7 @@
 [a: 1 b: none set [:b] [a] b =? 1]
 [unset 'a b: none all [error? try [set [:b] [a]] none? b]]
 [unset 'a b: none set/any [:b] [a] unset? get/any 'b]
+;-------------------------------------------------------------------------------
 ; functions/context/unset.r
 [
 	a: none
@@ -6255,6 +6447,7 @@
 	unset 'a
 	not value? 'a
 ]
+;-------------------------------------------------------------------------------
 ; functions/context/use.r
 ; local word test
 [
@@ -6330,6 +6523,7 @@
 	]
 	unset? f
 ]
+;-------------------------------------------------------------------------------
 ; functions/context/valueq.r
 [false == value? 'nonsense]
 [true == value? 'value?]
@@ -6338,6 +6532,7 @@
 [false == value? do func [x] ['x] none]
 #r3only
 [value? try [1 / 0]]
+;-------------------------------------------------------------------------------
 ; functions/control/all.r
 ; zero values
 [true == all []]
@@ -6686,6 +6881,7 @@
 	blk: [all blk]
 	error? try blk
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/any.r
 ; zero values
 [none? any []]
@@ -7044,6 +7240,7 @@
 	blk: [any blk]
 	error? try blk
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/apply.r
 ; bug#44
 [error? try [apply 'type?/word []]]
@@ -7137,6 +7334,7 @@
 		] [x]
 	]
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/attempt.r
 ; bug#41
 [none? attempt [1 / 0]]
@@ -7160,6 +7358,7 @@
 	blk: [attempt blk]
 	none? attempt blk
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/break.r
 ; see loop functions for basic breaking functionality
 ; just testing return values, but written as if break could fail altogether
@@ -7199,6 +7398,7 @@
 [loop 1 [spec-of break] true]
 ; the "result" of break should not be caught by try
 [a: 1 loop 1 [a: error? try [break]] :a =? 1]
+;-------------------------------------------------------------------------------
 ; functions/control/case.r
 [
 	success: false
@@ -7253,6 +7453,7 @@
 	blk: [case blk]
 	error? try blk
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/catch.r
 ; see also functions/control/throw.r
 [
@@ -7340,6 +7541,7 @@
 [error? try [catch/quit [] do make error! ""]]
 ; bug#851
 [none? attempt [catch/quit [] do make error! ""]]
+;-------------------------------------------------------------------------------
 ; functions/control/compose.r
 [
 	num: 1
@@ -7397,6 +7599,7 @@
 [
 	b: copy [] insert/dup b 1 32768 compose b
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/continue.r
 ; see loop functions for basic continuing functionality
 ; the "result" of continue should not be assignable, bug#1515
@@ -7420,9 +7623,11 @@
 ; continue should not be caught by try
 #r3only
 [a: 1 loop 1 [a: error? try [continue]] :a =? 1]
+;-------------------------------------------------------------------------------
 ; functions/control/disarm.r
 #r2only
 [object? disarm try [1 / 0]]
+;-------------------------------------------------------------------------------
 ; functions/control/do.r
 [
 	success: false
@@ -7757,6 +7962,7 @@
 	val2: try [do/next [1 / 0] 'b]
 	val1/near = val2/near
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/either.r
 [
 	either true [success: true] [success: false]
@@ -7827,11 +8033,13 @@
 	blk: [either false [] blk]
 	error? try blk
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/else.r
 #r2only
 [error? err: try [else] c: disarm err c/id = 'else-gone]
 #r3only
 [error? err: try [else] c: err c/id = 'no-value]
+;-------------------------------------------------------------------------------
 ; functions/control/exit.r
 [
 	success: true
@@ -7856,6 +8064,7 @@
 [do does [spec-of exit] true]
 ; exit should not be caught by try
 [a: 1 do does [a: error? try [exit]] :a =? 1]
+;-------------------------------------------------------------------------------
 ; functions/control/for.r
 [
 	; traverse all values
@@ -8263,6 +8472,7 @@
 ; FOR should not bind 'self
 ; bug#1529
 [same? 'self for i 1 1 1 ['self]]
+;-------------------------------------------------------------------------------
 ; functions/control/forall.r
 [
 	str: "abcdef"
@@ -8359,6 +8569,7 @@
 	blk: [1]
 	1 == forall blk [blk/1]
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/foreach.r
 [
 	out: copy ""
@@ -8438,6 +8649,7 @@
 	]
 	num = 10
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/forever.r
 [
 	num: 0
@@ -8491,6 +8703,7 @@
 	]
 	10 = num3
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/forskip.r
 #r2only
 [
@@ -8581,8 +8794,24 @@
 	e: disarm try [f]
 	e/near = [f]
 ]
+;-------------------------------------------------------------------------------
+; functions/control/func.r
+; recursive safety
+[
+	f: func [] [
+		func [x] [
+			if x = 1 [
+				do f 2
+				x = 1
+			]
+		]
+	]
+	do f 1
+]
+;-------------------------------------------------------------------------------
 ; functions/control/halt.r
 [any-function? :halt]
+;-------------------------------------------------------------------------------
 ; functions/control/if.r
 [
 	success: false
@@ -8666,6 +8895,7 @@
 	blk: [if true blk]
 	error? try blk
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/loop.r
 [
 	num: 0
@@ -8737,11 +8967,13 @@
 	]
 	f 1
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/map-each.r
 ; "return bug"
 [
 	integer? do does [map-each v [] [] 1]
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/quote.r
 [
 	unset? quote #[unset!]
@@ -8915,6 +9147,7 @@
 [
 	#[list![]] == quote #[list![]]
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/reduce.r
 [[1 2] = reduce [1 1 + 1]]
 [
@@ -8944,6 +9177,7 @@
 	blk: [reduce blk]
 	error? try blk
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/remove-each.r
 [
 	remove-each i s: [1 2] [true]
@@ -8953,6 +9187,7 @@
 	remove-each i s: [1 2] [false]
 	[1 2] = s
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/repeat.r
 [
 	success: true
@@ -9090,6 +9325,7 @@
 		]
 	]
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/return.r
 [
 	f1: does [return 1 2]
@@ -9123,6 +9359,7 @@
 [do does [spec-of return none] true]
 ; return should not be caught by try
 [a: 1 do does [a: error? try [return 2]] :a =? 1]
+;-------------------------------------------------------------------------------
 ; functions/control/switch.r
 [
 	11 = switch 1 [
@@ -9144,6 +9381,7 @@
 ]
 ; bug#2242
 [11 = do does [switch/all 1 [1 [return 11 88]] 99]]
+;-------------------------------------------------------------------------------
 ; functions/control/throw.r
 ; see functions/control/catch.r for basic functionality
 ; the "result" of throw should not be assignable, bug#1515
@@ -9164,6 +9402,7 @@
 ; throw should not be caught by try
 [a: 1 catch [a: error? try [throw 2]] :a =? 1]
 [a: 1 catch/name [a: error? try [throw/name 2 'b]] 'b :a =? 1]
+;-------------------------------------------------------------------------------
 ; functions/control/try.r
 #r2only
 [
@@ -9207,6 +9446,7 @@
 ; bug#1514
 #r3only
 [error? try [try/except [1 / 0] :add]]
+;-------------------------------------------------------------------------------
 ; functions/control/unless.r
 [
 	success: false
@@ -9231,6 +9471,7 @@
 	]
 	1 = f1
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/until.r
 [
 	num: 0
@@ -9272,9 +9513,11 @@
 	]
 	10 = num3
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/wait.r
 ; bug#5
 [wait 0:0:0.3 true]
+;-------------------------------------------------------------------------------
 ; functions/control/while.r
 [
 	num: 0
@@ -9372,6 +9615,7 @@
 	]
 	10 = num3
 ]
+;-------------------------------------------------------------------------------
 ; functions/control/quit.r
 ; In R3, DO of a script provided as a string! code catches QUIT, just as it
 ; would do for scripts in files.
@@ -9401,6 +9645,7 @@
 ]
 ; bug#2190
 [error? try [catch/quit [attempt [quit]] 1 / 0]]
+;-------------------------------------------------------------------------------
 ; functions/convert/as-binary.r
 #r2only
 [
@@ -9410,6 +9655,7 @@
 	change a "b"
 	b == to binary! a
 ]
+;-------------------------------------------------------------------------------
 ; functions/convert/as-string.r
 #r2only
 [
@@ -9419,12 +9665,14 @@
 	change a #{01}
 	b == to string! a
 ]
+;-------------------------------------------------------------------------------
 ; functions/convert/encode.r
 #r3only
 [binary? encode 'bmp make image! 10x20]
 ; bug#2040
 #r3only
 [binary? encode 'png make image! 10x20]
+;-------------------------------------------------------------------------------
 ; functions/convert/load.r
 ; bug#20
 [block? load/all "1"]
@@ -9457,6 +9705,7 @@
 	 error? try [x: load/header ""]
 	 not error? x
 ]
+;-------------------------------------------------------------------------------
 ; functions/convert/mold.r
 ; bug#860
 ; bug#6
@@ -9507,6 +9756,7 @@
 ; bug#84
 [equal? mold make bitset! "^(00)" "make bitset! #{80}"]
 [equal? mold/all make bitset! "^(00)" "#[bitset! #{80}]"]
+;-------------------------------------------------------------------------------
 ; functions/convert/to.r
 ; bug#12
 [image? to image! make gob! []]
@@ -9517,6 +9767,7 @@
 ['money! = to word! money!]
 ; bug#1967
 [not same? to binary! [1] to binary! [2]]
+;-------------------------------------------------------------------------------
 ; functions/convert/to-c-array.r
 [either value? 'to-c-array [#{} == to-c-array []] [true]]
 [either value? 'to-c-array [#{0000000000000000} == to-c-array [0.0]] [true]]
@@ -9536,33 +9787,50 @@
 		true
 	]
 ]
-; functions/datatype/as-pair.r
-; bug#1624
-#r3only
-[native? :as-pair]
-; functions/define/func.r
-; recursive safety
-[
-	f: func [] [
-		func [x] [
-			if x = 1 [
-				do f 2
-				x = 1
-			]
-		]
-	]
-	do f 1
-]
+;-------------------------------------------------------------------------------
 ; functions/convert/to-hex.r
 ; bug#43
 #r3only
 [#FFFFFFFE = to-hex/size -2 8]
+;-------------------------------------------------------------------------------
+; functions/datatype/as-pair.r
+; bug#1624
+#r3only
+[native? :as-pair]
+;-------------------------------------------------------------------------------
+; functions/dataset/difference.r
+[24:00 = difference 1/Jan/2007 31/Dec/2006]
+[0:00 = difference 1/Jan/2007 1/Jan/2007]
+; block
+[[1 2] = difference [1 3] [2 3]]
+[[] = difference [1 2] [1 2]]
+; bitset
+[(charset "a") = difference charset "a" charset ""]
+; bug#1822: DIFFERENCE on date!s problem
+[12:00 = difference 13/1/2011/12:00 13/1/2011]
+; bug#799
+#r3only
+[equal? make typeset! [decimal!] difference make typeset! [decimal! integer!] make typeset! [integer!]]
+;-------------------------------------------------------------------------------
+; functions/dataset/exclude.r
+[empty? exclude [1 2] [2 1]]
+; bug#799
+#r3only
+[equal? make typeset! [decimal!] exclude make typeset! [decimal! integer!] make typeset! [integer!]]
+;-------------------------------------------------------------------------------
+; functions/dataset/union.r
+; bug#799
+#r3only
+[equal? make typeset! [decimal! integer!] union make typeset! [decimal!] make typeset! [integer!]]
+;-------------------------------------------------------------------------------
 ; functions/file/clean-path.r
 ; bug#35
 [any-function? :clean-path]
+;-------------------------------------------------------------------------------
 ; functions/file/existsq.r
 ; bug#1613
 [exists? http://www.rebol.com/index.html]
+;-------------------------------------------------------------------------------
 ; functions/file/make-dir.r
 ; bug#1674
 #r2only
@@ -9579,13 +9847,201 @@
 		e/type = 'access
 	]
 ]
+;-------------------------------------------------------------------------------
 ; functions/file/open.r
 ; bug#1422: "Rebol crashes when opening the 128th port"
 [error? try [repeat n 200 [try [close open open join tcp://localhost: n]]] true]
+;-------------------------------------------------------------------------------
 ; functions/file/file-typeq.r
 ; bug#1651: "FILE-TYPE? should return NONE for unknown types"
 #r3only
 [none? file-type? %foo.0123456789bar0123456789]
+;-------------------------------------------------------------------------------
+; functions/logic/and.r
+[true and true = true]
+[true and false = false]
+[false and true = false]
+[false and false = false]
+; integer
+[1 and 1 = 1]
+[1 and 0 = 0]
+[0 and 1 = 0]
+[0 and 0 = 0]
+[1 and 2 = 0]
+[2 and 1 = 0]
+[2 and 2 = 2]
+; char
+[#"^(00)" and #"^(00)" = #"^(00)"]
+[#"^(01)" and #"^(00)" = #"^(00)"]
+[#"^(00)" and #"^(01)" = #"^(00)"]
+[#"^(01)" and #"^(01)" = #"^(01)"]
+[#"^(01)" and #"^(02)" = #"^(00)"]
+[#"^(02)" and #"^(02)" = #"^(02)"]
+; tuple
+[0.0.0 and 0.0.0 = 0.0.0]
+[1.0.0 and 1.0.0 = 1.0.0]
+[2.0.0 and 2.0.0 = 2.0.0]
+[255.255.255 and 255.255.255 = 255.255.255]
+; binary
+[#{030000} and #{020000} = #{020000}]
+; string
+#r2only
+["^(03)^(00)" and "^(02)^(00)" = "^(02)^(00)"]
+;-------------------------------------------------------------------------------
+; functions/logic/complement.r
+; bug#849
+[false = complement true]
+[true = complement false]
+; integer
+; two's complement representation
+[-1 = complement 0]
+; two's complement representation
+[0 = complement -1]
+; two's complement representation
+[2147483647 = complement -2147483648]
+; two's complement representation
+[-2147483648 = complement 2147483647]
+; char
+#r2only
+[#"^(ff)" = complement #"^@"]
+#r2only
+[#"^@" = complement #"^(ff)"]
+#r2only
+[#"^(fe)" = complement #"^(01)"]
+#r2only
+[#"^(01)" = complement #"^(fe)"]
+; tuple
+[255.255.255 = complement 0.0.0]
+[0.0.0 = complement 255.255.255]
+; binary
+[#{ffffffffff} = complement #{0000000000}]
+[#{0000000000} = complement #{ffffffffff}]
+; string
+#r2only
+["^(ff)" = complement "^@"]
+#r2only
+["^@" = complement "^(ff)"]
+#r2only
+["^(fe)" = complement "^(01)"]
+#r2only
+["^(01)" = complement "^(fe)"]
+; bitset
+#r2only
+[
+	(make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF})
+		= complement make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
+]
+#r2only
+[
+	(make bitset! #{0000000000000000000000000000000000000000000000000000000000000000})
+		= complement make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+]
+[not find complement charset "b" #"b"]
+[find complement charset "a" #"b"]
+[
+	a: make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
+	a == complement complement a
+]
+[
+	a: make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+	a == complement complement a
+]
+; image
+; bug#1706
+[(make image! [1x1 #{000000} #{00}]) = complement make image! [1x1 #{ffffff} #{ff}]]
+[(make image! [1x1 #{ffffff} #{ff}]) = complement make image! [1x1 #{000000} #{00}]]
+; typeset
+; bug#799
+#r3only
+[typeset? complement make typeset! [unset!]]
+;-------------------------------------------------------------------------------
+; functions/logic/not.r
+[false = not :abs]
+[false = not #{}]
+[false = not charset ""]
+[false = not []]
+[false = not #"a"]
+[false = not datatype!]
+[false = not 1/1/2007]
+[false = not 0.0]
+[false = not me@mydomain.com]
+[false = not %myfile]
+[false = not func [] []]
+[false = not first [:a]]
+#r2only
+[false = not make hash! []]
+[false = not make image! 0x0]
+[false = not 0]
+[false = not #1444]
+#r2only
+[false = not make list! []]
+[false = not first ['a/b]]
+[false = not first ['a]]
+[false = not true]
+[true = not false]
+#r3only
+[false = not make map! []]
+[false = not $0.00]
+[false = not :type?]
+[true = not none]
+[false = not make object! []]
+[false = not type? get '+]
+[false = not 0x0]
+[false = not first [()]]
+[false = not first [a/b]]
+[false = not make port! http://]
+[false = not /refinement]
+[false = not first [a/b:]]
+[false = not first [a:]]
+[false = not ""]
+[false = not <tag>]
+[false = not 1:00]
+[false = not 1.2.3]
+#r3only
+[false = not http://]
+[false = not 'a]
+; functions/math/oddq.r
+[not odd? 0]
+[odd? 1]
+[odd? -1]
+[odd? 2147483647]
+[not odd? -2147483648]
+#64bit
+[odd? 9223372036854775807]
+#64bit
+[not odd? -9223372036854775808]
+; decimal
+[not odd? 0.0]
+[odd? 1.0]
+[not odd? 2.0]
+[odd? -1.0]
+[not odd? -2.0]
+[not odd? 1.7976931348623157e308]
+[not odd? -1.7976931348623157e308]
+[odd? 999999999999999.0]
+[odd? -999999999999999.0]
+; char
+[not odd? #"^@"]
+[odd? #"^a"]
+[not odd? #"^b"]
+[odd? #"^(ff)"]
+; money
+[not odd? $0]
+[odd? $1]
+[not odd? $2]
+[odd? -$1]
+[not odd? -$2]
+[odd? $999999999999999]
+[odd? -$999999999999999]
+; time
+[not odd? 0:00]
+[not odd? 0:1:00]
+[not odd? -0:1:00]
+[odd? 0:0:01]
+[not odd? 0:0:02]
+[odd? -0:0:01]
+[not odd? -0:0:02]
+;-------------------------------------------------------------------------------
 ; functions/math/absolute.r
 [:abs = :absolute]
 [0 = abs 0]
@@ -9622,6 +10078,7 @@
 [2147483647x2147483647 = abs 2147483647x-2147483647]
 [2147483647x2147483647 = abs -2147483647x2147483647]
 [2147483647x2147483647 = abs -2147483647x-2147483647]
+;-------------------------------------------------------------------------------
 ; functions/math/add.r
 [3 = add 1 2]
 ; integer -9223372036854775808 + x tests
@@ -9875,36 +10332,7 @@
 [0.0.255 = add 0.0.255 0.0.0]
 [0.0.255 = add 0.0.255 0.0.1]
 [0.0.255 = add 0.0.255 0.0.255]
-; functions/math/and.r
-[true and true = true]
-[true and false = false]
-[false and true = false]
-[false and false = false]
-; integer
-[1 and 1 = 1]
-[1 and 0 = 0]
-[0 and 1 = 0]
-[0 and 0 = 0]
-[1 and 2 = 0]
-[2 and 1 = 0]
-[2 and 2 = 2]
-; char
-[#"^(00)" and #"^(00)" = #"^(00)"]
-[#"^(01)" and #"^(00)" = #"^(00)"]
-[#"^(00)" and #"^(01)" = #"^(00)"]
-[#"^(01)" and #"^(01)" = #"^(01)"]
-[#"^(01)" and #"^(02)" = #"^(00)"]
-[#"^(02)" and #"^(02)" = #"^(02)"]
-; tuple
-[0.0.0 and 0.0.0 = 0.0.0]
-[1.0.0 and 1.0.0 = 1.0.0]
-[2.0.0 and 2.0.0 = 2.0.0]
-[255.255.255 and 255.255.255 = 255.255.255]
-; binary
-[#{030000} and #{020000} = #{020000}]
-; string
-#r2only
-["^(03)^(00)" and "^(02)^(00)" = "^(02)^(00)"]
+;-------------------------------------------------------------------------------
 ; functions/math/arccosine.r
 [0 = arccosine 1]
 [0 = arccosine/radians 1]
@@ -9947,6 +10375,7 @@
 [1 >= ulp-dist pi * 2 / 3 arccosine/radians -0.5]
 [error? try [arccosine 1.1]]
 [error? try [arccosine -1.1]]
+;-------------------------------------------------------------------------------
 ; functions/math/arcsine.r
 [0 = arcsine 0]
 [0 = arcsine/radians 0]
@@ -10000,6 +10429,7 @@
 [1e-9 / (arcsine/radians 1e-9) = 1.0]
 [error? try [arcsine 1.1]]
 [error? try [arcsine -1.1]]
+;-------------------------------------------------------------------------------
 ; functions/math/arctangent.r
 [-90 = arctangent -1e16]
 [pi / -2 = arctangent/radians -1e16]
@@ -10031,72 +10461,7 @@
 [pi / 3 = arctangent/radians square-root 3]
 [90 = arctangent 1e16]
 [pi / 2 = arctangent/radians 1e16]
-; functions/math/complement.r
-; bug#849
-[false = complement true]
-[true = complement false]
-; integer
-; two's complement representation
-[-1 = complement 0]
-; two's complement representation
-[0 = complement -1]
-; two's complement representation
-[2147483647 = complement -2147483648]
-; two's complement representation
-[-2147483648 = complement 2147483647]
-; char
-#r2only
-[#"^(ff)" = complement #"^@"]
-#r2only
-[#"^@" = complement #"^(ff)"]
-#r2only
-[#"^(fe)" = complement #"^(01)"]
-#r2only
-[#"^(01)" = complement #"^(fe)"]
-; tuple
-[255.255.255 = complement 0.0.0]
-[0.0.0 = complement 255.255.255]
-; binary
-[#{ffffffffff} = complement #{0000000000}]
-[#{0000000000} = complement #{ffffffffff}]
-; string
-#r2only
-["^(ff)" = complement "^@"]
-#r2only
-["^@" = complement "^(ff)"]
-#r2only
-["^(fe)" = complement "^(01)"]
-#r2only
-["^(01)" = complement "^(fe)"]
-; bitset
-#r2only
-[
-	(make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF})
-		= complement make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
-]
-#r2only
-[
-	(make bitset! #{0000000000000000000000000000000000000000000000000000000000000000})
-		= complement make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
-]
-[not find complement charset "b" #"b"]
-[find complement charset "a" #"b"]
-[
-	a: make bitset! #{0000000000000000000000000000000000000000000000000000000000000000}
-	a == complement complement a
-]
-[
-	a: make bitset! #{FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
-	a == complement complement a
-]
-; image
-; bug#1706
-[(make image! [1x1 #{000000} #{00}]) = complement make image! [1x1 #{ffffff} #{ff}]]
-[(make image! [1x1 #{ffffff} #{ff}]) = complement make image! [1x1 #{000000} #{00}]]
-; typeset
-; bug#799
-#r3only
-[typeset? complement make typeset! [unset!]]
+;-------------------------------------------------------------------------------
 ; functions/math/cosine.r
 [1 = cosine 0]
 [1 = cosine/radians 0]
@@ -10146,16 +10511,7 @@
 [-0.5 = cosine/radians pi * 2 / 3]
 #ulp
 [4 >= ulp-dist -0.5 cosine/radians pi * 2 / 3]
-; functions/math/difference.r
-[24:00 = difference 1/Jan/2007 31/Dec/2006]
-[0:00 = difference 1/Jan/2007 1/Jan/2007]
-; block
-[[1 2] = difference [1 3] [2 3]]
-[[] = difference [1 2] [1 2]]
-; bitset
-[(charset "a") = difference charset "a" charset ""]
-; bug#1822: DIFFERENCE on date!s problem
-[12:00 = difference 13/1/2011/12:00 13/1/2011]
+;-------------------------------------------------------------------------------
 ; functions/math/divide.r
 [1 == divide -2147483648 -2147483648]
 [2 == divide -2147483648 -1073741824]
@@ -10223,6 +10579,7 @@
 [10x10 == divide 1x1 .1]
 ; bug#1974
 [10.10.10 == divide 1.1.1 .1]
+;-------------------------------------------------------------------------------
 ; functions/math/evenq.r
 [even? 0]
 [not even? 1]
@@ -10265,12 +10622,14 @@
 [even? 0:0:02]
 [not even? -0:0:01]
 [even? -0:0:02]
+;-------------------------------------------------------------------------------
 ; functions/math/exp.r
 [1 = exp 0]
 [2.718281828459045 = exp 1]
 [2.718281828459045 * 2.718281828459045 = exp 2]
 [(square-root 2.718281828459045) = exp 0.5]
 [1 / 2.718281828459045 = exp -1]
+;-------------------------------------------------------------------------------
 ; functions/math/log-10.r
 [0 = log-10 1]
 [0.5 = log-10 square-root 10]
@@ -10282,6 +10641,7 @@
 [-3 = log-10 0.001]
 [error? try [log-10 0]]
 [error? try [log-10 -1]]
+;-------------------------------------------------------------------------------
 ; functions/math/log-2.r
 [0 = log-2 1]
 [1 = log-2 2]
@@ -10292,6 +10652,7 @@
 [-3 = log-2 0.125]
 [error? try [log-2 0]]
 [error? try [log-2 -1]]
+;-------------------------------------------------------------------------------
 ; functions/math/log-e.r
 [0 = log-e 1]
 [0.5 = log-e square-root 2.718281828459045]
@@ -10300,6 +10661,7 @@
 [2 = log-e 2.718281828459045 * 2.718281828459045]
 [error? try [log-e 0]]
 [error? try [log-e -1]]
+;-------------------------------------------------------------------------------
 ; functions/math/mod.r
 [0.0 == mod 1E15 1]
 [0.0 == mod -1E15 1]
@@ -10342,6 +10704,7 @@
 [not negative? 1e-16 - abs mod 0.1 + 0.1 + 0.1 0.3]
 [not negative? 1e-16 - abs mod 0.3 0.1 + 0.1 + 0.1]
 [not negative? 1e-16 - abs mod to money! 0.1 + 0.1 + 0.1 $0.3]
+;-------------------------------------------------------------------------------
 ; functions/math/modulo.r
 [0.0 == modulo 0.1 + 0.1 + 0.1 0.3]
 [0.0 == modulo 0.3 0.1 + 0.1 + 0.1]
@@ -10351,6 +10714,7 @@
 [0.0 == modulo 0.15 - 0.05 - 0.1 0.1]
 ; bug#56
 [0 = modulo 1 1]
+;-------------------------------------------------------------------------------
 ; functions/math/multiply.r
 #32bit
 [error? try [multiply -2147483648 -2147483648]]
@@ -10467,6 +10831,7 @@
 #64bit
 [error? try [multiply -9223372036854775808 -1]]
 [0:0:1 == multiply 0:0:2 0.5]
+;-------------------------------------------------------------------------------
 ; functions/math/negate.r
 [0 = negate 0]
 [-1 = negate 1]
@@ -10519,6 +10884,7 @@
 [
 	strict-equal? - 1.0 * 1.0 -1.0
 ]
+;-------------------------------------------------------------------------------
 ; functions/math/negativeq.r
 [not negative? 0]
 [not negative? 1]
@@ -10552,92 +10918,7 @@
 [not negative? 0:00]
 [not negative? 0:00:0.000000001]
 [negative? -0:00:0.000000001]
-; functions/math/not.r
-[false = not :abs]
-[false = not #{}]
-[false = not charset ""]
-[false = not []]
-[false = not #"a"]
-[false = not datatype!]
-[false = not 1/1/2007]
-[false = not 0.0]
-[false = not me@mydomain.com]
-[false = not %myfile]
-[false = not func [] []]
-[false = not first [:a]]
-#r2only
-[false = not make hash! []]
-[false = not make image! 0x0]
-[false = not 0]
-[false = not #1444]
-#r2only
-[false = not make list! []]
-[false = not first ['a/b]]
-[false = not first ['a]]
-[false = not true]
-[true = not false]
-#r3only
-[false = not make map! []]
-[false = not $0.00]
-[false = not :type?]
-[true = not none]
-[false = not make object! []]
-[false = not type? get '+]
-[false = not 0x0]
-[false = not first [()]]
-[false = not first [a/b]]
-[false = not make port! http://]
-[false = not /refinement]
-[false = not first [a/b:]]
-[false = not first [a:]]
-[false = not ""]
-[false = not <tag>]
-[false = not 1:00]
-[false = not 1.2.3]
-#r3only
-[false = not http://]
-[false = not 'a]
-; functions/math/oddq.r
-[not odd? 0]
-[odd? 1]
-[odd? -1]
-[odd? 2147483647]
-[not odd? -2147483648]
-#64bit
-[odd? 9223372036854775807]
-#64bit
-[not odd? -9223372036854775808]
-; decimal
-[not odd? 0.0]
-[odd? 1.0]
-[not odd? 2.0]
-[odd? -1.0]
-[not odd? -2.0]
-[not odd? 1.7976931348623157e308]
-[not odd? -1.7976931348623157e308]
-[odd? 999999999999999.0]
-[odd? -999999999999999.0]
-; char
-[not odd? #"^@"]
-[odd? #"^a"]
-[not odd? #"^b"]
-[odd? #"^(ff)"]
-; money
-[not odd? $0]
-[odd? $1]
-[not odd? $2]
-[odd? -$1]
-[not odd? -$2]
-[odd? $999999999999999]
-[odd? -$999999999999999]
-; time
-[not odd? 0:00]
-[not odd? 0:1:00]
-[not odd? -0:1:00]
-[odd? 0:0:01]
-[not odd? 0:0:02]
-[odd? -0:0:01]
-[not odd? -0:0:02]
+;-------------------------------------------------------------------------------
 ; functions/math/positiveq.r
 [not positive? 0]
 [positive? 1]
@@ -10671,6 +10952,7 @@
 [not positive? 0:00]
 [positive? 0:00:0.000000001]
 [not positive? -0:00:0.000000001]
+;-------------------------------------------------------------------------------
 ; functions/math/power.r
 [1 = power 1 1000]
 [1 = power 1000 0]
@@ -10683,6 +10965,7 @@
 [error? try [power 0.0 -1.0]]
 [error? try [power -1 0.5]]
 [error? try [power -1.0 0.5]]
+;-------------------------------------------------------------------------------
 ; functions/math/random.r
 ; bug#1084
 #r3only
@@ -10706,6 +10989,7 @@
 	random/seed s
 	a = random 10000
 ]
+;-------------------------------------------------------------------------------
 ; functions/math/remainder.r
 #64bit
 ; integer! tests
@@ -10715,6 +10999,7 @@
 ; time! tests
 [-1:00 == remainder -1:00 -3:00]
 [1:00 == remainder 1:00 -3:00]
+;-------------------------------------------------------------------------------
 ; functions/math/round.r
 [0 == round 0]
 [1 == round 1]
@@ -11179,6 +11464,7 @@
 [1 >= ulp-dist -0.6 round/half-down/to -0.55001 0.1]
 [-0.5 == round/half-down/to -0.75 0.5]
 [-1.0 == round/half-down/to -0.75001 0.5]
+;-------------------------------------------------------------------------------
 ; functions/math/shift.r
 ; bug#2067
 ; logical shift of to integer! #{8000000000000000}
@@ -11888,6 +12174,7 @@
 [error? try [shift to integer! #{7fffffffffffffff} to integer! #{7ffffffffffffffe}]]
 #r3only
 [error? try [shift to integer! #{7fffffffffffffff} to integer! #{7fffffffffffffff}]]
+;-------------------------------------------------------------------------------
 ; functions/math/signq.r
 [0 = sign? 0]
 [1 = sign? 1]
@@ -11909,6 +12196,7 @@
 [0 = sign? 0:00]
 [1 = sign? 0:00:0.000000001]
 [-1 = sign? -0:00:0.000000001]
+;-------------------------------------------------------------------------------
 ; functions/math/sine.r
 [0 = sine 0]
 [0 = sine/radians 0]
@@ -11970,6 +12258,7 @@
 	]
 	30.314520404 = round/to s4 1e-9
 ]
+;-------------------------------------------------------------------------------
 ; functions/math/square-root.r
 [0 = square-root 0]
 [error? try [square-root -1]]
@@ -11978,6 +12267,7 @@
 [2 = square-root 4]
 [3 = square-root 9]
 [1.1 = square-root 1.21]
+;-------------------------------------------------------------------------------
 ; functions/math/subtract.r
 [1 == subtract 3 2]
 ; integer -9223372036854775808 - x tests
@@ -12255,6 +12545,7 @@
 [0.0.255 == subtract 0.0.255 0.0.0]
 [0.0.254 == subtract 0.0.255 0.0.1]
 [0.0.0 == subtract 0.0.255 0.0.255]
+;-------------------------------------------------------------------------------
 ; functions/math/tangent.r
 [error? try [tangent -90]]
 [error? try [tangent/radians pi / -2]]
@@ -12309,6 +12600,7 @@
 	]
 	30.314520404 = round/to s4t 1e-9
 ]
+;-------------------------------------------------------------------------------
 ; functions/math/zeroq.r
 [zero? 0]
 [not zero? 1]
@@ -12356,12 +12648,14 @@
 [not zero? 0.255.0]
 [not zero? 0.0.1]
 [not zero? 0.0.255]
+;-------------------------------------------------------------------------------
 ; functions/reflectors/body-of.r
 ; bug#49
 [
 	f: func [] []
 	not same? body-of :f body-of :f
 ]
+;-------------------------------------------------------------------------------
 ; functions/secure/protect.r
 ; bug#1748
 ; block
@@ -12523,6 +12817,7 @@
 ; bug#1764
 #r3only
 [unset 'blk protect/deep 'blk]
+;-------------------------------------------------------------------------------
 ; functions/secure/unprotect.r
 ; bug#1748
 ; block
@@ -12645,6 +12940,7 @@
 	unprotect value
 	not error? try [clear value]
 ]
+;-------------------------------------------------------------------------------
 ; functions/series/append.r
 ; bug#75
 #r3only
@@ -12667,6 +12963,7 @@
 ]
 [block? append copy [] #[unset!]]
 [strict-equal? quote 'a/b/c append quote 'a/b 'c]
+;-------------------------------------------------------------------------------
 ; functions/series/at.r
 [
 	blk: []
@@ -12757,6 +13054,7 @@
 	str: "12"
 	same? str at str -2147483648
 ]
+;-------------------------------------------------------------------------------
 ; functions/series/back.r
 [
 	a: [1]
@@ -12784,6 +13082,7 @@
 	a: "1"
 	same? a back a
 ]
+;-------------------------------------------------------------------------------
 ; functions/series/change.r
 [
 	blk1: at copy [1 2 3 4 5] 3
@@ -12794,6 +13093,7 @@
 ]
 ; bug#9
 [equal? "tr" change/part "str" "" 1]
+;-------------------------------------------------------------------------------
 ; functions/series/clear.r
 [[] = clear []]
 [[] = clear copy [1]]
@@ -12804,6 +13104,159 @@
 ]
 ; none
 [none == clear none]
+
+
+;-------------------------------------------------------------------------------
+; functions/series/collect-values.r
+[
+	"set up collect-values tests"
+
+	cv-test-blk: compose [
+		1 a 2 b: c a d: 3 f [e: b: f g: 4 f: [h][i: 5]]
+		"s" <T> #i e@f.g
+		[]
+		(:append) (:+) (:insert) (:try)
+	]
+	
+	true
+]
+
+[
+	"collect-values <empty> <empty"
+	none? collect-values [] []
+]
+
+[
+	"collect-values <empty>"
+	[] = collect-values [] word!
+]
+
+[
+	"collect-values word!"
+	[a c a f] = collect-values cv-test-blk word!
+]
+
+[
+	"collect-values/deep word!"
+	[a c a f f h] = collect-values/deep cv-test-blk word!
+]
+
+[
+	"collect-values [word! | integer!]"
+	[1 a 2 c a 3 f] = collect-values cv-test-blk [word! | integer!]
+]
+
+[
+	"collect-values/deep [word! | integer!]"
+	[1 a 2 c a 3 f f 4 h 5] = collect-values/deep cv-test-blk [word! | integer!]
+]
+
+[
+	"collect-values any-string!"
+	["s" <T> #i e@f.g] = collect-values cv-test-blk any-string!
+]
+
+; One of those funny things I don't remember running across in the past
+;>> a: (compose [(:append) (:+) (:insert) (:try)])
+;== [func [
+;        {Appends a value to the tail of a series and returns the series head.}
+;        series [series! port!]
+;        ...
+;>> b: collect-values cv-test-blk any-function!
+;== [func [
+;        {Appends a value to the tail of a series and returns the series head.}
+;        series [series! port!]
+;>> equal? first a first b
+;== true
+;>> equal? second a second b
+;== true
+;>> equal? third a third b
+;== true
+;>> equal? fourth a fourth b
+;== true
+;>> length? a
+;== 4
+;>> length? b
+;== 4
+;>> equal? a b
+;== false
+; So we'll stub this test out for now 
+;[
+;	"collect-values any-function!"
+;	(compose [(:append) (:+) (:insert) (:try)]) = collect-values cv-test-blk any-function!
+;]
+
+[
+	"collect-values op!"
+	(compose [(:+)]) = collect-values cv-test-blk op!
+]
+
+[
+	"clean up after collect-values tests"
+	unset 'cv-test-blk
+	true
+]
+
+;-------------------------------------------------------------------------------
+; functions/series/collect-words.r
+[
+	"set up collect-words tests"
+	cw-test-blk: [1 a 2 b: c a d: 3 f [e: b: f g: 4 f: [h][i:]]]
+	true
+]
+
+[
+	"collect-words <empty>"
+	[] = collect-words []
+]
+
+[
+	"collect-words <no refinements>"
+	[a b c d f] = collect-words cw-test-blk
+]
+
+[
+	"collect-words/set"
+	[b: d:] = collect-words/set cw-test-blk
+]
+
+[
+	"collect-words/set/as"
+	[b d] = collect-words/set/as cw-test-blk word!
+]
+
+[
+	"collect-words/deep"
+	[a b c d f e g h i] = collect-words/deep cw-test-blk
+]
+
+[
+	"collect-words/set/deep"
+	[b: d: e: g: f: i:] = collect-words/set/deep cw-test-blk
+]
+
+[
+	"collect-words/set/deep/as"
+	[b d e g f i] = collect-words/set/deep/as cw-test-blk word!
+]
+
+[
+	"collect-words/set/deep/ignore"
+	[b: d: e: g:] = collect-words/set/deep/ignore cw-test-blk [a: c: f: i:]
+]
+
+[
+	"collect-words/set/deep/ignore/as"
+	[b d e g] = collect-words/set/deep/ignore/as cw-test-blk [a c f i] word!
+]
+
+[
+	"clean up after collect-words tests"
+	unset 'cw-test-blk
+	true
+]
+
+;-------------------------------------------------------------------------------
 ; functions/series/copy.r
 [
 	blk: []
@@ -12894,6 +13347,7 @@
 	error? try [copy :f]
 	true
 ]
+;-------------------------------------------------------------------------------
 ; functions/series/deline.r
 [
 	equal?
@@ -12907,10 +13361,7 @@
 [["a"] = deline/lines "a"]
 ; bug#1794
 [1 = length? deline/lines "Slovenščina"]
-; functions/series/difference.r
-; bug#799
-#r3only
-[equal? make typeset! [decimal!] difference make typeset! [decimal! integer!] make typeset! [integer!]]
+;-------------------------------------------------------------------------------
 ; functions/series/emptyq.r
 [empty? []]
 [
@@ -12920,6 +13371,7 @@
 ]
 #r3only
 [empty? none]
+;-------------------------------------------------------------------------------
 ; functions/series/enline.r
 ; bug#2191
 [
@@ -12935,11 +13387,7 @@
 [x: copy "xx^/" loop 20 [enline x: join x x] true]
 ; bug#647
 [string? enline ["a" "b"]]
-; functions/series/exclude.r
-[empty? exclude [1 2] [2 1]]
-; bug#799
-#r3only
-[equal? make typeset! [decimal!] exclude make typeset! [decimal! integer!] make typeset! [integer!]]
+;-------------------------------------------------------------------------------
 ; functions/series/find.r
 #r2only
 [error? try [find none 1]]
@@ -12959,6 +13407,7 @@
 ; /match refinement
 [found? find/match [1 2] 1]
 [none? find/match [1 2] 2]
+;-------------------------------------------------------------------------------
 ; functions/series/indexq.r
 [1 == index? []]
 [2 == index? next [a]]
@@ -12971,6 +13420,7 @@
 ; bug#1611: Allow INDEX? to take none as an argument, return none
 #r3only
 [none? index? none]
+;-------------------------------------------------------------------------------
 ; functions/series/insert.r
 [
 	a: make block! 0
@@ -13281,19 +13731,23 @@
 	insert/dup a 0 -2147483648
 	empty? a
 ]
+;-------------------------------------------------------------------------------
 ; functions/series/intersect.r
 ; bug#799
 #r3only
 [equal? make typeset! [integer!] intersect make typeset! [decimal! integer!] make typeset! [integer!]]
+;-------------------------------------------------------------------------------
 ; functions/series/last.r
 ; bug#2
 [error? try [last #"c"]]
 [error? try [last 7]]
+;-------------------------------------------------------------------------------
 ; functions/series/lengthq.r
 ; bug#1626: "Allow LENGTH? to take none as an argument, return none"
 ; bug#1688: "LENGTH? NONE returns TRUE" (should return NONE)
 #r3only
 [none? length? none]
+;-------------------------------------------------------------------------------
 ; functions/series/next.r
 [
 	blk: [1]
@@ -13303,6 +13757,7 @@
 	blk: tail [1]
 	same? blk next blk
 ]
+;-------------------------------------------------------------------------------
 ; functions/series/ordinals.r
 #r2only
 [error? try [first []]]
@@ -13354,6 +13809,7 @@
 [8 = eighth [1 2 3 4 5 6 7 8 9 10 11]]
 [9 = ninth [1 2 3 4 5 6 7 8 9 10 11]]
 [10 = tenth [1 2 3 4 5 6 7 8 9 10 11]]
+;-------------------------------------------------------------------------------
 ; functions/series/parse.r
 ; SET-WORD! (store current input position)
 [res: parse ser: [x y] [pos: skip skip] all [res pos = ser]]
@@ -13471,6 +13927,7 @@
 [not parse "abcd" rule: ["ab" (remove back tail rule) "cd"]]
 ; bug#2214
 [not parse "abcd" rule: ["ab" (clear rule) "cd"]]
+;-------------------------------------------------------------------------------
 ; functions/series/pick.r
 #64bit
 [error? try [pick at [1 2 3 4 5] 3 -9223372036854775808]]
@@ -13522,6 +13979,7 @@
 [none? pick at "12345" 3 2147483647]
 #64bit
 [error? try [pick at "12345" 3 9223372036854775807]]
+;-------------------------------------------------------------------------------
 ; functions/series/poke.r
 [
 	poke a: #{00} 1 pick b: #{11} 1
@@ -13533,6 +13991,7 @@
 	poke blk2 1 pick blk1 1
 	unset? pick blk2 1
 ]
+;-------------------------------------------------------------------------------
 ; functions/series/remove.r
 [[] = remove []]
 [[] = head remove [1]]
@@ -13549,12 +14008,15 @@
 	remove/part a-bitset to integer! #"a"
 	none? find a-bitset #"a"
 ]
+;-------------------------------------------------------------------------------
 ; functions/series/reverse.r
 ; bug#1810: REVERSE/part does not work for tuple!
 [3.2.1.4.5 = reverse/part 1.2.3.4.5 3]
+;-------------------------------------------------------------------------------
 ; functions/series/select.r
 ; bug#1936: select returns incorrect value with block argument
 [4 == select [1 2 3 4 5 6] [1 2 3]]
+;-------------------------------------------------------------------------------
 ; functions/series/skip.r
 [
 	blk: []
@@ -13608,6 +14070,7 @@
 	blk: next [1 2 3]
 	same? head blk skip blk -2147483648
 ]
+;-------------------------------------------------------------------------------
 ; functions/series/sort.r
 [[1 2 3] = sort [1 3 2]]
 [[3 2 1] = sort/reverse [1 3 2]]
@@ -13644,6 +14107,7 @@
 [[3 2 1] = sort/compare [1 3 2] :>]
 ; bug#1516: SORT/compare ignores the typespec of its function argument
 [error? try [sort/compare [1 2 #[unset!]] :>]]
+;-------------------------------------------------------------------------------
 ; functions/series/split.r
 ; Tests taken from bug#1886.
 #r3
@@ -13709,11 +14173,13 @@
 [["abc" "de" "fghi" "jk"] == split "abc^M^Jde^Mfghi^Jjk" [crlf | #"^M" | newline]]
 #r3
 [["abc" "de" "fghi" "jk"] == split "abc     de fghi  jk" [some #" "]]
+;-------------------------------------------------------------------------------
 ; functions/series/swap.r
 [
 	lit-path: quote 'a/b
 	strict-equal? swap :lit-path next :lit-path quote 'b/a
 ]
+;-------------------------------------------------------------------------------
 ; functions/series/tailq.r
 [tail? []]
 [
@@ -13721,16 +14187,14 @@
 	clear head blk
 	tail? blk
 ]
+;-------------------------------------------------------------------------------
 ; functions/series/trim.r
 ; bug#83
 ; refinement order
 [strict-equal? trim/all/with "a" "a" trim/with/all "a" "a"]
 ; bug#1948
 ["foo^/" = trim "  foo ^/"]
-; functions/series/union.r
-; bug#799
-#r3only
-[equal? make typeset! [decimal! integer!] union make typeset! [decimal!] make typeset! [integer!]]
+;-------------------------------------------------------------------------------
 ; functions/string/checksum.r
 [#{ACBD18DB4CC2F85CEDEF654FCCC4A4D8} = checksum/method to-binary "foo" 'md5]
 [#{FC3FF98E8C6A0D3087D515C0473F8677} = checksum/method to-binary "hello world!" 'md5]
@@ -13742,10 +14206,12 @@
 ; bug#1678
 #r3only
 [(checksum/method to-binary "" 'CRC32) = 0]
+;-------------------------------------------------------------------------------
 ; functions/string/compress.r
 ; bug#1679
 #r3only
 [#{1F8B0800EF46BE4C00034BCBCF07002165738C03000000} = compress/gzip "foo"]
+;-------------------------------------------------------------------------------
 ; functions/string/decloak.r
 ; bug#48
 [
@@ -13753,6 +14219,7 @@
 	b: encloak a "a"
 	equal? a decloak b "a"
 ]
+;-------------------------------------------------------------------------------
 ; functions/string/decode.r
 #r3
 [image? decode 'bmp read %fixtures/rebol-logo.bmp]
@@ -13779,6 +14246,7 @@
 ["bar" == decode 'text #{626172}]
 #r3
 [[<b> "hello" </b>] == decode 'markup "<b>hello</b>"]
+;-------------------------------------------------------------------------------
 ; functions/string/encode.r
 #r3
 [out: encode 'bmp decode 'bmp src: read %fixtures/rebol-logo.bmp out == src]
@@ -13790,6 +14258,7 @@
 ; JPEG encoding is not yet implemented
 #r3
 [out: encode 'jpeg decode 'jpeg src: read %fixtures/rebol-logo.jpeg out == src]
+;-------------------------------------------------------------------------------
 ; functions/string/decompress.r
 ; bug#1679: "Native GZIP compress/decompress suport"
 #r3only
@@ -13802,6 +14271,7 @@
 	t: type? try [decompress #{AAAAAAAAAAAAAAAAAAAA}]
 	(t = string!) or (t = error!)
 ]
+;-------------------------------------------------------------------------------
 ; functions/string/dehex.r
 ["a%b" = dehex "a%b"]
 ["a%~b" = dehex "a%~b"]
@@ -13817,9 +14287,7 @@
 [(to-string #{61CEB262}) = dehex "a%ce%b2c"]
 ; bug#1986
 [#{61CEB262} = to-binary dehex "a%ce%b2c"]
-; system/system.r
-; bug#76
-[date? system/build]
+;-------------------------------------------------------------------------------
 ; system/clipboard.r
 ; empty clipboard
 [
@@ -13893,6 +14361,7 @@
 ; bug#1675
 [files: read %fixtures mold files block? files]
 [block? read %fixtures/]
+;-------------------------------------------------------------------------------
 ; system/gc.r
 ; bug#1776, bug#2072
 #long
@@ -13902,115 +14371,7 @@
 	recycle
 	true
 ]
-; ulp-dist.r
-#ulp
-[0 == ulp-dist 0.0 0.0]
-#ulp
-[0 == ulp-dist -0.0 -0.0]
-#ulp
-[0 == ulp-dist 0.0 -0.0]
-#ulp
-[0 == ulp-dist -0.0 0.0]
-#ulp
-[1 == ulp-dist 0.1 + 0.2 0.3]
-#ulp
-[1 == ulp-dist -0.1 + -0.2 -0.3]
-#ulp
-[1 == ulp-dist 0.3 0.1 + 0.2]
-#ulp
-[1 == ulp-dist -0.3 -0.1 + -0.2]
-; ulp-dif.r
-#ulp
-[0 == ulp-dif 0.0 0.0]
-#ulp
-[0 == ulp-dif -0.0 -0.0]
-#ulp
-[0 == ulp-dif 0.0 -0.0]
-#ulp
-[0 == ulp-dif -0.0 0.0]
-#ulp
-[1 == ulp-dif 0.1 + 0.2 0.3]
-#ulp
-[-1 == ulp-dif -0.1 + -0.2 -0.3]
-#ulp
-[-1 == ulp-dif 0.3 0.1 + 0.2]
-#ulp
-[1 == ulp-dif -0.3 -0.1 + -0.2]
-; eqq.r
-[eq? 0.0 0.0]
-[eq? -0.0 -0.0]
-[eq? 0.0 -0.0]
-[eq? -0.0 0.0]
-[eq? 0.1 + 0.2 0.3]
-[eq? -0.1 + -0.2 -0.3]
-[eq? 0.3 0.1 + 0.2]
-[eq? -0.3 -0.1 + -0.2]
-[not eq? 0.0 1.0]
-[not eq? 1.0 0.0]
-[not eq? 0.0 -1.0]
-[not eq? -1.0 0.0]
-; neq.r
-[not ne? 0.0 0.0]
-[not ne? -0.0 -0.0]
-[not ne? 0.0 -0.0]
-[not ne? -0.0 0.0]
-[not ne? 0.1 + 0.2 0.3]
-[not ne? -0.1 + -0.2 -0.3]
-[not ne? 0.3 0.1 + 0.2]
-[not ne? -0.3 -0.1 + -0.2]
-[ne? 0.0 1.0]
-[ne? 1.0 0.0]
-[ne? 0.0 -1.0]
-[ne? -1.0 0.0]
-; leq.r
-[le? 0.0 0.0]
-[le? -0.0 -0.0]
-[le? 0.0 -0.0]
-[le? -0.0 0.0]
-[le? 0.1 + 0.2 0.3]
-[le? -0.1 + -0.2 -0.3]
-[le? 0.3 0.1 + 0.2]
-[le? -0.3 -0.1 + -0.2]
-[le? 0.0 1.0]
-[not le? 1.0 0.0]
-[not le? 0.0 -1.0]
-[le? -1.0 0.0]
-; ltq.r
-[not lt? 0.0 0.0]
-[not lt? -0.0 -0.0]
-[not lt? 0.0 -0.0]
-[not lt? -0.0 0.0]
-[not lt? 0.1 + 0.2 0.3]
-[not lt? -0.1 + -0.2 -0.3]
-[not lt? 0.3 0.1 + 0.2]
-[not lt? -0.3 -0.1 + -0.2]
-[lt? 0.0 1.0]
-[not lt? 1.0 0.0]
-[not lt? 0.0 -1.0]
-[lt? -1.0 0.0]
-; geq.r
-[ge? 0.0 0.0]
-[ge? -0.0 -0.0]
-[ge? 0.0 -0.0]
-[ge? -0.0 0.0]
-[ge? 0.1 + 0.2 0.3]
-[ge? -0.1 + -0.2 -0.3]
-[ge? 0.3 0.1 + 0.2]
-[ge? -0.3 -0.1 + -0.2]
-[not ge? 0.0 1.0]
-[ge? 1.0 0.0]
-[ge? 0.0 -1.0]
-[not ge? -1.0 0.0]
-; gtq.r
-[not gt? 0.0 0.0]
-[not gt? -0.0 -0.0]
-[not gt? 0.0 -0.0]
-[not gt? -0.0 0.0]
-[not gt? 0.1 + 0.2 0.3]
-[not gt? -0.1 + -0.2 -0.3]
-[not gt? 0.3 0.1 + 0.2]
-[not gt? -0.3 -0.1 + -0.2]
-[not gt? 0.0 1.0]
-[gt? 1.0 0.0]
-[gt? 0.0 -1.0]
-[not gt? -1.0 0.0]
+;-------------------------------------------------------------------------------
+; system/system.r
+; bug#76
+[date? system/build]
