@@ -5,7 +5,8 @@
 ;     2012 REBOL Technologies
 ;     2013 Saphirion AG
 ; Author:
-;     Carl Sassenrath, Ladislav Mecir, Andreas Bolka, Brian Hawley, John K
+;     Carl Sassenrath, Ladislav Mecir, Andreas Bolka, Brian Hawley, John K,
+;     Gregg Irwin
 ; License:
 ;     Licensed under the Apache License, Version 2.0 (the "License");
 ;     you may not use this file except in compliance with the License.
@@ -886,6 +887,16 @@
 	a: 0.1 + 0.1 + 0.1
 	b: 0.3
 	equal? (lesser? a b) or (equal? a b) lesser-or-equal? a b
+]
+#long
+[
+	; this runs forever in Rebol 2.7.8
+	0.0 == to decimal! [0.0 1e20]
+]
+#long
+[
+	; this runs forever in Rebol 2.7.8
+	0.0 == to decimal! [1e308 -1e20]
 ]
 ;-------------------------------------------------------------------------------
 ; datatypes/email.r
