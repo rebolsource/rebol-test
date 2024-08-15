@@ -888,12 +888,29 @@
 	b: 0.3
 	equal? (lesser? a b) or (equal? a b) lesser-or-equal? a b
 ]
-#long
+[
+	1.0 == to decimal! [1.0 0.0]
+]
+[
+	; to decimal! [1.0 0.5] yields zero in Rebol 2.7.8
+	(square-root 10.0) == to decimal! [1.0 0.5]
+]
+[
+	10.0 == to decimal! [1.0 1.0]
+]
+[
+	100.0 == to decimal! [1.0 2.0]
+]
+[
+	0.1 == to decimal! [1.0 -1.0]
+]
+[
+	0.01 == to decimal! [1.0 -2.0]
+]
 [
 	; this runs forever in Rebol 2.7.8
 	0.0 == to decimal! [0.0 1e20]
 ]
-#long
 [
 	; this runs forever in Rebol 2.7.8
 	0.0 == to decimal! [1e308 -1e20]
