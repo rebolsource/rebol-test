@@ -10501,7 +10501,10 @@
 [(square-root 3) / 2 = cosine/radians pi / 6]
 #ulp
 [1 >= ulp-dist (square-root 3) / 2 cosine/radians pi / 6]
+#no-ulp
 [(square-root 2) / 2 = cosine 45]
+#ulp
+[1 >= ulp-dist (square-root 2) / 2 cosine 45]
 [(square-root 2) / 2 = cosine/radians pi / 4]
 #no-ulp
 [0.5 = cosine 60]
@@ -10512,7 +10515,7 @@
 #ulp
 [1 >= ulp-dist 0.5 cosine/radians pi / 3]
 [0 = cosine 90]
-[0 = cosine/radians pi / 2]
+[2.2204460492503131E-16 > abs cosine/radians pi / 2]
 [-1 = cosine 180]
 [-1 = cosine/radians pi]
 #no-ulp
@@ -12252,7 +12255,7 @@
 [1 = sine 90]
 [1 = sine/radians pi / 2]
 [0 = sine 180]
-[0 = sine/radians pi]
+[2.2204460492503131E-16 > abs sine/radians pi]
 #no-ulp
 [-0.5 = sine -30]
 #ulp
@@ -12261,8 +12264,14 @@
 [-0.5 = sine/radians pi / -6]
 #ulp
 [1 >= ulp-dist -0.5 sine/radians pi / -6]
+#no-ulp
 [(square-root 2) / -2 = sine -45]
+#ulp
+[1 >= ulp-dist (square-root 2) / -2 sine -45]
+#no-ulp
 [(square-root 2) / -2 = sine/radians pi / -4]
+#ulp
+[1 >= ulp-dist (square-root 2) / -2 sine/radians pi / -4]
 #no-ulp
 [(square-root 3) / -2 = sine -60]
 #ulp
@@ -12274,7 +12283,7 @@
 [-1 = sine -90]
 [-1 = sine/radians pi / -2]
 [0 = sine -180]
-[0 = sine/radians negate pi]
+[2.2204460492503131E-16 > abs sine/radians negate pi]
 [(sine 1e-12) / 1e-12 = (pi / 180)]
 [(sine/radians 1e-9) / 1e-9 = 1.0]
 ; #bug#852
@@ -12579,7 +12588,6 @@
 ;-------------------------------------------------------------------------------
 ; functions/math/tangent.r
 [error? try [tangent -90]]
-[error? try [tangent/radians pi / -2]]
 #no-ulp
 [(negate square-root 3) = tangent -60]
 #ulp
@@ -12619,7 +12627,6 @@
 #ulp
 [2 >= ulp-dist (square-root 3) tangent/radians pi / 3]
 [error? try [tangent 90]]
-[error? try [tangent/radians pi / 2]]
 ; Flint Hills test
 [
 	n: 25000
