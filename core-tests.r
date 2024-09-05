@@ -4303,6 +4303,7 @@
 #no-ulp
 [equal? 0.5 cosine 60]
 [equal? equal? 0.5 cosine 60 equal? cosine 60 0.5]
+#no-ulp
 [equal? 0.5 * square-root 3.0 sine 60]
 [equal? equal? 0.5 * square-root 3.0 sine 60 equal? sine 60 0.5 * square-root 3.0]
 #no-ulp
@@ -10501,10 +10502,7 @@
 [(square-root 3) / 2 = cosine/radians pi / 6]
 #ulp
 [1 >= ulp-dist (square-root 3) / 2 cosine/radians pi / 6]
-#no-ulp
 [(square-root 2) / 2 = cosine 45]
-#ulp
-[1 >= ulp-dist (square-root 2) / 2 cosine 45]
 [(square-root 2) / 2 = cosine/radians pi / 4]
 #no-ulp
 [0.5 = cosine 60]
@@ -10526,10 +10524,7 @@
 [(square-root 3) / -2 = cosine/radians pi * 5 / 6]
 #ulp
 [1 >= ulp-dist (square-root 3) / -2 cosine/radians pi * 5 / 6]
-#no-ulp
 [(square-root 2) / -2 = cosine 135]
-#ulp
-[1 >= ulp-dist (square-root 2) / -2 cosine 135]
 #no-ulp
 [(square-root 2) / -2 = cosine/radians pi * 3 / 4]
 #ulp
@@ -10537,7 +10532,7 @@
 #no-ulp
 [-0.5 = cosine 120]
 #ulp
-[4 >= ulp-dist -0.5 cosine 120]
+[1 >= ulp-dist -0.5 cosine 120]
 #no-ulp
 [-0.5 = cosine/radians pi * 2 / 3]
 #ulp
@@ -12242,15 +12237,15 @@
 [0.5 = sine/radians pi / 6]
 #ulp
 [1 >= ulp-dist 0.5 sine/radians pi / 6]
-#no-ulp
 [(square-root 2) / 2 = sine 45]
-#ulp
-[1 >= ulp-dist (square-root 2) / 2 sine 45]
 #no-ulp
 [(square-root 2) / 2 = sine/radians pi / 4]
 #ulp
 [1 >= ulp-dist (square-root 2) / 2 sine/radians pi / 4]
+#no-ulp
 [(square-root 3) / 2 = sine 60]
+#ulp
+[1 >= ulp-dist (square-root 3) / 2 sine 60]
 [(square-root 3) / 2 = sine/radians pi / 3]
 [1 = sine 90]
 [1 = sine/radians pi / 2]
@@ -12264,10 +12259,7 @@
 [-0.5 = sine/radians pi / -6]
 #ulp
 [1 >= ulp-dist -0.5 sine/radians pi / -6]
-#no-ulp
 [(square-root 2) / -2 = sine -45]
-#ulp
-[1 >= ulp-dist (square-root 2) / -2 sine -45]
 #no-ulp
 [(square-root 2) / -2 = sine/radians pi / -4]
 #ulp
