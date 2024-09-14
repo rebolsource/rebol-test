@@ -10658,7 +10658,7 @@
 #ulp
 [1 >= ulp-dist 2.718281828459045 * 2.718281828459045 exp 2]
 [
-	// this number is from OEIS
+	; this number is from OEIS
 	e2: 7.389056098930650227
 	0.0 == (e2 - exp 2)
 ]
