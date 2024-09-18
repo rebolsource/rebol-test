@@ -4284,54 +4284,19 @@
 #64bit
 [not equal? 9223372036854775807 9223372036854775806]
 ; decimal! approximate equality
-#no-ulp
-[equal? 0.3 0.1 + 0.1 + 0.1]
 ; decimal! approximate equality symmetry
 [equal? equal? 0.3 0.1 + 0.1 + 0.1 equal? 0.1 + 0.1 + 0.1 0.3]
-#no-ulp
-[equal? 0.15 - 0.05 0.1]
 [equal? equal? 0.15 - 0.05 0.1 equal? 0.1 0.15 - 0.05]
-#no-ulp
-[equal? -0.5 cosine 120]
 [equal? equal? -0.5 cosine 120 equal? cosine 120 -0.5]
-#no-ulp
-[equal? 0.5 * square-root 2.0 sine 45]
 [equal? equal? 0.5 * square-root 2.0 sine 45 equal? sine 45 0.5 * square-root 2.0]
-#no-ulp
-[equal? 0.5 sine 30]
 [equal? equal? 0.5 sine 30 equal? sine 30 0.5]
-#no-ulp
-[equal? 0.5 cosine 60]
 [equal? equal? 0.5 cosine 60 equal? cosine 60 0.5]
-#no-ulp
-[equal? 0.5 * square-root 3.0 sine 60]
 [equal? equal? 0.5 * square-root 3.0 sine 60 equal? sine 60 0.5 * square-root 3.0]
-#no-ulp
-[equal? 0.5 * square-root 3.0 cosine 30]
 [equal? equal? 0.5 * square-root 3.0 cosine 30 equal? cosine 30 0.5 * square-root 3.0]
-#no-ulp
-[equal? square-root 3.0 tangent 60]
 [equal? equal? square-root 3.0 tangent 60 equal? tangent 60 square-root 3.0]
 [equal? (square-root 3.0) / 3.0 tangent 30]
 [equal? equal? (square-root 3.0) / 3.0 tangent 30 equal? tangent 30 (square-root 3.0) / 3.0]
-#no-ulp
-[equal? 1.0 tangent 45]
 [equal? equal? 1.0 tangent 45 equal? tangent 45 1.0]
-#no-ulp
-[
-	num: square-root 2.0
-	equal? 2.0 num * num
-]
-#no-ulp
-[
-	num: square-root 2.0
-	equal? equal? 2.0 num * num equal? num * num 2.0
-]
-#no-ulp
-[
-	num: square-root 3.0
-	equal? 3.0 num * num
-]
 [
 	num: square-root 3.0
 	equal? equal? 3.0 num * num equal? num * num 3.0
@@ -10365,178 +10330,304 @@
 ; functions/math/arccosine.r
 [0 = arccosine 1]
 [0 = arccosine/radians 1]
-#no-ulp
-[30 = arccosine (square-root 3) / 2]
-#ulp
-[1 >= ulp-dist 30.0 arccosine (square-root 3) / 2]
-#no-ulp
-[pi / 6 = arccosine/radians (square-root 3) / 2]
-#ulp
-[1 >= ulp-dist pi / 6 arccosine/radians (square-root 3) / 2]
-[45 = arccosine (square-root 2) / 2]
-[pi / 4 = arccosine/radians (square-root 2) / 2]
-#no-ulp
-[60 = arccosine 0.5]
-#ulp
-[1 >= ulp-dist 60.0 arccosine 0.5]
-#no-ulp
-[pi / 3 = arccosine/radians 0.5]
-#ulp
-[1 >= ulp-dist pi / 3 arccosine/radians 0.5]
-[90 = arccosine 0]
-[pi / 2 = arccosine/radians 0]
-[180 = arccosine -1]
-[pi = arccosine/radians -1]
-#no-ulp
-[150 = arccosine (square-root 3) / -2]
-#ulp
-[1 >= ulp-dist 150.0 arccosine (square-root 3) / -2]
-[pi * 5 / 6 = arccosine/radians (square-root 3) / -2]
-[135 = arccosine (square-root 2) / -2]
-[pi * 3 / 4 = arccosine/radians (square-root 2) / -2]
-#no-ulp
-[120 = arccosine -0.5]
-#ulp
-[1 >= ulp-dist 120.0 arccosine -0.5]
-#no-ulp
-[pi * 2 / 3 = arccosine/radians -0.5]
-#ulp
-[1 >= ulp-dist pi * 2 / 3 arccosine/radians -0.5]
+[
+	; from OEIS
+	sqrt3_over_2: 0.866025403784438646763723
+	dif: subtract 30.0 arccosine sqrt3_over_2
+	all [
+		dif >= negate 2 ** -48
+		dif <= 0
+	]	
+]
+[
+	; from OEIS
+	pi_over_6: 0.523598775598298873
+	0.0 == subtract pi_over_6 arccosine/radians sqrt3_over_2
+]
+[
+	; from OEIS
+	sqrt2_over_2: 0.70710678118654752
+	0.0 == subtract 45 arccosine sqrt2_over_2
+]
+[
+	; from OEIS
+	pi_over_4: 0.78539816339744830961566
+	0.0 == subtract pi_over_4 arccosine/radians sqrt2_over_2
+]
+[
+	dif: subtract 60 arccosine 0.5
+	all [
+		dif >= negate 2 ** -47
+		dif <= 0
+	]
+]
+[
+	; from OEIS
+	pi_over_3: 1.0471975511965977
+	dif: subtract pi_over_3 arccosine/radians 0.5
+	all [
+		dif >= negate 2 ** -49
+		dif <= 0
+	]
+]
+[0.0 == subtract 90 arccosine 0]
+[
+	; from OEIS
+	pi_over_2: 1.57079632679489661923132
+	0.0 == subtract pi_over_2 arccosine/radians 0
+]
+[0.0 == subtract 180 arccosine -1]
+[0.0 == subtract pi arccosine/radians -1]
+[0.0 == subtract 150.0 arccosine negate sqrt3_over_2]
+[
+	; from OEIS
+	_5_pi_over_6: 2.61799387799149436538553615273291907
+	0.0 == subtract _5_pi_over_6 arccosine/radians negate sqrt3_over_2
+]
+[0.0 == subtract 135 arccosine negate sqrt2_over_2]
+[
+	; from OEIS
+	_3_pi_over_4: 2.35619449019234492884698
+	0.0 == subtract _3_pi_over_4 arccosine/radians negate sqrt2_over_2
+]
+[
+	dif: subtract 120.0 arccosine -0.5
+	all [
+		dif >= negate 2 ** -46
+		dif <= 0
+	]
+]
+[
+	; from OEIS
+	_2_pi_over_3: 2.09439510239319549
+	0.0 == subtract _2_pi_over_3 arccosine/radians -0.5
+]
 [error? try [arccosine 1.1]]
+[error? try [arccosine/radians 1.1]]
 [error? try [arccosine -1.1]]
+[error? try [arccosine/radians -1.1]]
 ;-------------------------------------------------------------------------------
 ; functions/math/arcsine.r
 [0 = arcsine 0]
 [0 = arcsine/radians 0]
-#no-ulp
-[30 = arcsine 0.5]
-#ulp
-[1 >= ulp-dist 30.0 arcsine 0.5]
-#no-ulp
-[pi / 6 = arcsine/radians 0.5]
-#ulp
-[1 >= ulp-dist pi / 6 arcsine/radians 0.5]
-#no-ulp
-[45 = arcsine (square-root 2) / 2]
-#ulp
-[1 >= ulp-dist 45.0 arcsine (square-root 2) / 2]
-#no-ulp
-[pi / 4 = arcsine/radians (square-root 2) / 2]
-#ulp
-[1 >= ulp-dist pi / 4 arcsine/radians (square-root 2) / 2]
-#no-ulp
-[60 = arcsine (square-root 3) / 2]
-#ulp
-[1 >= ulp-dist 60.0 arcsine (square-root 3) / 2]
-[pi / 3 = arcsine/radians (square-root 3) / 2]
-[90 = arcsine 1]
-[pi / 2 = arcsine/radians 1]
-#no-ulp
-[-30 = arcsine -0.5]
-#ulp
-[1 >= ulp-dist -30.0 arcsine -0.5]
-#no-ulp
-[pi / -6 = arcsine/radians -0.5]
-#ulp
-[1 >= ulp-dist pi / -6 arcsine/radians -0.5]
-#no-ulp
-[-45 = arcsine (square-root 2) / -2]
-#ulp
-[1 >= ulp-dist -45.0 arcsine (square-root 2) / -2]
-#no-ulp
-[pi / -4 = arcsine/radians (square-root 2) / -2]
-#ulp
-[1 >= ulp-dist pi / -4 arcsine/radians (square-root 2) / -2]
-#no-ulp
-[-60 = arcsine (square-root 3) / -2]
-#ulp
-[1 >= ulp-dist -60.0 arcsine (square-root 3) / -2]
-[pi / -3 = arcsine/radians (square-root 3) / -2]
-[-90 = arcsine -1]
-[pi / -2 = arcsine/radians -1]
-[1e-12 / (arcsine 1e-12) = (pi / 180)]
-[1e-9 / (arcsine/radians 1e-9) = 1.0]
+[
+	dif: subtract 30.0 arcsine 0.5
+	all [
+		dif >= negate 2 ** -48
+		dif <= 0
+	]
+]
+[
+	; from OEIS
+	pi_over_6: 0.5235987755982988730771
+	0.0 == subtract pi_over_6 arcsine/radians 0.5
+]
+[
+	dif: subtract 45 arcsine sqrt2_over_2
+	all [
+		dif >= negate 2 ** -47
+		dif <= 0
+	]
+]
+[
+	dif: subtract pi_over_4 arcsine/radians sqrt2_over_2
+	all [
+		dif >= negate 2 ** -53
+		dif <= 0.0
+	]
+]
+[
+	dif: subtract 60 arcsine sqrt3_over_2
+	all [
+		dif >= 0.0
+		dif <= (2 ** -47)
+	]
+]
+[0.0 == subtract pi_over_3 arcsine/radians sqrt3_over_2]
+[0.0 == subtract 90 arcsine 1]
+[0.0 == subtract pi_over_2 arcsine/radians 1]
+[
+	dif: subtract -30 arcsine -0.5
+	all [
+		dif <= (2 ** -48)
+		dif >= 0
+	]
+]
+[0.0 == subtract negate pi_over_6 arcsine/radians -0.5]
+[
+	dif: subtract -45 arcsine negate sqrt2_over_2
+	all [
+		dif <= (2 ** -47)
+		dif >= 0
+	]
+]
+[
+	dif: subtract negate pi_over_4 arcsine/radians negate sqrt2_over_2
+	all [
+		dif <= (2 ** -53)
+		dif >= 0
+	]
+]
+[
+	dif: subtract -60 arcsine negate sqrt3_over_2
+	all [
+		dif >= negate 2 ** -47
+		dif <= 0
+	]
+]
+[0.0 == subtract negate pi_over_3 arcsine/radians negate sqrt3_over_2]
+[0.0 == subtract -90 arcsine -1]
+[0.0 == subtract negate pi_over_2 arcsine/radians -1]
+[
+	; from OEIS
+	pi_over_180: 0.01745329251994329576923690768
+	0.0 == subtract 1e-12 / (arcsine 1e-12) pi_over_180
+]
+[
+	; from OEIS
+	_180_over_pi: 57.29577951308232087679815
+	0.0 == subtract (arcsine 1e-12) / 1e-12 _180_over_pi
+]
+[0.0 == subtract 1e-9 / (arcsine/radians 1e-9) 1.0]
+[0.0 == subtract (arcsine/radians 1e-9) / 1e-9 1.0]
 [error? try [arcsine 1.1]]
+[error? try [arcsine/radians 1.1]]
 [error? try [arcsine -1.1]]
+[error? try [arcsine/radians -1.1]]
 ;-------------------------------------------------------------------------------
 ; functions/math/arctangent.r
-[-90 = arctangent -1e16]
-[pi / -2 = arctangent/radians -1e16]
-#no-ulp
-[-60 = arctangent negate square-root 3]
-#ulp
-[1 >= ulp-dist -60.0 arctangent negate square-root 3]
-[pi / -3 = arctangent/radians negate square-root 3]
-[-45 = arctangent -1]
-[pi / -4 = arctangent/radians -1]
-#no-ulp
-[-30 = arctangent (square-root 3) / -3]
-#ulp
-[1 >= ulp-dist -30.0 arctangent (square-root 3) / -3]
-[pi / -6 = arctangent/radians (square-root 3) / -3]
-[0 = arctangent 0]
-[0 = arctangent/radians 0]
-#no-ulp
-[30 = arctangent (square-root 3) / 3]
-#ulp
-[1 >= ulp-dist 30.0 arctangent (square-root 3) / 3]
-[pi / 6 = arctangent/radians (square-root 3) / 3]
-[45 = arctangent 1]
-[pi / 4 = arctangent/radians 1]
-#no-ulp
-[60 = arctangent square-root 3]
-#ulp
-[1 >= ulp-dist 60.0 arctangent square-root 3]
-[pi / 3 = arctangent/radians square-root 3]
-[90 = arctangent 1e16]
-[pi / 2 = arctangent/radians 1e16]
+[0.0 == subtract -90 arctangent -1e16]
+[0.0 == subtract negate pi_over_2 arctangent/radians -1e16]
+[
+	; from OEIS
+	sqrt3: 1.73205080756887729352744634
+	dif: subtract -60 arctangent negate sqrt3
+	all [
+		dif >= negate 2 ** -47
+		dif <= 0
+	]
+]
+[0.0 == subtract negate pi_over_3 arctangent/radians negate sqrt3]
+[0.0 == subtract -45 arctangent -1]
+[0.0 == subtract negate pi_over_4 arctangent/radians -1]
+[
+	; from OEIS
+	sqrt3_over_3: 0.5773502691896257645
+	dif: subtract -30 arctangent negate sqrt3_over_3
+	all [
+		dif >= negate 2 ** -48
+		dif <= 0
+	]
+]
+[
+	dif: subtract negate pi_over_6 arctangent/radians negate sqrt3_over_3
+	all [
+		dif >= negate 2 ** -53
+		dif <= 0
+	]
+]
+[0.0 == arctangent 0]
+[0.0 == arctangent/radians 0]
+[
+	dif: subtract 30 arctangent sqrt3_over_3
+	all [
+		dif <= (2 ** -48)
+		dif >= 0
+	]
+]
+[
+	dif: subtract pi_over_6 arctangent/radians sqrt3_over_3
+	all [
+		dif <= (2 ** -53)
+		dif >= 0
+	]
+]
+[0.0 == subtract 45 arctangent 1]
+[0.0 == subtract pi_over_4 arctangent/radians 1]
+[
+	dif: subtract 60 arctangent sqrt3
+	all [
+		dif <= (2 ** -47)
+		dif >= 0
+	]
+]
+[0.0 == subtract pi_over_3 arctangent/radians sqrt3]
+[0.0 == subtract 90 arctangent 1e16]
+[0.0 == subtract pi_over_2 arctangent/radians 1e16]
 ;-------------------------------------------------------------------------------
 ; functions/math/cosine.r
-[1 = cosine 0]
-[1 = cosine/radians 0]
-#no-ulp
-[(square-root 3) / 2 = cosine 30]
-#ulp
-[1 >= ulp-dist (square-root 3) / 2 cosine 30]
-#no-ulp
-[(square-root 3) / 2 = cosine/radians pi / 6]
-#ulp
-[1 >= ulp-dist (square-root 3) / 2 cosine/radians pi / 6]
-[(square-root 2) / 2 = cosine 45]
-[(square-root 2) / 2 = cosine/radians pi / 4]
-#no-ulp
-[0.5 = cosine 60]
-#ulp
-[1 >= ulp-dist 0.5 cosine 60]
-#no-ulp
-[0.5 = cosine/radians pi / 3]
-#ulp
-[1 >= ulp-dist 0.5 cosine/radians pi / 3]
-[0 = cosine 90]
-[2.2204460492503131E-16 > abs cosine/radians pi / 2]
-[-1 = cosine 180]
-[-1 = cosine/radians pi]
-#no-ulp
-[(square-root 3) / -2 = cosine 150]
-#ulp
-[1 >= ulp-dist (square-root 3) / -2 cosine 150]
-#no-ulp
-[(square-root 3) / -2 = cosine/radians pi * 5 / 6]
-#ulp
-[1 >= ulp-dist (square-root 3) / -2 cosine/radians pi * 5 / 6]
-[(square-root 2) / -2 = cosine 135]
-#no-ulp
-[(square-root 2) / -2 = cosine/radians pi * 3 / 4]
-#ulp
-[1 >= ulp-dist (square-root 2) / -2 cosine/radians pi * 3 / 4]
-#no-ulp
-[-0.5 = cosine 120]
-#ulp
-[1 >= ulp-dist -0.5 cosine 120]
-#no-ulp
-[-0.5 = cosine/radians pi * 2 / 3]
-#ulp
-[4 >= ulp-dist -0.5 cosine/radians pi * 2 / 3]
+[0.0 == subtract 1 cosine 0]
+[0.0 = subtract 1 cosine/radians 0]
+[
+	dif: subtract sqrt3_over_2 cosine 30
+	all [
+		dif >= negate 2 ** -53
+		dif <= 0
+	]
+]
+[0.0 == subtract sqrt3_over_2 cosine/radians pi_over_6]
+[0.0 == subtract sqrt2_over_2 cosine 45]
+[0.0 == subtract sqrt2_over_2 cosine/radians pi_over_4]
+[
+	dif: subtract 0.5 cosine 60
+	all [
+		dif <= (2 ** -54)
+		dif >= 0
+	]
+]
+[
+	dif: subtract 0.5 cosine/radians pi_over_3
+	all [
+		dif >= negate 2 ** -53
+		dif <= 0
+	]
+]
+[0.0 == cosine 90]
+[
+	dif: cosine/radians pi_over_2
+	all [
+		dif < (2 ** -53)
+		dif >= 0
+	]
+]
+[0.0 == subtract -1 cosine 180]
+[0.0 == subtract -1 cosine/radians pi]
+[
+	dif: subtract negate sqrt3_over_2 cosine 150
+	all [
+		dif <= (2 ** -53)
+		dif >= 0
+	]
+]
+[
+	dif: subtract negate sqrt3_over_2 cosine/radians _5_pi_over_6
+	all [
+		dif <= (2 ** -53)
+		dif >= 0
+	]
+]
+[0.0 == subtract negate sqrt2_over_2 cosine 135]
+[
+	dif: subtract negate sqrt2_over_2 cosine/radians _3_pi_over_4
+	all [
+		dif >= negate 2 ** -53
+		dif <= 0
+	]
+]
+[
+	dif: subtract -0.5 cosine 120
+	all [
+		dif >= negate 2 ** -54
+		dif <= 0
+	]
+]
+[
+	dif: subtract -0.5 cosine/radians _2_pi_over_3
+	all [
+		dif <= (2 ** -52)
+		dif >= 0
+	]
+]
 [0.0 == cosine 17 * 90]
 ;-------------------------------------------------------------------------------
 ; functions/math/divide.r
@@ -10651,50 +10742,62 @@
 [even? -0:0:02]
 ;-------------------------------------------------------------------------------
 ; functions/math/exp.r
-[1 = exp 0]
-[2.718281828459045 = exp 1]
-#no-ulp
-[2.718281828459045 * 2.718281828459045 = exp 2]
-#ulp
-[1 >= ulp-dist 2.718281828459045 * 2.718281828459045 exp 2]
+[0.0 == subtract 1 exp 0]
 [
-	; this number is from OEIS
-	e2: 7.389056098930650227
-	0.0 == (e2 - exp 2)
+	; from OEIS
+	exp_1: 2.71828182845904523536
+	0.0 == subtract exp_1 exp 1
 ]
-[(square-root 2.718281828459045) = exp 0.5]
-[1 / 2.718281828459045 = exp -1]
+[
+	; from OEIS
+	exp_2: 7.389056098930650227
+	0.0 == subtract exp_2 exp 2
+]
+[
+	; from OEIS
+	sqrt_e: 1.64872127070012814684865
+	0.0 == subtract sqrt_e exp 0.5
+]
+[
+	; from OEIS
+	_1_over_e: 0.36787944117144232159552377
+	0.0 == subtract _1_over_e exp -1
+]
 ;-------------------------------------------------------------------------------
 ; functions/math/log-10.r
-[0 = log-10 1]
-[0.5 = log-10 square-root 10]
-[1 = log-10 10]
-[-1 = log-10 0.1]
-[2 = log-10 100]
-[-2 = log-10 0.01]
-[3 = log-10 1000]
-[-3 = log-10 0.001]
+[0.0 == log-10 1]
+[
+	; from OEIS
+	sqrt10: 3.1622776601683793319988935444
+	0.0 == subtract 0.5 log-10 sqrt10
+]
+[0.0 == subtract 1 log-10 10]
+[0.0 == subtract -1 log-10 0.1]
+[0.0 == subtract 2 log-10 100]
+[0.0 == subtract -2 log-10 0.01]
+[0.0 == subtract 3 log-10 1000]
+[0.0 == subtract -3 log-10 0.001]
 [error? try [log-10 0]]
 [error? try [log-10 -1]]
 ;-------------------------------------------------------------------------------
 ; functions/math/log-2.r
-[0 = log-2 1]
-[1 = log-2 2]
-[-1 = log-2 0.5]
-[2 = log-2 4]
-[-2 = log-2 0.25]
-[3 = log-2 8]
-[-3 = log-2 0.125]
+[0.0 == log-2 1]
+[0.0 == subtract 1 log-2 2]
+[0.0 == subtract -1 log-2 0.5]
+[0.0 == subtract 2 log-2 4]
+[0.0 == subtract -2 log-2 0.25]
+[0.0 == subtract 3 log-2 8]
+[0.0 == subtract -3 log-2 0.125]
 [error? try [log-2 0]]
 [error? try [log-2 -1]]
 [zero? (log-2 2147483648.0) // 1.0]
 ;-------------------------------------------------------------------------------
 ; functions/math/log-e.r
-[0 = log-e 1]
-[0.5 = log-e square-root 2.718281828459045]
-[1 = log-e 2.718281828459045]
-[-1 = log-e 1 / 2.718281828459045]
-[2 = log-e 2.718281828459045 * 2.718281828459045]
+[0.0 == log-e 1]
+[0.0 == subtract 0.5 log-e sqrt_e]
+[0.0 == subtract 1 log-e exp_1]
+[0.0 == subtract -1 log-e _1_over_e]
+[0.0 == subtract 2 log-e exp_2]
 [error? try [log-e 0]]
 [error? try [log-e -1]]
 ;-------------------------------------------------------------------------------
@@ -12234,57 +12337,80 @@
 [-1 = sign? -0:00:0.000000001]
 ;-------------------------------------------------------------------------------
 ; functions/math/sine.r
-[0 = sine 0]
-[0 = sine/radians 0]
-#no-ulp
-[0.5 = sine 30]
-#ulp
-[1 >= ulp-dist 0.5 sine 30]
-#no-ulp
-[0.5 = sine/radians pi / 6]
-#ulp
-[1 >= ulp-dist 0.5 sine/radians pi / 6]
-[(square-root 2) / 2 = sine 45]
-#no-ulp
-[(square-root 2) / 2 = sine/radians pi / 4]
-#ulp
-[1 >= ulp-dist (square-root 2) / 2 sine/radians pi / 4]
-#no-ulp
-[(square-root 3) / 2 = sine 60]
-#ulp
-[1 >= ulp-dist (square-root 3) / 2 sine 60]
-[(square-root 3) / 2 = sine/radians pi / 3]
-[1 = sine 90]
-[1 = sine/radians pi / 2]
-[0 = sine 180]
-[2.2204460492503131E-16 > abs sine/radians pi]
-#no-ulp
-[-0.5 = sine -30]
-#ulp
-[1 >= ulp-dist -0.5 sine -30]
-#no-ulp
-[-0.5 = sine/radians pi / -6]
-#ulp
-[1 >= ulp-dist -0.5 sine/radians pi / -6]
-[(square-root 2) / -2 = sine -45]
-#no-ulp
-[(square-root 2) / -2 = sine/radians pi / -4]
-#ulp
-[1 >= ulp-dist (square-root 2) / -2 sine/radians pi / -4]
-#no-ulp
-[(square-root 3) / -2 = sine -60]
-#ulp
-[1 >= ulp-dist (square-root 3) / -2 sine -60]
-#no-ulp
-[(square-root 3) / -2 = sine/radians pi / -3]
-#ulp
-[1 >= ulp-dist (square-root 3) / -2 sine/radians pi / -3]
-[-1 = sine -90]
-[-1 = sine/radians pi / -2]
-[0 = sine -180]
-[2.2204460492503131E-16 > abs sine/radians negate pi]
-[(sine 1e-12) / 1e-12 = (pi / 180)]
-[(sine/radians 1e-9) / 1e-9 = 1.0]
+[0.0 == sine 0]
+[0.0 == sine/radians 0]
+[
+	dif: subtract 0.5 sine 30
+	all [
+		dif <= (2 ** -54)
+		dif >= 0
+	]
+]
+[0.0 == subtract 0.5 sine/radians pi_over_6]
+[0.0 == subtract sqrt2_over_2 sine 45]
+[
+	dif: subtract sqrt2_over_2 sine/radians pi_over_4
+	all [
+		dif <= (2 ** -53)
+		dif >= 0
+	]
+]
+[
+	dif: subtract sqrt3_over_2 sine 60
+	all [
+		dif >= negate 2 ** -53
+		dif <= 0
+	]
+]
+[0.0 == subtract sqrt3_over_2 sine/radians pi_over_3]
+[0.0 == subtract 1 sine 90]
+[0.0 == subtract 1 sine/radians pi_over_2]
+[0.0 == sine 180]
+[
+	dif: sine/radians pi
+	all [
+		dif < (2 ** -52)
+		dif >= 0
+	]
+]
+[
+	dif: subtract -0.5 sine -30
+	all [
+		dif >= negate 2 ** -54
+		dif <= 0
+	]
+]
+[0.0 == subtract -0.5 sine/radians negate pi_over_6]
+[0.0 == subtract negate sqrt2_over_2 sine -45]
+[
+	dif: subtract negate sqrt2_over_2 sine/radians negate pi_over_4
+	all [
+		dif >= negate 2 ** -53
+		dif <= 0
+	]
+]
+[
+	dif: subtract negate sqrt3_over_2 sine -60
+	all [
+		dif <= (2 ** -53)
+		dif >= 0
+	]
+]
+[0.0 == subtract negate sqrt3_over_2 sine/radians negate pi_over_3]
+[0.0 == subtract -1 sine -90]
+[0.0 == subtract -1 sine/radians negate pi_over_2]
+[0.0 == sine -180]
+[
+	dif: sine/radians negate pi
+	all [
+		dif > negate 2 ** -52
+		dif <= 0.0
+	]
+]
+[0.0 == subtract (sine 1e-12) / 1e-12 pi_over_180]
+[0.0 == subtract 1e-12 / (sine 1e-12) _180_over_pi]
+[0.0 == subtract (sine/radians 1e-9) / 1e-9 1.0]
+[0.0 == subtract 1e-9 / (sine/radians 1e-9) 1.0]
 [0.0 == sine 17 * 180]
 ; #bug#852
 ; Flint Hills test
@@ -12300,13 +12426,13 @@
 ]
 ;-------------------------------------------------------------------------------
 ; functions/math/square-root.r
-[0 = square-root 0]
+[0.0 == square-root 0]
 [error? try [square-root -1]]
-[1 = square-root 1]
-[0.5 = square-root 0.25]
-[2 = square-root 4]
-[3 = square-root 9]
-[1.1 = square-root 1.21]
+[0.0 == subtract 1 square-root 1]
+[0.0 == subtract 0.5 square-root 0.25]
+[0.0 == subtract 2 square-root 4]
+[0.0 == subtract 3 square-root 9]
+[0.0 = subtract 1.1 square-root 1.21]
 ;-------------------------------------------------------------------------------
 ; functions/math/subtract.r
 [1 == subtract 3 2]
@@ -12588,44 +12714,80 @@
 ;-------------------------------------------------------------------------------
 ; functions/math/tangent.r
 [error? try [tangent -90]]
-#no-ulp
-[(negate square-root 3) = tangent -60]
-#ulp
-[2 >= ulp-dist (negate square-root 3) tangent -60]
-#no-ulp
-[(negate square-root 3) = tangent/radians pi / -3]
-#ulp
-[2 >= ulp-dist (negate square-root 3) tangent/radians pi / -3]
-#no-ulp
-[-1 = tangent -45]
-#ulp
-[1 >= ulp-dist -1.0 tangent -45]
-#no-ulp
-[-1 = tangent/radians pi / -4]
-#ulp
-[1 >= ulp-dist -1.0 tangent/radians pi / -4]
-[(square-root 3) / -3 = tangent -30]
-[(square-root 3) / -3 = tangent/radians pi / -6]
+[
+	dif: subtract negate sqrt3 tangent -60
+	all [
+		dif >= negate 2 ** -51
+		dif <= 0
+	]
+]
+[
+	dif: subtract negate sqrt3 tangent/radians negate pi_over_3
+	all [
+		dif >= negate 2 ** -51
+		dif <= 0
+	]
+]
+[
+	dif: subtract -1 tangent -45
+	all [
+		dif >= negate 2 ** -53
+		dif <= 0
+	]
+]
+[
+	dif: subtract -1 tangent/radians negate pi_over_4
+	all [
+		dif >= negate 2 ** -53
+		dif <= 0
+	]
+]
+[0.0 == subtract negate sqrt3_over_3 tangent -30]
+[
+	dif: subtract negate sqrt3_over_3 tangent/radians negate pi_over_6
+	all [
+		dif <= (2 ** -53)
+		dif >= 0
+	]
+]
 [0 = tangent 0]
 [0 = tangent/radians 0]
-[(square-root 3) / 3 = tangent 30]
-[(square-root 3) / 3 = tangent/radians pi / 6]
-#no-ulp
-[1 = tangent 45]
-#ulp
-[1 >= ulp-dist 1.0 tangent 45]
-#no-ulp
-[1 = tangent/radians pi / 4]
-#ulp
-[1 >= ulp-dist 1.0 tangent/radians pi / 4]
-#no-ulp
-[(square-root 3) = tangent 60]
-#ulp
-[2 >= ulp-dist (square-root 3) tangent 60]
-#no-ulp
-[(square-root 3) = tangent/radians pi / 3]
-#ulp
-[2 >= ulp-dist (square-root 3) tangent/radians pi / 3]
+[0.0 == subtract sqrt3_over_3 tangent 30]
+[
+	dif: subtract sqrt3_over_3 tangent/radians pi_over_6
+	all [
+		dif >= negate 2 ** -53
+		dif <= 0
+	]
+]
+[
+	dif: subtract 1 tangent 45
+	all [
+		dif <= (2 ** -53)
+		dif >= 0
+	]
+]
+[
+	dif: subtract 1 tangent/radians pi_over_4
+	all [
+		dif <= (2 ** -53)
+		dif >= 0
+	]
+]
+[
+	dif: subtract sqrt3 tangent 60
+	all [
+		dif <= (2 ** -51)
+		dif >= 0
+	]
+]
+[
+	dif: subtract sqrt3 tangent/radians pi_over_3
+	all [
+		dif <= (2 ** -51)
+		dif >= 0
+	]
+]
 [error? try [tangent 90]]
 ; Flint Hills test
 [
