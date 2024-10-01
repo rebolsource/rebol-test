@@ -211,6 +211,8 @@ make object! compose [
 				"^(line)"
 				"system/version: " system/version
 				"^(line)"
+				"system/build: " system/build
+				"^(line)"
 				"code-checksum: " code-checksum
 				"^(line)"
 				"test-checksum: " test-checksum
