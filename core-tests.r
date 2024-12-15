@@ -3936,9 +3936,10 @@
 [3 = first maximum-of [1 2 3]]
 ;-------------------------------------------------------------------------------
 ; functions/comparison/equalq.r
-; reflexivity test for native!
+; reflexivity test for action!
 [equal? :abs :abs]
 [not equal? :abs :add]
+; reflexivity test for native!
 [equal? :all :all]
 [not equal? :all :any]
 ; reflexivity test for op!
@@ -4104,6 +4105,14 @@
 [equal? equal? #[bitset! #{00}] #{00} equal? #{00} #[bitset! #{00}]]
 [equal? [] []]
 [equal? a-value: [] a-value]
+; Basic structural/deep equality
+[equal? [1] [1]]
+[not equal? [] [1]]
+[not equal? [1] [2]]
+[equal? reduce [:abs] reduce [:abs]]
+[equal? reduce [:all] reduce [:all]]
+[equal? reduce [:+] reduce [:+]]
+[equal? reduce [does []] reduce [does []]]
 ; Reflexivity for past-tail blocks
 ; Error in R2.
 #r3only
@@ -9676,7 +9685,11 @@
 [error? try [load "':a:"]]
 ; bug#858
 [
-	a: [ < ]
+	a: append copy [] load "<"
+	a = load mold a
+]
+[
+	a: append copy first [()] load "<"
 	a = load mold a
 ]
 [error? try [load "1xyz#"]]
@@ -9791,6 +9804,14 @@
 ; bug#1624
 #r3only
 [native? :as-pair]
+;-------------------------------------------------------------------------------
+; functions/date/now.r
+[
+	any [
+		not find spec-of :now /utc
+		(now/time - now/utc/time) = now/zone
+	]
+]
 ;-------------------------------------------------------------------------------
 ; functions/dataset/difference.r
 [24:00 = difference 1/Jan/2007 31/Dec/2006]
@@ -10337,7 +10358,7 @@
 	all [
 		dif >= negate 2 ** -48
 		dif <= 0
-	]	
+	]
 ]
 [
 	; from OEIS
@@ -13304,8 +13325,6 @@
 ]
 ; none
 [none == clear none]
-
-
 ;-------------------------------------------------------------------------------
 ; functions/series/collect-values.r
 [
@@ -13317,45 +13336,37 @@
 		[]
 		(:append) (:+) (:insert) (:try)
 	]
-	
+
 	true
 ]
-
 [
 	"collect-values <empty> <empty"
 	none? collect-values [] []
 ]
-
 [
 	"collect-values <empty>"
 	[] = collect-values [] word!
 ]
-
 [
 	"collect-values word!"
 	[a c a f] = collect-values cv-test-blk word!
 ]
-
 [
 	"collect-values/deep word!"
 	[a c a f f h] = collect-values/deep cv-test-blk word!
 ]
-
 [
 	"collect-values [word! | integer!]"
 	[1 a 2 c a 3 f] = collect-values cv-test-blk [word! | integer!]
 ]
-
 [
 	"collect-values/deep [word! | integer!]"
 	[1 a 2 c a 3 f f 4 h 5] = collect-values/deep cv-test-blk [word! | integer!]
 ]
-
 [
 	"collect-values any-string!"
 	["s" <T> #i e@f.g] = collect-values cv-test-blk any-string!
 ]
-
 ; One of those funny things I don't remember running across in the past
 ;>> a: (compose [(:append) (:+) (:insert) (:try)])
 ;== [func [
@@ -13380,23 +13391,20 @@
 ;== 4
 ;>> equal? a b
 ;== false
-; So we'll stub this test out for now 
+; So we'll stub this test out for now
 ;[
 ;	"collect-values any-function!"
 ;	(compose [(:append) (:+) (:insert) (:try)]) = collect-values cv-test-blk any-function!
 ;]
-
 [
 	"collect-values op!"
 	(compose [(:+)]) = collect-values cv-test-blk op!
 ]
-
 [
 	"clean up after collect-values tests"
 	unset 'cv-test-blk
 	true
 ]
-
 ;-------------------------------------------------------------------------------
 ; functions/series/collect-words.r
 [
