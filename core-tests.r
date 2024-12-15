@@ -4112,7 +4112,10 @@
 [equal? reduce [:abs] reduce [:abs]]
 [equal? reduce [:all] reduce [:all]]
 [equal? reduce [:+] reduce [:+]]
-[equal? reduce [does []] reduce [does []]]
+[
+	f: does []
+	equal? reduce [:f] reduce [:f]
+]
 ; Reflexivity for past-tail blocks
 ; Error in R2.
 #r3only
