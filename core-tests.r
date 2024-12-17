@@ -4116,6 +4116,15 @@
 	f: does []
 	equal? reduce [:f] reduce [:f]
 ]
+[
+	g: does []
+	not-equal? reduce [:f] reduce [:g]
+]
+[not-equal? reduce [:g] reduce [:f]]
+[xor~ lesser? reduce [:f] reduce [:g] lesser? reduce [:g] reduce [:f]]
+[xor~ greater? reduce [:f] reduce [:g] greater? reduce [:g] reduce [:f]]
+[equal? lesser? reduce [:f] reduce [:g] greater? reduce [:g] reduce [:f]]
+[equal? lesser? reduce [:g] reduce [:f] greater? reduce [:f] reduce [:g]]
 ; Reflexivity for past-tail blocks
 ; Error in R2.
 #r3only
