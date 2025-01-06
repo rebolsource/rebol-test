@@ -85,37 +85,33 @@
 ; bug#1459
 [lesser? #{0141} #{0161}]
 ; integer! to binary!
-#64-bit
+#64bit
 [strict-equal? #{8000000000000000} to binary! -9223372036854775808]
-#32-bit
-[error? try [to binary! -9223372036854775808]]
-#64-bit
+#64bit
 [strict-equal? #{8000000000000001} to binary! -9223372036854775807]
-#32-bit
-[error? try [to binary! -9223372036854775807]]
-#64-bit
+#64bit
 [strict-equal? #{ffffffff80000000} to binary! -2147483648]
-#32-bit
+#32bit
 [strict-equal? #{80000000} to binary! -2147483648]
-#64-bit
+#64bit
 [strict-equal? #{ffffffff80000001} to binary! -2147483647]
-#32-bit
+#32bit
 [strict-equal? #{80000001} to binary! -2147483647]
-#64-bit
+#64bit
 [strict-equal? #{ffffffffffffffff} to binary! -1]
-#32-bit
+#32bit
 [strict-equal? #{ffffffff} to binary! -1]
-#64-bit
+#64bit
 [strict-equal? #{0000000000000000} to binary! 0]
-#32-bit
+#32bit
 [strict-equal? #{00000000} to binary! 0]
-#64-bit
+#64bit
 [strict-equal? #{000000000000001} to binary! 1]
-#32-bit
+#32bit
 [strict-equal? #{00000001} to binary! 1]
-#64-bit
+#64bit
 [strict-equal? #{000000007fffffff} to binary! 2147483647]
-#32-bit
+#32bit
 [strict-equal? #{7fffffff} to binary! 2147483647]
 ; decimal! to binary!
 ; LOAD decimal and to binary! tests
@@ -1968,9 +1964,9 @@
 [error? try [to integer! -2147483649.0]]
 #32bit
 [error? try [to integer! 2147483648.0]]
-#64-bit
+#64bit
 [to integer! -9223372036854775808.0]
-#64-bit
+#64bit
 [to integer! 9223372036854775807.0]
 ; bug#921
 [error? try [to integer! -9.223372036854778e+18]]
@@ -1998,6 +1994,12 @@
 ["0" = mold 0]
 ["1" = mold 1]
 ["-1" = mold -1]
+[greater? 2147483647 -2147483648]
+[greater? [2147483647] [-2147483648]]
+#64bit
+[greater? 9223372036854775807 -9223372036854775808]
+#64bit
+[greater? [9223372036854775807] [-9223372036854775808]]
 ;-------------------------------------------------------------------------------
 ; datatypes/issue.r
 [issue? #aa]
