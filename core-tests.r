@@ -4345,11 +4345,13 @@
 ; integer! vs. decimal!
 [equal? 0 0.0]
 ; integer! vs. money!
+#r3only
 [equal? 0 $0]
 ; integer! vs. percent!
 #r3only
 [equal? 0 0%]
 ; decimal! vs. money!
+#r3only
 [equal? 0.0 $0]
 ; decimal! vs. percent!
 #r3only
