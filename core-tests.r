@@ -1800,6 +1800,15 @@
 	set/any 'r4 get! w
 	equal? equal?! get/any 'r1 get/any 'r2 equal?! get/any 'r3 get/any 'r4
 ]
+[
+	; does type checking interleave argument evaluation?
+	a-function: func [
+		str [string!]
+		delim [string!]
+	] [true]
+	e: disarm try [a-function 99 (1 / 0)]
+	e/type = 'script
+]
 ;-------------------------------------------------------------------------------
 ; datatypes/get-path.r
 ; minimum
@@ -3008,6 +3017,26 @@
 		]
 	]
 	free a-library
+	success
+]
+#r2only
+[
+	; does type checking interleave argument evaluation?
+	success: true
+	case [
+		system/version/4 = 3 [
+			; Windows
+			a-lib: load/library %kernel32.dll
+			a-routine: make routine! [
+				str [string!]
+				delim [string!]
+				return: [int]
+			] a-lib "SetSystemTime"
+			e: disarm try [a-routine 99 (1 / 0)]
+			success: e/type = 'script
+			free a-lib
+		]
+	]
 	success
 ]
 ;-------------------------------------------------------------------------------
@@ -14442,12 +14471,10 @@
 [#{FC3FF98E8C6A0D3087D515C0473F8677} = checksum/method to-binary "hello world!" 'md5]
 [#{0BEEC7B5EA3F0FDBC95D0DD47F3C5BC275DA8A33} = checksum/method to-binary "foo" 'sha1]
 [#{430CE34D020724ED75A196DFC2AD67C77772D169} = checksum/method to-binary "hello world!" 'sha1]
-; bug#1678: "Can we add CRC-32 as a checksum method?"
-#r3only
 [(checksum/method to-binary "foo" 'CRC32) = -1938594527]
-; bug#1678
-#r3only
 [(checksum/method to-binary "" 'CRC32) = 0]
+[(checksum/method to-binary "IDAT" 'CRC32) = 900662814]
+[(checksum/method "IEND" 'CRC32) = -1371381630]
 ;-------------------------------------------------------------------------------
 ; functions/string/compress.r
 ; bug#1679
