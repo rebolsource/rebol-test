@@ -911,6 +911,67 @@
 	; this runs forever in Rebol 2.7.8
 	0.0 == to decimal! [1e308 -1e20]
 ]
+[
+	rounding-mode: func [
+	    "detect rounding mode"
+		/local a1 a2 b1 b2 c1 c2 d1 d2
+	] [
+		a1: to decimal! #{4340000000000000}
+		a2: a1 + 1.0
+		b1: to decimal! #{4340000000000001}
+		b2: b1 + 1.0
+		c1: to decimal! #{C340000000000000}
+		c2: c1 - 1.0
+		d1: to decimal! #{C340000000000001}
+		d2: d1 - 1.0
+		return case [
+			all [
+				#{4340000000000000} = to binary! a2
+				#{4340000000000002} = to binary! b2
+				#{C340000000000000} = to binary! c2
+				#{C340000000000002} = to binary! d2
+			] [
+				"round to nearest, ties to even"
+			]
+			all [
+				#{4340000000000001} = to binary! a2
+				#{4340000000000002} = to binary! b2
+				#{C340000000000001} = to binary! c2
+				#{C340000000000002} = to binary! d2
+			] [
+				"round to nearest, ties away from zero"
+			]
+			all [
+				#{4340000000000000} = to binary! a2
+				#{4340000000000001} = to binary! b2
+				#{C340000000000000} = to binary! c2
+				#{C340000000000001} = to binary! d2
+			] [
+				"round toward 0"
+			]
+			all [
+				#{4340000000000001} = to binary! a2
+				#{4340000000000002} = to binary! b2
+				#{C340000000000000} = to binary! c2
+				#{C340000000000001} = to binary! d2
+			] [
+				"round toward +infinity"
+			]
+			all [
+				#{4340000000000000} = to binary! a2
+				#{4340000000000001} = to binary! b2
+				#{C340000000000001} = to binary! c2
+				#{C340000000000002} = to binary! d2
+			] [
+				"round toward -infinity"
+			]
+			'else [
+				do make error! "rounding mode detection failed"
+			]
+		]
+	]
+	"round to nearest, ties to even" = rounding-mode
+]
 ;-------------------------------------------------------------------------------
 ; datatypes/email.r
 [email? me@here.com]
@@ -3028,10 +3089,10 @@
 			; Windows
 			a-lib: load/library %kernel32.dll
 			a-routine: make routine! [
-				str [string!]
-				delim [string!]
+				existing-file-name [string!]
+				new-file-name [string!]
 				return: [int]
-			] a-lib "SetSystemTime"
+			] a-lib "MoveFileA"
 			e: disarm try [a-routine 99 (1 / 0)]
 			success: e/type = 'script
 			free a-lib
