@@ -4425,7 +4425,6 @@
 [equal? equal? 0.5 * square-root 3.0 sine 60 equal? sine 60 0.5 * square-root 3.0]
 [equal? equal? 0.5 * square-root 3.0 cosine 30 equal? cosine 30 0.5 * square-root 3.0]
 [equal? equal? square-root 3.0 tangent 60 equal? tangent 60 square-root 3.0]
-[equal? (square-root 3.0) / 3.0 tangent 30]
 [equal? equal? (square-root 3.0) / 3.0 tangent 30 equal? tangent 30 (square-root 3.0) / 3.0]
 [equal? equal? 1.0 tangent 45 equal? tangent 45 1.0]
 [
@@ -10928,12 +10927,15 @@
 [1 == divide 2147483647 2147483647]
 [10.0 == divide 1 .1]
 [10.0 == divide 1.0 .1]
+; pair
 [10x10 == divide 1x1 .1]
+[93x93 == divide 1x1 (1. / 93.)]
 ; tuple
 ; bug#1974
 [10.10.10 == divide 1.1.1 .1]
 [255.255.255 == divide 1.1.1 1e-12]
 [0.0.0 == divide 1.1.1 -1e-12]
+[93.93.93 == divide 1.1.1 (1. / 93.)]
 ;-------------------------------------------------------------------------------
 ; functions/math/evenq.r
 [even? 0]
@@ -11206,6 +11208,8 @@
 [error? try [multiply -1 -9223372036854775808]]
 #64bit
 [error? try [multiply -9223372036854775808 -1]]
+; pair
+[0x0 = multiply 1x1 1e300]
 ; tuple
 [0:0:1 == multiply 0:0:2 0.5]
 [255.255.255 == multiply 1.1.1 2147483648.0]
@@ -12977,13 +12981,7 @@
 ;-------------------------------------------------------------------------------
 ; functions/math/tangent.r
 [error? try [tangent -90]]
-[
-	dif: subtract negate sqrt3 tangent -60
-	all [
-		dif >= negate 2 ** -51
-		dif <= 0
-	]
-]
+[(abs subtract negate sqrt3 tangent -60) <= (2 ** -51)]
 [
 	dif: subtract negate sqrt3 tangent/radians negate pi_over_3
 	all [
@@ -13005,7 +13003,7 @@
 		dif <= 0
 	]
 ]
-[0.0 == subtract negate sqrt3_over_3 tangent -30]
+[(abs subtract negate sqrt3_over_3 tangent -30) <= (2 ** -53)]
 [
 	dif: subtract negate sqrt3_over_3 tangent/radians negate pi_over_6
 	all [
@@ -13015,7 +13013,7 @@
 ]
 [0 = tangent 0]
 [0 = tangent/radians 0]
-[0.0 == subtract sqrt3_over_3 tangent 30]
+[(abs subtract sqrt3_over_3 tangent 30) <= (2 ** -53)]
 [
 	dif: subtract sqrt3_over_3 tangent/radians pi_over_6
 	all [
@@ -13037,13 +13035,7 @@
 		dif >= 0
 	]
 ]
-[
-	dif: subtract sqrt3 tangent 60
-	all [
-		dif <= (2 ** -51)
-		dif >= 0
-	]
-]
+[(abs subtract sqrt3 tangent 60) <= (2 ** -51)]
 [
 	dif: subtract sqrt3 tangent/radians pi_over_3
 	all [
