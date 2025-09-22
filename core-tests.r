@@ -1854,7 +1854,7 @@
 	f "my-secret"
 	any [
 		error? try [
-			success: not-equal? "my-secret" get/any fourth second :f
+			success: not-equal? "my-secret" get/any fourth body-of :f
 		]
 		success
 	]
