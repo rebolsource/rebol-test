@@ -1823,16 +1823,41 @@
     integer! = b/1 (change b :f2 1)
 ]
 [
-	; argument passing from one function frame to another
-	get!: func [w [any-word!]] [
-		error? try [return get/any w]
-		#[unset!]
+	; we should not modify the function's frame
+	; until after the new args are collected
+	classify: func [word [word!]] [
+		if error? try [get/any word] [
+			return 0
+		]
+		type? get/any word
 	]
-	f: func [x [any-type!]] ['x]
-	t: type? get! f 1
-	w: f none
-	error? try [set w 1]
-	equal? t type? get! f get! w
+	f: func [x tick] [
+		if tick = 0 [
+			return [x tick]
+		]
+		tick
+	]
+	frame: f 0 0
+	f (
+		c: classify first frame
+		; generate a value with a different classification
+		either not-equal? c none! [none] [1]
+	) (
+		c = classify first frame
+	)
+]
+[
+	; functions should not reveal secrets
+	f: func [secret [string!]] [
+		checksum/method to binary! secret 'sha1
+	]
+	f "my-secret"
+	any [
+		error? try [
+			success: not-equal? "my-secret" get/any fourth second :f
+		]
+		success
+	]
 ]
 [
 	; argreturn test
@@ -14815,3 +14840,5 @@
 ; system/system.r
 ; bug#76
 [date? system/build]
+[time? system/build/time]
+[0:00 = system/build/zone]
