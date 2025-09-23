@@ -1826,10 +1826,8 @@
 	; we should not modify the function's frame
 	; until after the new args are collected
 	classify: func [word [word!]] [
-		if error? try [get/any word] [
-			return 0
-		]
-		type? get/any word
+		error? try [return type? get/any word]
+		0
 	]
 	f: func [x tick] [
 		if tick = 0 [
