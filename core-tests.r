@@ -1860,6 +1860,10 @@
 	]
 ]
 [
+	; check callback nesting behaviour (R2 2.7.8 bug)
+	"az" = sort/compare "za" cmp: func [a b /nested] [unless nested [cmp/nested 0 0] a - b]
+]
+[
 	; argreturn test
 	get!: func [w [any-word!]] [
 		error? try [return get/any w]
