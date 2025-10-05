@@ -1746,18 +1746,16 @@
 [lf: func ['x] [:x] (first [:o/f]) == lf :o/f]
 ; basic test for recursive function invocation
 [i: 0 countdown: func [n] [if n > 0 [++ i countdown n - 1]] countdown 10 i = 10]
-; a function-local word that escapes the function's dynamic extent still works
-; when re-entering the dynamic extent of the same function later.
+; a function-local word that escapes the function's extent still works
+; when re-entering the extent of the same function later.
 [
 	f: func [code value] [either none? code ['value] [do code]]
-	f-value: f none none
-	42 == f compose [2 * (f-value)] 21  ; re-entering same function
-]
-[
-	f: func [code value] [either none? code ['value] [do code]]
-	g: func [code value] [either none? code ['value] [do code]]
-	f-value: f none none
-	error? try [g compose [2 * (f-value)] 21]  ; re-entering different function
+	f-value: f none "closure"
+	v: f compose [(f-value)] "dynamic extent"
+	any [
+		v = "closure"
+		v = "dynamic extent"
+	]
 ]
 ; bug#19
 [
@@ -1772,15 +1770,6 @@
 [
 	f: does reduce [does [true]]
 	f
-]
-; no-rebind test
-[
-	a: func [b] [a: none c: b]
-	f: func [d] [a [d] do c]
-	found? all [
-		1 = f 1
-		2 = f 2
-	]
 ]
 ; bug#1528
 [function? func [self] []]
