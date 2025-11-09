@@ -13899,6 +13899,14 @@
 ; /match refinement
 [found? find/match [1 2] 1]
 [none? find/match [1 2] 2]
+[
+	; /same test
+	blk: []
+	any [
+		error? try [find/same [[]] blk]
+		3 == index? find/same reduce [1 [] blk 2] blk
+	]
+]
 ;-------------------------------------------------------------------------------
 ; functions/series/indexq.r
 [1 == index? []]
