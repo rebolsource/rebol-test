@@ -13902,9 +13902,18 @@
 [
 	; /same test
 	blk: []
+	3 == index? find/same reduce [1 [] blk 2] blk
+]
+[
+	; find/same hash test
+	a: make hash! []
+	b: make block! []
+	c: make block! []
+	append/only a b
+	append/only a c
 	any [
-		error? try [find/same [[]] blk]
-		3 == index? find/same reduce [1 [] blk 2] blk
+		error? try [find/same a c]
+		same? c first find/same a c
 	]
 ]
 ;-------------------------------------------------------------------------------
