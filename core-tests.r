@@ -148,6 +148,22 @@
 [bitset! = type? make bitset! "a"]
 ; minimum, literal representation
 [bitset? #[bitset! #{}]]
+[bitset? make bitset! 8]
+[bitset? make bitset! #{cafe}]
+[bitset? make bitset! #"c"]
+[bitset? make bitset! "abcd"]
+[bitset? make bitset! []]
+[bitset? make bitset! [#"c"]]
+[bitset? make bitset! ["abcd"]]
+[bitset? make bitset! [#"a" - #"z"]]
+[bitset? make bitset! [#"a" #"b" - #"v" "wxyz"]]
+[8 = length? make bitset! 8]
+[16 = length? make bitset! #{cafe}]
+[256 = length? make bitset! #"a"]
+[256 = length? make bitset! "abcd"]
+[256 = length? make bitset! []]
+; bitset sizes need to be multiples of 8
+[error? try [make bitset! 10]]
 ; TS crash
 [bitset? charset reduce [to-char "^(A0)"]]
 ;-------------------------------------------------------------------------------
@@ -972,6 +988,85 @@
 	]
 	"round to nearest, ties to even" = rounding-mode
 ]
+[
+  decimal-equal?: func [
+    a [decimal!]
+    b [decimal!]
+    /local a-f64 b-f64
+  ][
+    a-f64: make struct! [val [decimal!]] none
+    b-f64: make struct! [val [decimal!]] none
+    a-f64/val: a
+    b-f64/val: b
+    strict-equal? third a-f64
+                  third b-f64
+  ]
+  true
+]
+[
+  "it should include .0 for decimal values xxxx.0 "
+  strict-equal? "1.0" mold-decimal 1.0
+]
+[
+  "it should handle  0.0"
+  decimal-equal? 0.0 load mold-decimal 0.0
+]
+[
+  "it should handle max positive value"
+  decimal-equal? 1.7976931348623157E308 load mold-decimal 1.7976931348623157E308
+]
+[
+  "it should handle min positive value"
+  decimal-equal? 1.4E-45 load mold-decimal 1.4E-45
+]
+[
+  "it should handle largest negative exact integer"
+  decimal-equal? -9007199254740992 load mold-decimal -9007199254740992
+]
+[
+  "it should handle largest postive exact integer"
+  decimal-equal? 9007199254740992 load mold-decimal 9007199254740992
+]
+[
+  "it should handle an integer that is rounded to a multiple of two"
+  decimal-equal? 18014398509481983 load mold-decimal 18014398509481983
+]
+[
+  "it should handle an integer that is rounded to a multiple of four"
+  decimal-equal? 36028797018963966 load mold-decimal 36028797018963966
+]
+[
+  "it should handle 'min normal' value"
+  decimal-equal? 2.2250738585072014E-308 load mold-decimal 2.2250738585072014E-308
+]
+[
+  "it should handle 'absolute' minimum value"
+  decimal-equal? 4.9e-324 load mold-decimal 4.9e-324
+]
+[
+  "it should handle negative 'min normal' value"
+  decimal-equal? -2.2250738585072014E-308 load mold-decimal -2.2250738585072014E-308
+]
+[
+  "it should handle negative 'absolute' minimum value"
+  decimal-equal? -4.9e-324 load mold-decimal -4.9e-324
+]
+[
+  "it should handle a typical number calculated by NLPP"
+  decimal-equal? 434.95784858162699 load mold-decimal 434.95784858162699
+]
+[
+  "it should handle a typical number calculated by NLPP"
+  decimal-equal? -446.80000000000001 load mold-decimal -446.80000000000001
+]
+[
+  "it should handle a typical number calculated by NLPP"
+  decimal-equal? 3523.8832070417998 load mold-decimal 3523.8832070417998
+]
+[
+  "it should handle a typical number calculated by NLPP"
+  decimal-equal? 5874.8000000000002 load mold-decimal 5874.8000000000002
+]
 ;-------------------------------------------------------------------------------
 ; datatypes/email.r
 [email? me@here.com]
@@ -1731,19 +1826,19 @@
 [gf: func [:x] [:x] (first [(10 + 20)]) == gf (10 + 20)]
 [gf: func [:x] [:x] o: context [f: 10] (first [:o/f]) == gf :o/f]
 ; Argument passing of "literal arguments" ("lit-args")
-[lf: func ['x] [:x] 10 == lf 10]
-[lf: func ['x] [:x] 'a == lf a]
-[lf: func ['x] [:x] (first ['a]) == lf 'a]
-[lf: func ['x] [:x] a: 10 10 == lf :a]
-[lf: func ['x] [:x] (first [a:]) == lf a:]
+[laf: func ['x] [:x] 10 == laf 10]
+[laf: func ['x] [:x] 'a == laf a]
+[laf: func ['x] [:x] (first ['a]) == laf 'a]
+[laf: func ['x] [:x] a: 10 10 == laf :a]
+[laf: func ['x] [:x] (first [a:]) == laf a:]
 #r3only
-[lf: func ['x] [:x] 30 == lf (10 + 20)]
+[laf: func ['x] [:x] 30 == laf (10 + 20)]
 #r3only
-[lf: func ['x] [:x] o: context [f: 10] 10 == lf :o/f]
+[laf: func ['x] [:x] o: context [f: 10] 10 == laf :o/f]
 #r2only
-[lf: func ['x] [:x] (first [(10 + 20)]) == lf (10 + 20)]
+[laf: func ['x] [:x] (first [(10 + 20)]) == laf (10 + 20)]
 #r2only
-[lf: func ['x] [:x] (first [:o/f]) == lf :o/f]
+[laf: func ['x] [:x] (first [:o/f]) == laf :o/f]
 ; basic test for recursive function invocation
 [i: 0 countdown: func [n] [if n > 0 [++ i countdown n - 1]] countdown 10 i = 10]
 ; a function-local word that escapes the function's extent still works
@@ -4272,6 +4367,14 @@
 	insert/only a-value a-value
 	b-value: copy []
 	insert/only b-value b-value
+	error? try [equal? a-value b-value]
+	true
+]
+[
+	a-value: copy/deep [[[]]]
+	insert/only a-value/1/1 a-value
+	b-value: copy/deep [[[]]]
+	insert/only b-value/1/1 b-value
 	error? try [equal? a-value b-value]
 	true
 ]
@@ -9832,6 +9935,21 @@
 	b == to binary! a
 ]
 ;-------------------------------------------------------------------------------
+; functions/convert/as-bitset.r
+#r2only
+[
+	x: copy #{00}
+	b: as-bitset x
+	append x #{FF}
+	b == make bitset! #{00FF}
+]
+[
+	x: copy #{00}
+	b: as-bitset x
+	insert b 0  ; Set bit at position 0
+	x == #{01}
+]
+;-------------------------------------------------------------------------------
 ; functions/convert/as-string.r
 #r2only
 [
@@ -9999,17 +10117,35 @@
 ; bug#799
 #r3only
 [equal? make typeset! [decimal!] difference make typeset! [decimal! integer!] make typeset! [integer!]]
+[equal? make bitset! #{00} difference make bitset! #{00} make bitset! #{00}]
+[equal? make bitset! #{ff} difference make bitset! #{00} make bitset! #{ff}]
+[equal? make bitset! #{ff} difference make bitset! #{ff} make bitset! #{00}]
+[equal? make bitset! #{00} difference make bitset! #{ff} make bitset! #{ff}]
+[equal? make bitset! #{ff} difference make bitset! #{f0} make bitset! #{0f}]
+[equal? make bitset! #{f0} difference make bitset! #{ff} make bitset! #{0f}]
 ;-------------------------------------------------------------------------------
 ; functions/dataset/exclude.r
 [empty? exclude [1 2] [2 1]]
 ; bug#799
 #r3only
 [equal? make typeset! [decimal!] exclude make typeset! [decimal! integer!] make typeset! [integer!]]
+[equal? make bitset! #{00} exclude make bitset! #{00} make bitset! #{00}]
+[equal? make bitset! #{00} exclude make bitset! #{00} make bitset! #{ff}]
+[equal? make bitset! #{ff} exclude make bitset! #{ff} make bitset! #{00}]
+[equal? make bitset! #{00} exclude make bitset! #{ff} make bitset! #{ff}]
+[equal? make bitset! #{f0} exclude make bitset! #{f0} make bitset! #{0f}]
+[equal? make bitset! #{f0} exclude make bitset! #{ff} make bitset! #{0f}]
 ;-------------------------------------------------------------------------------
 ; functions/dataset/union.r
 ; bug#799
 #r3only
 [equal? make typeset! [decimal! integer!] union make typeset! [decimal!] make typeset! [integer!]]
+[equal? make bitset! #{00} union make bitset! #{00} make bitset! #{00}]
+[equal? make bitset! #{ff} union make bitset! #{00} make bitset! #{ff}]
+[equal? make bitset! #{ff} union make bitset! #{ff} make bitset! #{00}]
+[equal? make bitset! #{ff} union make bitset! #{ff} make bitset! #{ff}]
+[equal? make bitset! #{ff} union make bitset! #{f0} make bitset! #{0f}]
+[equal? make bitset! #{ff} union make bitset! #{ff} make bitset! #{0f}]
 ;-------------------------------------------------------------------------------
 ; functions/file/clean-path.r
 ; bug#35
@@ -14245,6 +14381,15 @@
 ; bug#799
 #r3only
 [equal? make typeset! [integer!] intersect make typeset! [decimal! integer!] make typeset! [integer!]]
+[equal? make bitset! [] intersect make bitset! [#"a" - #"u"] make bitset! [#"v" - #"z"]]
+[equal? make bitset! [#"v"] intersect make bitset! [#"a" - #"v"] make bitset! [#"v" - #"z"]]
+[equal? make bitset! #{00} intersect make bitset! #{00} make bitset! #{00}]
+[equal? make bitset! #{00} intersect make bitset! #{00} make bitset! #{ff}]
+[equal? make bitset! #{00} intersect make bitset! #{ff} make bitset! #{00}]
+[equal? make bitset! #{ff} intersect make bitset! #{ff} make bitset! #{ff}]
+[equal? make bitset! #{00} intersect make bitset! #{f0} make bitset! #{0f}]
+[equal? make bitset! #{0f} intersect make bitset! #{ff} make bitset! #{0f}]
+[equal? make bitset! #{00ff00} intersect make bitset! #{11ff00} make bitset! #{00ff22}]
 ;-------------------------------------------------------------------------------
 ; functions/series/last.r
 ; bug#2
