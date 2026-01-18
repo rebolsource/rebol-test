@@ -2754,6 +2754,13 @@
 	o: bound? use [x] ['x]
 	2 == length? words-of append o [self: 1]
 ]
+[
+	; this code should not crash the interpreter
+	o: bound? use [a b] [a: 1 b: 2 'a]
+	p: make object! [c: 3 d: 4]
+	make p o
+	true
+]
 ;-------------------------------------------------------------------------------
 ; datatypes/op.r
 [op? get '+]
@@ -3251,6 +3258,9 @@
 		a == 1x2
 		a == [x 4]
 	]
+]
+[
+	error? try [now/precise:]
 ]
 ; bug#64
 [
