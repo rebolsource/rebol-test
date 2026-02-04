@@ -1008,7 +1008,15 @@
   strict-equal? "1.0" mold-decimal 1.0
 ]
 [
-  "it should handle  0.0"
+  "e-notation serialisation should omit the . unless digits follow it"
+  equal? "1e-45" mold-decimal 1E-45
+]
+[
+  "e-notation `e` should be lowercase"
+  strict-equal? "1e-45" mold-decimal 1E-45
+]
+[
+  "it should handle 0.0"
   decimal-equal? 0.0 load mold-decimal 0.0
 ]
 [
