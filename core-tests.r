@@ -6675,6 +6675,58 @@
 	same? bound? in o 'self bound? in o 'a
 ]
 ;-------------------------------------------------------------------------------
+; functions/context/get.r
+[
+	a-path: 'a/b
+	clear a-path
+	error? try [get a-path]
+]
+[
+	a-path: 'a/b
+	clear a-path
+	error? try [get/any a-path]
+]
+[
+	unset 'a
+	a-path: 'a/b
+	remove back tail a-path
+	error? try [get a-path]
+]
+[
+	unset 'a
+	a-path: 'a/b
+	remove back tail a-path
+	unset? get/any a-path
+]
+[
+	a: 1
+	a-path: 'a/b
+	remove back tail a-path
+	1 == get a-path
+]
+[
+	a: 1
+	a-path: 'a/b
+	remove back tail a-path
+	1 == get/any a-path
+]
+[
+	a: make object! [b: 1]
+	1 == get 'a/b
+]
+[
+	a: make object! [b: 1]
+	1 == get/any 'a/b
+]
+[
+	a: make object! [b: 1 unset 'b]
+	error? try [get 'a/b]
+]
+[
+	a: make object! [b: 1 unset 'b]
+	unset? get/any 'a/b
+]
+;-------------------------------------------------------------------------------
 ; functions/context/resolve.r
 ; bug#2017: crash in RESOLVE/extend/only
 #r3only
@@ -6700,6 +6752,60 @@
 [a: 1 b: none set [:b] [a] b =? 1]
 [unset 'a b: none all [error? try [set [:b] [a]] none? b]]
 [unset 'a b: none set/any [:b] [a] unset? get/any 'b]
+[
+	a-path: 'a/b
+	clear a-path
+	error? try [set a-path]
+]
+[
+	a-path: 'a/b
+	clear a-path
+	error? try [set/any a-path]
+]
+[
+	unset 'a
+	a-path: 'a/b
+	remove back tail a-path
+	set a-path 1
+	1 == a
+]
+[
+	unset 'a
+	a-path: 'a/b
+	remove back tail a-path
+	set/any a-path 1
+	1 == a
+]
+[
+	a-path: 'a/b
+	remove back tail a-path
+	error? try [set a-path #[unset!]]
+]
+[
+	a-path: 'a/b
+	remove back tail a-path
+	set/any a-path #[unset!]
+	unset? get/any 'a
+]
+[
+	a: make object! [b: 1]
+	set 'a/b 2
+	2 == get 'a/b
+]
+[
+	a: make object! [b: 1]
+	set/any 'a/b 2
+	2 == get/any 'a/b
+]
+[
+	a: make object! [b: 1]
+	error? try [set 'a/b #[unset!]]
+]
+[
+	a: make object! [b: 1]
+	set/any 'a/b #[unset!]
+	unset? get/any 'a/b
+]
 ;-------------------------------------------------------------------------------
 ; functions/context/unset.r
 [
